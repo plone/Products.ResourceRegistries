@@ -10,8 +10,6 @@ Things to do in the near future:
   - Change from dicts to classes to hold the registry information
   
   - Find a way to let Limi enforce pretty URLs for stylesheets instead of the magic numbered ones. 
-  
-  - Include stylesheets with different media property in the same concatenation, just separate them from the rest with the @media selector.
 
   - Write install instructions
   

@@ -122,6 +122,15 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ get the stylesheets for management screens """
         return tuple([item.copy() for item in self.stylesheets])
 
+    security.declarePrivate('getStylesheetsDict')
+    def getStylesheetsDict(self):
+        """ get the stylesheets as a disctionary insterad of an ordered list. Good for lookups. internal"""
+        stylesheets = self.getStylesheets()
+        d = {}
+        for s in stylesheets:
+            d[s['id']]=s
+        return d
+
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):
         """rendering methods for use in ZMI forms"""
@@ -151,7 +160,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         
     security.declarePrivate('compareStylesheets')            
     def compareStylesheets(self, sheet1, sheet2 ):
-        for attr in ('expression', 'media', 'rel', 'rendering'):
+        for attr in ('expression', 'rel', 'rendering'):
             if sheet1.get(attr) != sheet2.get(attr):
                 return 0
             if 'alternate' in sheet1.get('rel'):
@@ -243,6 +252,9 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ Return a stylesheet from the registry """
         ids = self.concatenatedstylesheets[item]
         output = ""
+        
+        sheets = self.getStylesheetsDict()
+        
         for id in ids:
             obj = getattr(self.aq_parent, id)
             if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
@@ -257,8 +269,12 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             else:
                 content = str(obj)
             
-            output += content
-            
+            m = sheets[id].get('media')
+            if not m:
+                output += content
+            else:
+                output += "@media %s {\n%s\n}\n"%(m, content)
+        
         return File(item, item, output, "text/css").__of__(self)
         
 InitializeClass(CSSRegistryTool)

@@ -94,6 +94,16 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.unregisterStylesheet('foo')
         self.assertEqual(len(self.tool.getStylesheets()), 0)
         
+    def testStylesheetsDict(self):
+        self.tool.registerStylesheet('spam')        
+        self.tool.registerStylesheet('ham')
+        keys = self.tool.getStylesheetsDict().keys()
+        keys.sort()
+        res = ['ham','spam']
+        res.sort()
+        self.assertEqual(res,keys)
+        self.assertEqual(self.tool.getStylesheetsDict()['ham']['id'], 'ham')
+        
 class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
@@ -164,9 +174,9 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testMoreComplexStylesheetsCollapsing(self ):        
         self.tool.registerStylesheet('ham')
-        self.tool.registerStylesheet('spam',           media='spam')
-        self.tool.registerStylesheet('spam spam',      media='spam')
-        self.tool.registerStylesheet('spam spam spam', media='spam')
+        self.tool.registerStylesheet('spam',           expression='string:spam')
+        self.tool.registerStylesheet('spam spam',      expression='string:spam')
+        self.tool.registerStylesheet('spam spam spam', expression='string:spam')
         self.tool.registerStylesheet('eggs')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)) , 3 )
         ids = [item.get('id') for item in self.tool.getEvaluatedStylesheets(self.folder)]
@@ -193,14 +203,14 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testCollapsingStylesheetsLookup(self):        
         self.tool.registerStylesheet('ham')
-        self.tool.registerStylesheet('spam',           media='spam')
-        self.tool.registerStylesheet('spam spam',      media='spam')
+        self.tool.registerStylesheet('spam',           expression='string:ham')
+        self.tool.registerStylesheet('spam spam',      expression='string:ham')
         evaluated = self.tool.getEvaluatedStylesheets(self.folder)
         self.assertEqual(len(evaluated), 2)
         
     def testRenderingIsInTheRightOrder(self):
-        self.tool.registerStylesheet('ham' , media='ham')
-        self.tool.registerStylesheet('spam', media='spam')
+        self.tool.registerStylesheet('ham' , expression='string:ham')
+        self.tool.registerStylesheet('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedStylesheets(self.folder)
         evaluatedids = [item['id'] for item in evaluated]
         self.failUnless(evaluatedids[1]=='spam')
@@ -209,14 +219,16 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         # can you tell we had good fun writing these tests ? 
         
     def testRenderingStylesheetLinks(self):        
-        self.tool.registerStylesheet('ham', rendering='link')
-        self.tool.registerStylesheet('ham 2 b merged', rendering='link')
-        self.tool.registerStylesheet('spam', media='print', rendering='link')
-        self.tool.registerStylesheet('simple.css', rendering='inline')
+        self.tool.registerStylesheet('ham',                 rendering='link')
+        self.tool.registerStylesheet('ham 2 b merged',      rendering='link')
+        self.tool.registerStylesheet('spam', expression='string:ham', rendering='link')
+        self.tool.registerStylesheet('simple.css',          rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
         self.failUnless('<link' in all)
         self.failUnless('/spam' in all)
+        self.failIf('/simple.css' in all)
+        
         
     def testReenderingConcatenatesInline(self):
         self.tool.registerStylesheet('simple.css',  rendering='inline')
@@ -224,6 +236,12 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)        
+
+    def testDifferentMediaAreCollapsed(self):
+        self.tool.registerStylesheet('simple.css',  media='print')
+        self.tool.registerStylesheet('simple2.css', media='all')
+        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)),1)
+
         
     def testRenderingWorksInMainTemplate(self):
 
@@ -263,6 +281,19 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in content)
         self.failUnless('blue' in content)
 
+    def testMediadescriptorsInConcatenatedStylesheets(self):
+        self.tool.registerStylesheet('simple2.css', media='print')
+        styles = self.tool.getEvaluatedStylesheets(self.portal)
+        self.assertEqual(len(styles), 1)
+        magicId = styles[0].get('id')
+        
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        
+        self.failUnless("@media print" in content)
+        self.failUnless("background-color : red" in content)
+        self.failUnless("H1 { color: blue; }" in content)
+
+
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -295,6 +326,7 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf("&lt;dtml-call" in o)            
         self.failIf("&amp;dtml-fontBaseSize;" in o)            
         self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)            
+        
         
                 
 

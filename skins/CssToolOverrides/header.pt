@@ -1,0 +1,125 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en"
+      lang="en"
+      i18n:domain="plone"
+      tal:define="Iterator python:modules['Products.CMFPlone'].IndexIterator;
+                  tabindex python:Iterator();">
+
+  <head metal:define-macro="html_header"
+        tal:define="ztu ztu|modules/ZTUtils;
+                    skinrequest python:request.get(here.portal_skins.getRequestVarname(), '');">
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"
+          tal:define="charset site_properties/default_charset|string:utf-8"
+          tal:attributes="content string:text/html;;charset=${charset}" />
+
+    <title tal:define="portal_title portal_properties/title;
+                       page_title python:here.getPageTitle(here, template, portal_title)" >
+        <span tal:replace="page_title" />
+        &mdash;
+        <span tal:replace="portal_title" />
+    </title>
+
+    <metal:baseslot define-slot="base" />
+
+    <meta name="generator" content="Plone - http://plone.org" />
+
+    <meta tal:define="metatags here/listMetaTags|nothing" 
+          tal:condition="metatags"
+          tal:repeat="keyval metatags"
+          tal:attributes="name python:keyval[0];
+                          content python:keyval[1];" />
+
+
+
+    <metal:css metal:use-macro="here/renderAllTheStylesheets/macros/cssrenderer">
+        <!-- Fetch  stylesheets from the CSS tool-- >
+
+    </metal:css>
+    
+
+    <!-- Internet Explorer CSS Fixes -->
+    <tal:iefixstart replace="structure string:&lt;!--[if IE]&gt;" />
+    <style type="text/css" media="all" tal:condition="exists: portal/ploneIEFixes.css"
+           tal:content="string:@import url($portal_url/ploneIEFixes.css);">
+    </style>
+    <tal:iefixend replace="structure string:&lt;![endif]--&gt;" />
+
+
+    <link rel="shortcut icon" href="" type="image/x-icon" tal:attributes="href string:$portal_url/favicon.ico" />
+
+    <link rel="search" href="" title="Search this site" tal:attributes="href string:$portal_url/search_form" />
+
+    <tal:fixme tal:replace="nothing">
+      <link rel="help" href="" title="Help" tal:attributes="href string:$portal_url/help" />
+      <link rel="contents" href="" title="Site Map" tal:attributes="href string:$portal_url/sitemap" />
+    <link rel="copyright" href="" title="Copyright information" tal:attributes="href string:copyright" />
+    <link rel="author" href="" title="Author information" tal:attributes="href string:author" />
+    </tal:fixme>
+
+    <link rel="up" href="" title="Up one level"
+          tal:define="parent python:here.navigationParent(here, template_id)"
+          tal:condition="parent"
+          tal:attributes="href parent" />
+
+    <metal:block metal:define-slot="rel_slot" tal:replace="nothing">
+      Inserts rel links specified from a page.
+    </metal:block>
+
+    <!-- Disable IE6 image toolbar -->
+    <meta http-equiv="imagetoolbar" content="no" />
+
+    <metal:block metal:define-slot="css_slot" tal:replace="nothing">
+      Inserts CSS specified from a page.
+    </metal:block>
+
+    <metal:block metal:define-slot="head_slot" tal:replace="nothing">
+      Flexibility for published templates to inject stuff into the head tag.
+    </metal:block>
+
+    <metal:block metal:define-slot="javascript_head_slot" tal:replace="nothing">
+      Inserts javascript specified from a page.
+    </metal:block>
+
+    <!-- Common Plone ECMAScripts -->
+
+    <!-- Pull-down ECMAScript menu, only active if logged in -->
+    <script tal:condition="not: isAnon"
+            type="text/javascript"
+            tal:attributes="src string:$portal_url/plone_menu.js">
+    </script>
+
+    <!-- Define dynamic server-side variables for javascripts in this one  -->
+    <script type="text/javascript"
+            tal:attributes="src string:$portal_url/plone_javascript_variables.js">
+    </script>
+
+    <script type="text/javascript"
+            tal:attributes="src string:$portal_url/plone_javascripts.js">
+    </script>
+
+    <tal:block tal:define="showdefault python:test(portal.portal_memberdata.getProperty('formtooltips'), 'true', 0);
+                           formtooltips python:member.getProperty('formtooltips', showdefault)"
+               tal:omit-tag="">
+
+      <!-- Old JS from Plone 1.0, remove tal:condition="nothing" if you need to use the old pop-ups.
+           Will be removed in Plone 2.1 -->
+      <tal:oldjs tal:condition="nothing">
+        <script type="text/javascript"
+                tal:condition="formtooltips"
+                tal:attributes="src string:$portal_url/plone_formtooltip.js">
+        </script>
+
+        <tal:block tal:condition="not:formtooltips">
+          <tal:block tal:replace="structure string:&lt;script language='javascript' type='text/javascript' &gt;" />
+          <metal:block >function formtooltip(el,flag){}</metal:block>
+          <tal:block tal:replace="structure python:'&lt;/script&gt;'" />
+        </tal:block>
+      </tal:oldjs>
+
+    </tal:block>
+  </head>
+
+  <body>
+  </body>
+
+</html>

@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en">
+    <metal:allcss define-macro="cssrenderer" >
+        <tal:fetcher define="stylesheets python:here.portal_css.getEvaluatedStylesheets(here);
+                             global portal_url here/portal_url;">
+            <tal:renderer tal:repeat="stylesheet stylesheets">
+                <link tal:condition="python: not (path('stylesheet/cssimport') or path('stylesheet/inline'))"
+                    tal:attributes="src string:${portal_url}/portal_css/${stylesheet/id};
+                                    media python:path('stylesheet/media|nothing') or nothing;
+                                    rel stylesheet/rel;
+                                    ">
+                <tal:import condition="stylesheet/cssimport">
+                    <style type="text/css" 
+                        tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"
+                        tal:content="structure string:<!-- @import url(${portal_url}/portal_css/${stylesheet/id};); -->">
+                    </style>
+                </tal:import> 
+                <tal:inline condition="stylesheet/inline">
+                    <style type="text/css" 
+                        tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"
+                        tal:define="stylestring python:str(here.portal_css[stylesheet.get('id')])"
+                        tal:content="structure string:<!--  ${stylestring}  -->">
+                    </style>
+                </tal:inline>
+            </tal:renderer>    
+        </tal:fetcher>
+    </metal:allcss>
+      
+</html>

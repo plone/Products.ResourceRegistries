@@ -47,14 +47,14 @@ class TestJSSkin(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('CSSRegistry' in skins) 
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'simple.css' ))
+        self.failUnless(getattr(self.portal, 'renderAllTheScripts' ))
                                            
 
 class testJSZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-                             
+        self.tool.scripts = []    
                 
     def testAdd(self):
         self.tool.manage_addScript(id='joe')
@@ -66,6 +66,8 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.scripts = []    
+
 
     def testStoringScript(self):
         self.tool.registerScript('foo')
@@ -96,6 +98,7 @@ class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.scripts = []    
 
     def testRegistrationSecurity(self):
         from AccessControl import Unauthorized
@@ -113,6 +116,7 @@ class TestJSToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.scripts = []    
 
     def testSimplestExpression(self):
         context = self.portal
@@ -133,6 +137,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.scripts = []    
         
     def testScriptCooking(self):
         self.tool.registerScript('ham')
@@ -234,6 +239,7 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.scripts = []    
         self.tool.registerScript('simple.css')
 
     def testGetItemTraversal(self):
@@ -256,8 +262,33 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in content)
         self.failUnless('blue' in content)
 
+class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+    
+    def testDefaultsInstall(self):
+        scriptids = [item['id'] for item in self.tool.getScripts()]
+        self.failUnless('plone_menu.js' in scriptids)
+        self.failUnless('plone_javascript_variables.js' in scriptids)
+        self.failUnless('plone_javascripts.js' in scriptids)
 
+    def testTraverseToConcatenatedDefaults(self):
+        scripts = self.tool.getEvaluatedScripts(self.portal)
+        for s in scripts:
+            try:
+                magicId = s.get('id')
+                self.portal.restrictedTraverse('portal_javascripts/%s' % magicId)
+            except KeyError:
+                self.fail()
+
+    def testUserConditionOnMenuScript(self):
+        scripts1 = self.tool.getEvaluatedScripts(self.portal)
+        self.logout()
+        scripts2 = self.tool.getEvaluatedScripts(self.portal)
+        self.failUnless(len(scripts1) > len(scripts2))
+                
+                
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -270,6 +301,7 @@ def test_suite():
     suite.addTest(makeSuite(TestJSToolExpression))
     suite.addTest(makeSuite(TestJSScriptCooking))
     suite.addTest(makeSuite(TestJSTraversal))
+    suite.addTest(makeSuite(TestJSDefaults))
     return suite
 
 if __name__ == '__main__':

@@ -1,6 +1,24 @@
 from StringIO import StringIO
 from Products.Archetypes.Extensions.utils import install_subskin
 from Products.CSSRegistry.config import *
+from Products.CMFCore.utils import getToolByName
+
+
+def installPloneDeafultCSS(self, out):
+    pass
+    
+def installPloneDefaultJS(self, out):
+    """ Install all the jaascripts plne comes with normally"""
+    jstool = getToolByName(self, JSTOOLNAME)    
+    jstool.registerScript('plone_menu.js', expression='not:portal/portal_membership/isAnonymousUser')
+    print >> out, 'installed the menu-javascript'
+    
+    jstool.registerScript('plone_javascript_variables.js')
+    print >> out, 'installed the javascript variables'
+    
+    jstool.registerScript('plone_javascripts.js')
+    print >> out, 'installed the global plone javascripts'
+
 
 def install(self):
     out = StringIO()
@@ -23,4 +41,9 @@ def install(self):
     else:
         print >> out, 'JSRegistry already exists.'
 
+    installPloneDefaultJS(self, out)
+
     return out.getvalue()
+
+
+    

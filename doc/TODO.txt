@@ -7,8 +7,6 @@ Things to do in the near future:
 
   - Change from dicts to classes to hold the registry information
   
-  - Give stylesheets a 'rendering' attribute (with a vocabulary in the zmi) to choose the way they should be rendered. THe current way, with several boolean attributes, is backwards and wrong.
-
   - Find a way to let Limi enforce pretty URLs for stylesheets instead of the magic numbered ones. 
   
   - Include stylesheets with different media property in the same concatenation, just separate them from the rest with the @media selector.

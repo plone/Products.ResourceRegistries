@@ -78,15 +78,15 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ sdf """
         
         raise NotImplemented
-        #return tuple([item.copy() for item in self.stylesheets])
+        #return tuple([item.copy() for item in self.scripts])
         
     security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
     def unregisterScript(self, id ):
-        """ unreginster a registered stylesheet """
+        """ unreginster a registered script """
         
         raise NotImplemented
-        #stylesheets = [ item for item in self.getStylesheets() if item.get('id') != id ]
-        #self.stylesheets = tuple(stylesheets)
+        #scripts = [ item for item in self.getStylesheets() if item.get('id') != id ]
+        #self.scripts = tuple(scripts)
         #self.cookStylesheets()
         
     
@@ -106,40 +106,40 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                             
     def cookScripts(self ):
         raise NotImplemented
-        #stylesheets = self.getStylesheets()
-        #self.concatenatedstylesheets = {}
-        #self.cookedstylesheets = ()
+        #scripts = self.getStylesheets()
+        #self.concatenatedscripts = {}
+        #self.cookedscripts = ()
         #results = []
-        #for stylesheet in stylesheets:
-        #    #self.concatenatedstylesheets[stylesheet['id']] = [stylesheet['id']]
+        #for script in scripts:
+        #    #self.concatenatedscripts[script['id']] = [script['id']]
         #    if results:
         #        previtem = results[-1]
-        #        if self.compareStylesheets(stylesheet, previtem):
+        #        if self.compareStylesheets(script, previtem):
         #            previd = previtem.get('id')
         #
-        #            if self.concatenatedstylesheets.has_key(previd):
-        #                self.concatenatedstylesheets[previd].append(stylesheet.get('id'))
+        #            if self.concatenatedscripts.has_key(previd):
+        #                self.concatenatedscripts[previd].append(script.get('id'))
         #            else:
         #                magicId = self.generateId()
-        #                self.concatenatedstylesheets[magicId] = [previd, stylesheet.get('id')]
+        #                self.concatenatedscripts[magicId] = [previd, script.get('id')]
         #                previtem['id'] = magicId
         #        else:
-        #            results.append(stylesheet)    
+        #            results.append(script)    
         #    else:
-        #        results.append(stylesheet)
-        ##for entry in self.concatenatedstylesheets.:
+        #        results.append(script)
+        ##for entry in self.concatenatedscripts.:
         #    
         #    
-        #stylesheets = self.getStylesheets()
-        #for stylesheet in stylesheets:
-        #    self.concatenatedstylesheets[stylesheet['id']] = [stylesheet['id']]
-        #self.cookedstylesheets = tuple(results)
+        #scripts = self.getStylesheets()
+        #for script in scripts:
+        #    self.concatenatedscripts[script['id']] = [script['id']]
+        #self.cookedscripts = tuple(results)
         
         
     security.declareProtected(permissions.View, 'getEvaluatedScripts')        
     def getEvaluatedScripts(self, context ):
         raise NotImplemented
-        #results = self.cookedstylesheets
+        #results = self.cookedscripts
         ## filter results by expression
         #results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    
         #results.reverse()

@@ -35,7 +35,6 @@ CSSRegistry
 
     Geir Bækholt -- Plone Solutions AS  
     
-  at the Snowsprint 2005
 
 Netsight Internet Solutions 
 

@@ -1,5 +1,39 @@
 <div tal:replace="structure here/manage_page_header"/>
     
+<script type="text/javascript">
+function moveDown(node){
+    fieldset = node.parentNode.parentNode
+    nextBlock = fieldset.nextSibling
+    if (nextBlock){
+    shiftBlocks( nextBlock, fieldset)
+    }
+}
+
+function moveUp(node){
+    fieldset = node.parentNode.parentNode
+    previousBlock = fieldset.previousSibling
+    if (previousBlock){
+    shiftBlocks(fieldset, previousBlock)
+    }
+}
+
+function shiftBlocks(fieldset, previousBlock){
+    while (previousBlock.nodeType == 3){
+         previousBlock = previousBlock.previousSibling
+        }
+    while (fieldset.nodeType == 3){
+         fieldset = fieldset.nextSibling
+        }
+    x = fieldset.firstChild.value
+    y = previousBlock.firstChild.value
+    fieldset.firstChild.value = y
+    previousBlock.firstChild.value= x
+    fieldset.parentNode.insertBefore(fieldset, previousBlock )
+    
+}
+</script>    
+    
+    
     <style type="text/css">
     label{ width : 9em;
             text-align : right;

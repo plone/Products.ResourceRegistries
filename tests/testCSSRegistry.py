@@ -55,7 +55,7 @@ class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-        self.tool.stylesheets = []
+        self.tool.clearStylesheets()
                 
     def testAdd(self):
         self.tool.manage_addStylesheet(id='joe')
@@ -67,7 +67,7 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-        self.tool.stylesheets = []
+        self.tool.clearStylesheets()
 
     def testStoringStylesheet(self):
         self.tool.registerStylesheet('foo')
@@ -108,7 +108,7 @@ class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-        self.tool.stylesheets = []
+        self.tool.clearStylesheets()
 
     def testRegistrationSecurity(self):
         from AccessControl import Unauthorized
@@ -126,7 +126,7 @@ class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-        self.tool.stylesheets = []
+        self.tool.clearStylesheets()
 
     def testSimplestExpression(self):
         context = self.portal
@@ -147,7 +147,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-        self.tool.stylesheets = []
+        self.tool.clearStylesheets()
         
     def testStylesheetCooking(self):
         self.tool.registerStylesheet('ham')
@@ -258,7 +258,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-        self.tool.stylesheets = []
+        self.tool.clearStylesheets()
         self.tool.registerStylesheet('simple.css')
 
     def testGetItemTraversal(self):

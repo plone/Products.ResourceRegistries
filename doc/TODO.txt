@@ -1,3 +1,27 @@
-PloneControlPanel interface
-ordering of stylesheets
-factor out JS into its own tool
+
+Things to do in the near future: 
+
+  - Make the zmi forms align a bit nicer. Have descriptions for the form elements there.
+
+  - Stylesheet and script ordering in the ZMI panels
+
+  - Change from dicts to classes to hold the registry information
+  
+  - Give stylesheets a 'rendering' attribute (with a vocabulary in the zmi) to choose the way they should be rendered. THe current way, with several boolean attributes, is backwards and wrong.
+
+  - Find a way to let Limi enforce pretty URLs for stylesheets instead of the magic numbered ones. 
+  
+  - Include stylesheets with different media property in the same concatenation, just separate them from the rest with the @media selector.
+
+  - Write install instructions
+  
+  
+
+Thoughts for the future that are not explicitly plannned for: 
+
+  - Parsing of css into selector-level css-objects?
+  
+  - Controlling http cache headers from the tool 
+
+  - PloneControlPanel interface?
+

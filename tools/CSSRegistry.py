@@ -243,12 +243,19 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         output = ""
         for id in ids:
             obj = getattr(self.aq_parent, id)
-            if hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
+            if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
+                content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
+            
+            # we should add more explicit type-matching checks.    
+            
+            elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                 content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
+            elif callable(obj):
+                content = obj(self.REQUEST, self.REQUEST.RESPONSE)
             else:
                 content = str(obj)
             
-            output += content # This needs to be fixed to render the object first
+            output += content
             
         return File(item, item, output, "text/css").__of__(self)
         

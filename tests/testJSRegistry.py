@@ -288,6 +288,19 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         scripts2 = self.tool.getEvaluatedScripts(self.portal)
         self.failUnless(len(scripts1) > len(scripts2))
                 
+    def testCallingOfConcatenatedScripts(self):     
+        stylesheets = self.tool.getEvaluatedScripts(self.portal)
+        for s in stylesheets:
+            if 'ploneScripts' in s.get('id'):
+                output = self.portal.restrictedTraverse('portal_javascripts/%s' % s.get('id'))
+                break
+        if not output:
+            self.fail()
+        o = str(output)[:]
+        self.failIf("&lt;dtml-call" in o)            
+        self.failIf("&amp;dtml" in o)            
+        self.failUnless('portal_url' in o)            
+        
                 
 def test_suite():
     from unittest import TestSuite, makeSuite

@@ -288,13 +288,12 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
             if 'ploneStyles' in s.get('id'):
                 output = self.portal.restrictedTraverse('portal_css/%s' % s.get('id'))
                 break
-        print output
         if not output:
             self.fail()
-            
-        self.failIf("&lt;dtml-call" in output)            
-        self.failIf("&amp;dtml-fontBaseSize;" in output)            
-        self.failUnless('** Plone style sheet for CSS2-capable browsers.' in output)            
+        o = str(output)[:]
+        self.failIf("&lt;dtml-call" in o)            
+        self.failIf("&amp;dtml-fontBaseSize;" in o)            
+        self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)            
         
                 
 

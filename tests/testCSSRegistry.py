@@ -38,7 +38,8 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
         tool = getattr(self.portal, TOOLNAME)
         self.setRoles(['Manager'])
         self.failUnless(tool.manage_cssForm())
-        
+        self.failUnless(tool.manage_cssComposition())
+        #print tool.manage_cssComposition()
 
 class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -218,7 +219,15 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(evaluatedids[1]=='spam')
         self.failUnless(evaluatedids[0]=='ham')
         
-        # can you tell we had good fun writing these tests ? 
+    def testConcatenatedSheetsAreInTheRightOrderToo(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        evaluated = self.tool.getEvaluatedStylesheets(self.folder)
+        results = self.tool.concatenatedstylesheets[evaluated[0]['id']]
+        self.failUnless(results[2]=='ham')
+        self.failUnless(results[1]=='spam')
+        self.failUnless(results[0]=='eggs')
         
     def testRenderingStylesheetLinks(self):        
         self.tool.registerStylesheet('ham',                 rendering='link')

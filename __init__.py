@@ -1,7 +1,10 @@
 from Products.CMFCore.utils import ToolInit
 
-from Products.CSSRegistry.config import PROJECTNAME
+from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CSSRegistry.config import PROJECTNAME, SKINS_DIR, GLOBALS
 from Products.CSSRegistry import tools
+
+registerDirectory(SKINS_DIR, GLOBALS)
 
 def initialize(context):
 

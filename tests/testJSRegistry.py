@@ -13,6 +13,8 @@ from Products.CSSRegistry.config import JSTOOLNAME
 from Products.CSSRegistry.interfaces import IJSRegistry
 from Interface.Verify import verifyObject
 
+from Products.PloneTestCase.PloneTestCase import PLONE21        
+
 class TestJSImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -319,7 +321,13 @@ def test_suite():
     suite.addTest(makeSuite(TestJSToolExpression))
     suite.addTest(makeSuite(TestJSScriptCooking))
     suite.addTest(makeSuite(TestJSTraversal))
-    suite.addTest(makeSuite(TestJSDefaults))
+
+    if not PLONE21:
+        # we must not test for the defaults in Plone 2.1 because they are all different
+        # Plone2.1 has tests in CMFPlone/tests for defaults and migrations
+        suite.addTest(makeSuite(TestJSDefaults))
+
+
     return suite
 
 if __name__ == '__main__':

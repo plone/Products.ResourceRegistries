@@ -13,6 +13,8 @@ from Products.CSSRegistry.config import TOOLNAME
 from Products.CSSRegistry.interfaces import ICSSRegistry
 from Interface.Verify import verifyObject
 
+from Products.PloneTestCase.PloneTestCase import PLONE21
+
 
 class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -304,6 +306,7 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.clearStylesheets()
         self.failIf(self.tool.getStylesheets())
     
+
     def testDefaultsInstall(self):
         stylesheetids = [item['id'] for item in self.tool.getStylesheets()]
         self.failUnless('plone.css' in stylesheetids)
@@ -347,7 +350,12 @@ def test_suite():
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))
     suite.addTest(makeSuite(TestTraversal))
-    suite.addTest(makeSuite(TestCSSDefaults))
+    
+    if not PLONE21:
+        # we must not test for the defaults in Plone 2.1 because they are all different
+        # Plone2.1 has tests in CMFPlone/tests for defaults and migrations
+        suite.addTest(makeSuite(TestCSSDefaults))
+        
     return suite
 
 if __name__ == '__main__':

@@ -1,11 +1,31 @@
 <div tal:replace="structure here/manage_page_header"/>
+    
+<style type="text/css">
+    label{ width : 9em;
+            text-align : right;
+            float: left; 
+            padding : 0.2em 0.4em;
+        }
+    
+    fieldset div {
+        clear:both;
+        margin : 0.2em;
+    }
+
+    p.delete-button{
+        float: right;
+    }
+
+</style>    
+
 <div tal:replace="structure here/manage_tabs"/>
 
     <form action="manage_saveStylesheets" tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'" method="post">
 
       
       <fieldset tal:repeat="stylesheet here/getStylesheets">
-            <button tal:attributes="onclick string:window.location=' manage_removeStylesheet?id=${stylesheet/id}';;return false">Remove</button>
+            <p class="delete-button">
+            <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}'">** Remove this stylesheet **</a></p>
             
             <div>
                 <label>id</label>
@@ -35,7 +55,6 @@
                                             selected python:r == stylesheet.get('rendering')" 
                             tal:content="r">import</option>                    
                 </select>    
-                <p tal:content="python:stylesheet.get('rendering')"></p>         
             </div>
 
             <div>
@@ -98,8 +117,11 @@
                 <input type="checkbox" name="enabled:boolean" value="1">    
             </div>
 
+        <div>
+            <input type=submit i18n:attributes="value" value="Add" />
+        </div>
+
       </fieldset>
-        <input type=submit i18n:attributes="value" value="Add" />
     </form>
 
 

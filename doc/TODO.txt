@@ -3,7 +3,7 @@ Things to do in the near future:
 
   - Add support for IE-only-hack for stylesheets
 
-  - Make the zmi forms align a bit nicer. Have descriptions for the form elements there.
+  - Descriptions for the form elements in the ZMI. Some ZMI documentation
 
   - Stylesheet and script ordering in the ZMI panels
 

@@ -73,77 +73,69 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.cookScripts()
 
     
-    security.declareProtected(permissions.ManagePortal, 'getStylesheets')
+    security.declareProtected(permissions.ManagePortal, 'getScripts')
     def getScripts(self ):
-        """ sdf """
+        """ get the script data, uncooked. for management screens """
+        return tuple([item.copy() for item in self.scripts])
         
-        raise NotImplemented
-        #return tuple([item.copy() for item in self.scripts])
-        
-    security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
+    security.declareProtected(permissions.ManagePortal, 'unregisterScript')        
     def unregisterScript(self, id ):
         """ unreginster a registered script """
+        scripts = [ item for item in self.getScripts() if item.get('id') != id ]
+        self.scripts = tuple(scripts)
+        self.cookScripts()
         
-        raise NotImplemented
-        #scripts = [ item for item in self.getStylesheets() if item.get('id') != id ]
-        #self.scripts = tuple(scripts)
-        #self.cookStylesheets()
-        
-    
-    
-    def compareScripts(self, sheet1, sheet2 ):
-        
-        raise NotImplemented
-        #for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
-        #    if sheet1.get(attr) != sheet2.get(attr):
-        #        return 0
-        #return 1
+       
+    def compareScripts(self, s1, s2 ):
+        for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
+            if s1.get(attr) != s2.get(attr):
+                return 0
+        return 1
                             
     def generateId(self):
-        base = "ploneJavascripts"
+        base = "ploneScripts"
         appendix = ".js"
         return "%s%04d%s" % (base, random.randint(0, 9999), appendix)
                             
     def cookScripts(self ):
-        raise NotImplemented
-        #scripts = self.getStylesheets()
-        #self.concatenatedscripts = {}
-        #self.cookedscripts = ()
-        #results = []
-        #for script in scripts:
-        #    #self.concatenatedscripts[script['id']] = [script['id']]
-        #    if results:
-        #        previtem = results[-1]
-        #        if self.compareStylesheets(script, previtem):
-        #            previd = previtem.get('id')
-        #
-        #            if self.concatenatedscripts.has_key(previd):
-        #                self.concatenatedscripts[previd].append(script.get('id'))
-        #            else:
-        #                magicId = self.generateId()
-        #                self.concatenatedscripts[magicId] = [previd, script.get('id')]
-        #                previtem['id'] = magicId
-        #        else:
-        #            results.append(script)    
-        #    else:
-        #        results.append(script)
-        ##for entry in self.concatenatedscripts.:
-        #    
-        #    
-        #scripts = self.getStylesheets()
-        #for script in scripts:
-        #    self.concatenatedscripts[script['id']] = [script['id']]
-        #self.cookedscripts = tuple(results)
+
+        scripts = self.getScripts()
+        self.concatenatedscripts = {}
+        self.cookedscripts = ()
+        results = []
+        for script in scripts:
+            #self.concatenatedscripts[script['id']] = [script['id']]
+            if results:
+                previtem = results[-1]
+                if self.compareScripts(script, previtem):
+                    previd = previtem.get('id')
+        
+                    if self.concatenatedscripts.has_key(previd):
+                        self.concatenatedscripts[previd].append(script.get('id'))
+                    else:
+                        magicId = self.generateId()
+                        self.concatenatedscripts[magicId] = [previd, script.get('id')]
+                        previtem['id'] = magicId
+                else:
+                    results.append(script)    
+            else:
+                results.append(script)
+        #for entry in self.concatenatedscripts.:
+            
+            
+        scripts = self.getScripts()
+        for script in scripts:
+            self.concatenatedscripts[script['id']] = [script['id']]
+        self.cookedscripts = tuple(results)
         
         
     security.declareProtected(permissions.View, 'getEvaluatedScripts')        
     def getEvaluatedScripts(self, context ):
-        raise NotImplemented
-        #results = self.cookedscripts
-        ## filter results by expression
-        #results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    
-        #results.reverse()
-        #return results
+        results = self.cookedscripts
+        # filter results by expression
+        results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    
+        results.reverse()
+        return results
          
     security.declarePrivate('evaluateExpression')
     def evaluateExpression(self, expression, context):

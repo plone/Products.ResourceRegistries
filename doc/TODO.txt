@@ -15,6 +15,7 @@ Things to do in the near future:
 
   - Write install instructions
   
+  - Force Limi to add better icons
   
 
 Thoughts for the future that are not explicitly plannned for: 

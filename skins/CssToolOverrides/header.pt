@@ -23,7 +23,7 @@
 
     <meta name="generator" content="Plone - http://plone.org" />
 
-    <meta tal:define="metatags here/listMetaTags|nothing" 
+    <meta tal:define="metatags here/listMetaTags|nothing"
           tal:condition="metatags"
           tal:repeat="keyval metatags"
           tal:attributes="name python:keyval[0];
@@ -32,10 +32,9 @@
 
 
     <metal:css metal:use-macro="here/renderAllTheStylesheets/macros/cssrenderer">
-        <!-- Fetch  stylesheets from the CSS tool-- >
-
+        <!-- Fetch  stylesheets from the CSS tool -->
     </metal:css>
-    
+
 
     <!-- Internet Explorer CSS Fixes -->
     <tal:iefixstart replace="structure string:&lt;!--[if IE]&gt;" />

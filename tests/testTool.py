@@ -20,7 +20,7 @@ class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, TOOLNAME)
-	self.failUnless(ICSSRegistry.isImplementedBy(tool))
+        self.failUnless(ICSSRegistry.isImplementedBy(tool))
         self.failUnless(verifyObject(ICSSRegistry, tool))
 
 class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -30,6 +30,11 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testToolExists(self):
         self.failUnless(TOOLNAME in self.portal.objectIds())
+        
+    def testZMIForm(self):
+        tool = getattr(self.portal, TOOLNAME)
+        self.setRoles(['Manager'])
+        self.failUnless(tool.manage_cssForm())
 
 class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 

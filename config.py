@@ -1,7 +1,10 @@
 PROJECTNAME = 'CSSRegistry'
 
 TOOLNAME = 'portal_css'
-TOOLTYPE = 'Stylesheeets and scripts Tool'
+TOOLTYPE = 'Stylesheeets Tool'
+
+JSTOOLNAME = 'portal_javascripts'
+JSTOOLTYPE = 'Scripts tool'
 
 SKINS_DIR = 'skins'
 

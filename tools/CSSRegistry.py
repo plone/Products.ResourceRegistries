@@ -7,6 +7,8 @@ from OFS.PropertyManager import PropertyManager
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
 from Acquisition import aq_base, aq_parent 
 
 from Products.CSSRegistry import config
@@ -30,16 +32,25 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
     security = ClassSecurityInfo()
 
-    #__implements__ = (ActionProviderBase.__implements__,)
     __implements__ = (SimpleItem.__implements__, ICSSRegistry,)
+    
+    # ZMI stuff
+    manage_cssForm = PageTemplateFile('www/cssconfig', config.GLOBALS)
+    
+    manage_options=(
+        ({ 'label'  : 'CSS Registry',
+           'action' : 'manage_cssForm',
+           },
+         ) + SimpleItem.manage_options
+        )    
+        
 
     def __init__(self ):
         """ add the storages """
         self.stylesheets = ()
         self.cookedstylesheets = ()
         self.concatenatedstylesheets = {}
-        self.scripts = ()
-        self.cookedscripts = ()
+
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet', cssimport=0, inline=0, enabled=1 ):
@@ -53,6 +64,19 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         stylesheet['inline'] = inline
         stylesheet['enabled'] = enabled
         self.storeStylesheet(stylesheet )
+
+    security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
+    def unregisterStylesheet(self, sheetid):
+        """unregister a registered stylesheet"""
+        stylesheets = [ item for item in self.getStylesheets() if item.get('id') != sheetid ]
+        self.stylesheets = tuple(stylesheets)
+        self.cookStylesheets()
+
+    security.declareProtected(permissions.ManagePortal, 'manage_saveStylesheets')
+    def manage_saveStylesheets(self, data):
+        print data
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', contenttype='text/javascript', inline=0, enabled=1):
@@ -99,19 +123,11 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             scripts.insert(0, script )
         self.scripts = tuple(scripts)
         self.cookScripts()
-
     
     security.declareProtected(permissions.ManagePortal, 'getStylesheets')
     def getStylesheets(self ):
-        """ sdf """
+        """ get the stylesheets for management screens """
         return tuple([item.copy() for item in self.stylesheets])
-        
-    security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
-    def unregisterStylesheet(self, id ):
-        """ unreginster a registered stylesheet """
-        stylesheets = [ item for item in self.getStylesheets() if item.get('id') != id ]
-        self.stylesheets = tuple(stylesheets)
-        self.cookStylesheets()
         
     
     def compareStylesheets(self, sheet1, sheet2 ):
@@ -158,7 +174,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         
     security.declareProtected(permissions.View, 'getEvaluatedStyleheets')        
     def getEvaluatedStylesheets(self, context ):
-        
+        """ get all the stylesheet references we are going to need for making proper templates """
         results = self.cookedstylesheets
         # filter results by expression
         results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    

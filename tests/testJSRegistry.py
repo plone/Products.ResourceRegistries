@@ -75,7 +75,12 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('foo')
         
         self.assertEqual(len(self.tool.getScripts()), 1)
-        self.assertEqual(self.tool.getScripts()[0].get('id'), 'foo')
+        script = self.tool.getScripts()[0]
+        self.assertEqual(script.get('id'), 'foo')
+        self.assertEqual(script.get('contenttype'), 'text/javascript')
+        self.assertEqual(script.get('expression'), '')
+        self.assertEqual(script.get('inline'), False)
+        self.assertEqual(script.get('enabled'), True)
 
     def testDisallowingDuplicateIds(self):
         self.tool.registerScript('foo')

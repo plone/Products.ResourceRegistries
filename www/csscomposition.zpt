@@ -1,0 +1,31 @@
+<div tal:replace="structure here/manage_page_header"/>
+    
+    
+<style type="text/css">
+
+</style>    
+
+<div tal:replace="structure here/manage_tabs"/>
+
+
+
+   
+<ul tal:define="portal_url python:here.portal_url()">
+    <li tal:repeat="entry python:here.getEvaluatedStylesheets(here)">
+        <div>
+            <a href="" tal:attributes="href string:${portal_url}/portal_css/${entry/id}">
+                <b tal:content="entry/id">ploneCustom.css</b>
+            </a>
+        </div>
+        <ul tal:define="sheets here/concatenatedstylesheets">
+            <li tal:repeat="subentry python:sheets.get(entry['id'])">
+                <a href="" tal:attributes="href string:${portal_url}/portal_css/${subentry}"
+                            tal:content="subentry">
+                    plone.css
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+  
+<div tal:replace="structure here/manage_page_footer"/>

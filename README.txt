@@ -1,6 +1,33 @@
 CSSRegistry
 
-  A registry for linked Stylesheet files and Javascripts
+  A registry for linked Stylesheet files and Javascripts            
+  
+  As of now, the CSSRegistry must be configured through the ZMI. it can be found in the ZMI of your plonesite as '/portal_css/'                              
+  
+  Add links to stylesheets that exist in your skins paths, by ids;  like 'plone.css', 'ploneCustom.css' etc. 
+  
+  Linked stylesheets take some parameters:
+  
+    id -- the id mentioned above. the Zope id of the stylesheet to be used. 
+    
+    expression -- a CMF expression to be evaluated to check if the stylesheet should be included in output or not. 
+    
+    media -- the media for which the stylesheet should apply, normally empty or 'all'. other possible values are 'screen', 'print' etc. 
+    
+    rel -- link relation. defaults to 'stylesheet', and should almost always stay that way. For designating alternative stylesheets.
+    
+    cssimport -- if the stylesheet should be linked as a css-import instead of a link-tag. Only important to manpulate browser-incompatibilities. 
+    
+    inline -- render the stylesheet inline instead of linking it externally. Use sparingly. Costs bandwidth, but is very useful for style that vary for example on a per-folder-basis, like those famous header graphics bars. 
+  
+  
+  
+  If several stylesheets listed directly after each other in the registry have the same parameters and expression, they will be concatenated into a larger, composite, stylesheet on rendering. - This can be useful for splitting stylesheets into smaller components for overrideing, while preserving cacheability and minimising the number of http-requests to Plone. 
+  
+  
+  
+  
+  
 
   Created by:
   
@@ -22,3 +49,4 @@ Plone Solutions AS
 
   "info@plonesolutions.com":mailto:info@plonesolutions.com
   
+Most of this tool was written on the excellent SnowSprint 2005 - Organised by Telesis in the Austrian Alps. Thanks, Jodok :) 

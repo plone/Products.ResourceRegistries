@@ -274,30 +274,34 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             try:
                 obj = getattr(self.aq_parent, id)
             except AttributeError:
-                output += "/* could not find %s\n"%(id)
-            if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
-                content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
-            
-            # we should add more explicit type-matching checks.    
-            elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
-                content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
-            elif callable(obj):
-                content = obj(self.REQUEST, self.REQUEST.RESPONSE)
-            else:
-                content = str(obj)
-            
-            # add a note to the stylesheet
-            # makes for better understanding and debugging
-            output += "/* ----- start %s ----- */\n" % (id,)
-            
-            m = sheets[id].get('media')
-            if not m:
-                output += content
-            else:
-                output += "@media %s {\n%s\n}\n"%(m, content)
+                output += "\n/* XXX ERROR -- could not find '%s' XXX */\n"%(id)
+                content=""
+                obj = None
 
-            output += "/* ----- end %s ----- */\n" % (id,)
+            if obj is not None:
+                if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
+                    content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
+            
+                # we should add more explicit type-matching checks.    
+                elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
+                    content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
+                elif callable(obj):
+                    content = obj(self.REQUEST, self.REQUEST.RESPONSE)
+                else:
+                    content = str(obj)
+            
+            # add start/end notes to the stylesheet
+            # makes for better understanding and debugging
+            if content:
+                output += "/* ----- start %s ----- */\n" % (id,)
+                m = sheets[id].get('media')
+                if not m:
+                    output += content
+                else:
+                    output += "@media %s {\n%s\n}\n"%(m, content)
+
+                output += "/* ----- end %s ----- */\n" % (id,)
         
         return File(item, item, output, "text/css").__of__(self)
         
-InitializeClass(CSSRegistryTool)
+InitializeClass(CSSRegistryTool)    

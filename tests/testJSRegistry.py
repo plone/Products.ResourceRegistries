@@ -259,10 +259,17 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         scripts = self.tool.getEvaluatedScripts(self.portal)
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].get('id')
-        
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
         self.failUnless('background-color' in content)
         self.failUnless('blue' in content)
+
+    def testCompositesWithBrokedId(self):
+        self.tool.registerScript('nonexistant.css')
+        scripts = self.tool.getEvaluatedScripts(self.portal)
+        self.assertEqual(len(scripts), 1)
+        magicId = scripts[0].get('id')
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+        print content
 
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 

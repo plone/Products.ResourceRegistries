@@ -292,6 +292,15 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in content)
         self.failUnless('blue' in content)
 
+
+    def testCompositesWithBrokedId(self):
+        self.tool.registerStylesheet('nonexistant.css')
+        stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
+        self.assertEqual(len(stylesheets), 1)
+        magicId = stylesheets[0].get('id')
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        print content
+
     def testMediadescriptorsInConcatenatedStylesheets(self):
         self.tool.registerStylesheet('simple2.css', media='print')
         styles = self.tool.getEvaluatedStylesheets(self.portal)

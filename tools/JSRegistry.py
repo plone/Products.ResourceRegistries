@@ -90,9 +90,10 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     # ZMI METHODS
 
     security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
-    def manage_addScript(self, id, expression='', media='', rel='script', cssimport=False, inline=False, enabled=True, REQUEST=None):
+    def manage_addScript(self,id, expression='', contenttype='text/javascript', inline=False, enabled=True, REQUEST=None):
         """ register a script from a TTW request"""
-        self.registerScript(id, expression, media, rel, cssimport, inline, enabled)
+        self.registerScript(id, expression, contenttype, inline, enabled)
+                            
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 

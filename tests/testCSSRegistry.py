@@ -299,7 +299,6 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(stylesheets), 1)
         magicId = stylesheets[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        print content
 
     def testMediadescriptorsInConcatenatedStylesheets(self):
         self.tool.registerStylesheet('simple2.css', media='print')

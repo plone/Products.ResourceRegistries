@@ -242,16 +242,16 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.scripts = []    
-        self.tool.registerScript('simple.css')
+        self.tool.registerScript('plone_javascripts.js')
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['simple.css'])
+        self.failUnless(self.tool['plone_javascripts.js'])
         
     def testGetItemTraversalContent(self):
-        self.failUnless('background-color' in str(self.tool['simple.css']))
+        self.failUnless('registerPloneFunction' in str(self.tool['plone_javascripts.js']))
         
     def testRestrictedTraverseContent(self):
-        self.failUnless('background-color' in str(self.portal.restrictedTraverse('portal_javascripts/simple.css')))
+        self.failUnless('registerPloneFunction' in str(self.portal.restrictedTraverse('portal_javascripts/plone_javascripts.js')))
 
 
     def testRestricedTraverseComposition(self):
@@ -260,16 +260,15 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
-        self.failUnless('background-color' in content)
-        self.failUnless('blue' in content)
+        self.failUnless('plone_javascripts.js' in content)
+        self.failUnless('registerPloneFunction' in content)
 
     def testCompositesWithBrokedId(self):
-        self.tool.registerScript('nonexistant.css')
+        self.tool.registerScript('nonexistant.js')
         scripts = self.tool.getEvaluatedScripts(self.portal)
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
-        print content
 
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 

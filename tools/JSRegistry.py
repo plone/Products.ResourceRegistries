@@ -153,7 +153,16 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def getScripts(self):
         """ get the scripts for management screens """
         return tuple([item.copy() for item in self.scripts])     
-      
+     
+    security.declarePrivate('getScriptsDict')
+    def getScriptsDict(self):
+        """ get the scripts as a disctionary insterad of an ordered list. Good for lookups. internal"""
+        scripts = self.getScripts()
+        d = {}
+        for s in scripts:
+            d[s['id']]=s
+        return d
+ 
        
     def compareScripts(self, s1, s2 ):
         for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
@@ -242,23 +251,38 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def __getitem__(self, item):
         """ Return a script from the registry """
         ids = self.concatenatedscripts[item]
+        ids.reverse()
         output = ""
+        
+        scripts = self.getScriptsDict()
+        
         for id in ids:
-            obj = getattr(self.aq_parent, id)
-            if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
-                content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
+            try:
+                obj = getattr(self.aq_parent, id)
+            except AttributeError:
+                output += "\n/* XXX ERROR -- could not find '%s' XXX */\n"%(id)
+                content=""
+                obj = None
+
+            if obj is not None:
+                if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
+                    content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
             
-            # we should add more explicit type-matching checks.    
+                # we should add more explicit type-matching checks.    
+                elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
+                    content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
+                elif callable(obj):
+                    content = obj(self.REQUEST, self.REQUEST.RESPONSE)
+                else:
+                    content = str(obj)
             
-            elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
-                content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
-            elif callable(obj):
-                content = obj(self.REQUEST, self.REQUEST.RESPONSE)
-            else:
-                content = str(obj)
-            
-            output += content
-            
+            # add start/end notes to the stylesheet
+            # makes for better understanding and debugging
+            if content:
+                output += "/* ----- start %s ----- */\n" % (id,)
+                output += content
+                output += "/* ----- end %s ----- */\n" % (id,)
+        
         return File(item, item, output, "text/javascript").__of__(self)
         
 InitializeClass(JSRegistryTool)

@@ -152,6 +152,9 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
             if sheet1.get(attr) != sheet2.get(attr):
                 return 0
+            if 'alternate' in sheet1.get('rel'):
+                return 0
+                # this part needs a test
         return 1
 
     security.declarePrivate('generateId')            

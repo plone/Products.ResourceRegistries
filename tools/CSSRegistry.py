@@ -75,6 +75,13 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.stylesheets = tuple(stylesheets)
         self.cookStylesheets()
 
+
+    security.declarePrivate('clearStylesheets')
+    def clearStylesheets(self):
+        """ Clears all stylesheet data. convenience for Plone migrations"""
+        self.stylesheets = ()
+        self.cookedstylesheets = ()
+        self.concatenatedstylesheets = {}    
     
     ###############
     # ZMI METHODS

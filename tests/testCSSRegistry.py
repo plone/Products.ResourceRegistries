@@ -299,6 +299,11 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
     
+    def testClearingStylesheets(self):
+        self.failUnless(self.tool.getStylesheets())
+        self.tool.clearStylesheets()
+        self.failIf(self.tool.getStylesheets())
+    
     def testDefaultsInstall(self):
         stylesheetids = [item['id'] for item in self.tool.getStylesheets()]
         self.failUnless('plone.css' in stylesheetids)

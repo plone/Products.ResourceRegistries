@@ -93,6 +93,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
          updates the whole sequence. for editing and reordering
         """
         records = REQUEST.get('stylesheets')
+        records.sort()
         self.stylesheets = ()
         stylesheets = []
         for r in records:

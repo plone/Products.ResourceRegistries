@@ -1,5 +1,39 @@
 <div tal:replace="structure here/manage_page_header"/>
     
+    
+<script type="text/javascript">
+function moveDown(node){
+    fieldset = node.parentNode.parentNode
+    nextBlock = fieldset.nextSibling
+    if (nextBlock){
+    shiftBlocks( nextBlock, fieldset)
+    }
+}
+
+function moveUp(node){
+    fieldset = node.parentNode.parentNode
+    previousBlock = fieldset.previousSibling
+    if (previousBlock){
+    shiftBlocks(fieldset, previousBlock)
+    }
+}
+
+function shiftBlocks(fieldset, previousBlock){
+    while (previousBlock.nodeType == 3){
+         previousBlock = previousBlock.previousSibling
+        }
+    while (fieldset.nodeType == 3){
+         fieldset = fieldset.nextSibling
+        }
+    x = fieldset.firstChild.value
+    y = previousBlock.firstChild.value
+    fieldset.firstChild.value = y
+    previousBlock.firstChild.value= x
+    fieldset.parentNode.insertBefore(fieldset, previousBlock )
+    
+}
+</script>
+    
 <style type="text/css">
     label{ width : 9em;
             text-align : right;
@@ -12,21 +46,34 @@
         margin : 0.2em;
     }
 
-    p.delete-button{
+    p.delete-button, p.updown-buttons{
         float: right;
+        clear: right
     }
 
 </style>    
 
 <div tal:replace="structure here/manage_tabs"/>
 
-    <form action="manage_saveStylesheets" tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'" method="post">
+    <form action="manage_saveStylesheets" tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'" method="get">
+        <input type=submit i18n:attributes="value" value="Save" />
 
       
-      <fieldset tal:repeat="stylesheet here/getStylesheets">
-            <p class="delete-button">
-            <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}'">** Remove this stylesheet **</a></p>
+      <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records" tal:attributes="value repeat/stylesheet/index" /><p class="updown-buttons">
+                <button onclick="moveUp(this);return false;"> <!-- condition="not:repeat/stylesheet/start"-->
+                    move UP
+                </button>
+                 
+                <button onclick="moveDown(this);return false;"> <!-- :condition="not:repeat/stylesheet/end"-->
+                    move DOWN
+                </button>             
+            </p>
             
+            <p class="delete-button">
+                <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}'">
+                    ** Remove this stylesheet **
+                </a>
+            </p>
             <div>
                 <label>id</label>
                 <input type="text" name="stylesheets.id:records" tal:attributes="value stylesheet/id">    

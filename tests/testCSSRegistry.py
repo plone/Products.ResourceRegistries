@@ -262,7 +262,41 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in content)
         self.failUnless('blue' in content)
 
+class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, TOOLNAME)
+    
+    def testDefaultsInstall(self):
+        stylesheetids = [item['id'] for item in self.tool.getStylesheets()]
+        self.failUnless('plone.css' in stylesheetids)
+        self.failUnless('ploneColumns.css' in stylesheetids)
+        self.failUnless('ploneCustom.css' in stylesheetids)
+
+    def testTraverseToConcatenatedDefaults(self):
+        stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
+        for s in stylesheets:
+            try:
+                magicId = s.get('id')
+                self.portal.restrictedTraverse('portal_css/%s' % magicId)
+            except KeyError:
+                self.fail()
+
+    def testCallingOfConcatenatedStylesheets(self):     
+        stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
+        for s in stylesheets:
+            if 'ploneStyles' in s.get('id'):
+                output = self.portal.restrictedTraverse('portal_css/%s' % s.get('id'))
+                break
+        print output
+        if not output:
+            self.fail()
+            
+        self.failIf("&lt;dtml-call" in output)            
+        self.failIf("&amp;dtml-fontBaseSize;" in output)            
+        self.failUnless('** Plone style sheet for CSS2-capable browsers.' in output)            
+        
+                
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -276,6 +310,7 @@ def test_suite():
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))
     suite.addTest(makeSuite(TestTraversal))
+    suite.addTest(makeSuite(TestCSSDefaults))
     return suite
 
 if __name__ == '__main__':

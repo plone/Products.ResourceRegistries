@@ -56,15 +56,14 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
-    def registerStylesheet(self, id, expression='', media='', rel='stylesheet', cssimport=0, inline=0, enabled=1 ):
+    def registerStylesheet(self, id, expression='', media='', rel='stylesheet', rendering='import',  enabled=1 ):
         """ register a stylesheet"""
         stylesheet = {}
         stylesheet['id'] = id
         stylesheet['expression'] = expression 
         stylesheet['media'] = media
         stylesheet['rel'] = rel 
-        stylesheet['cssimport'] = cssimport
-        stylesheet['inline'] = inline
+        stylesheet['rendering'] = rendering
         stylesheet['enabled'] = enabled
         self.storeStylesheet(stylesheet )
 
@@ -81,9 +80,9 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     # ZMI METHODS
 
     security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
-    def manage_addStylesheet(self, id, expression='', media='', rel='stylesheet', cssimport=False, inline=False, enabled=True, REQUEST=None):
+    def manage_addStylesheet(self, id, expression='', media='', rel='stylesheet', rendering='import', enabled=True, REQUEST=None):
         """ register a stylesheet from a TTW request"""
-        self.registerStylesheet(id, expression, media, rel, cssimport, inline, enabled)
+        self.registerStylesheet(id, expression, media, rel, rendering, enabled)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -93,7 +92,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
          save stylesheets from the ZMI 
          updates the whole sequence. for editing and reordering
         """
-        records = REQUEST.form.get('stylesheets')
+        records = REQUEST.get('stylesheets')
         self.stylesheets = ()
         stylesheets = []
         for r in records:
@@ -102,8 +101,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             stylesheet['expression'] = r.get('expression', '') 
             stylesheet['media']      = r.get('media', '')
             stylesheet['rel']        = r.get('rel', 'stylesheet') 
-            stylesheet['cssimport']  = r.get('cssimport', False)
-            stylesheet['inline']     = r.get('inline', False)
+            stylesheet['rendering']  = r.get('rendering','import')
             stylesheet['enabled']    = r.get('enabled', True)
 
             stylesheets.append(stylesheet)
@@ -124,6 +122,10 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ get the stylesheets for management screens """
         return tuple([item.copy() for item in self.stylesheets])
 
+    security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
+    def getRenderingOptions(self):
+        """rendering methods for use in ZMI forms"""
+        return config.CSS_RENDER_METHODS
 
     security.declarePrivate('validateId')
     def validateId(self, id, existing):
@@ -149,7 +151,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         
     security.declarePrivate('compareStylesheets')            
     def compareStylesheets(self, sheet1, sheet2 ):
-        for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
+        for attr in ('expression', 'media', 'rel', 'rendering'):
             if sheet1.get(attr) != sheet2.get(attr):
                 return 0
             if 'alternate' in sheet1.get('rel'):
@@ -197,7 +199,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         
     security.declareProtected(permissions.View, 'getEvaluatedStyleheets')        
     def getEvaluatedStylesheets(self, context ):
-        """ get all the stylesheet references we are going to need for making proper templates """
+        """ get all the stylesheet references we are going to need for making proper templates"""
         results = self.cookedstylesheets
         # filter results by expression
         results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    

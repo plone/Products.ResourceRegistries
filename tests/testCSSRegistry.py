@@ -13,6 +13,7 @@ from Products.CSSRegistry.config import TOOLNAME
 from Products.CSSRegistry.interfaces import ICSSRegistry
 from Interface.Verify import verifyObject
 
+
 class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -208,18 +209,18 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         # can you tell we had good fun writing these tests ? 
         
     def testRenderingStylesheetLinks(self):        
-        self.tool.registerStylesheet('ham')
-        self.tool.registerStylesheet('ham 2 b merged')
-        self.tool.registerStylesheet('spam', media='print')
-        self.tool.registerStylesheet('simple.css', inline='1')
+        self.tool.registerStylesheet('ham', rendering='link')
+        self.tool.registerStylesheet('ham 2 b merged', rendering='link')
+        self.tool.registerStylesheet('spam', media='print', rendering='link')
+        self.tool.registerStylesheet('simple.css', rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
         self.failUnless('<link' in all)
         self.failUnless('/spam' in all)
         
     def testReenderingConcatenatesInline(self):
-        self.tool.registerStylesheet('simple.css', inline='1')
-        self.tool.registerStylesheet('simple2.css', inline='1')
+        self.tool.registerStylesheet('simple.css',  rendering='inline')
+        self.tool.registerStylesheet('simple2.css', rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)        
@@ -229,7 +230,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failIf('background-color' in renderedpage)
         
-        self.tool.registerStylesheet('simple.css', inline=1)
+        self.tool.registerStylesheet('simple.css', rendering='inline')
         
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
@@ -252,7 +253,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in str(self.portal.restrictedTraverse('portal_css/simple.css')))
 
 
-    def testRestricedTraverseComposition(self):
+    def testRestrictedTraverseComposition(self):
         self.tool.registerStylesheet('simple2.css')
         styles = self.tool.getEvaluatedStylesheets(self.portal)
         self.assertEqual(len(styles), 1)

@@ -28,13 +28,14 @@
             </div>
 
             <div>
-                <label>css-import</label>
-                <input type="checkbox" name="stylesheets.cssimport:records.boolean" tal:attributes="checked stylesheet/cssimport">    
-            </div>
-
-            <div>
-                <label>inline</label>
-                <input type="checkbox" name="stylesheets.inline:records.boolean" tal:attributes="checked stylesheet/inline">    
+                <label>rendering</label>
+                <select name="stylesheets.rendering:records">
+                    <option tal:repeat="r here/getRenderingOptions" 
+                            tal:attributes="value r;
+                                            selected python:r == stylesheet.get('rendering')" 
+                            tal:content="r">import</option>                    
+                </select>    
+                <p tal:content="python:stylesheet.get('rendering')"></p>         
             </div>
 
             <div>
@@ -82,15 +83,15 @@
                 <input type="text" name="rel" value="stylesheet">    
             </div>                       
                                          
-            <div>                        
-                <label>cssimport</label> 
-                <input type="checkbox" name="cssimport:boolean" value="0">    
-            </div>                       
-                                         
-            <div>                        
-                <label>inline</label>    
-                <input type="checkbox" name="inline:boolean" value="0">    
-            </div>                       
+            <div>
+            <label>rendering</label>
+                <select name="rendering">
+                    <option tal:repeat="r here/getRenderingOptions" 
+                            tal:attributes="value r" 
+                            tal:content="r">import</option>                    
+                </select>  
+              
+            </div>
                                          
             <div>                        
                 <label>enabled</label>   

@@ -3,7 +3,7 @@ from Interface import Interface
 class ICSSRegistry(Interface):
     """A tool for registering and evaluating stylesheet and script linkage"""
     
-    def registerStylesheet(id, expression='', media='', rel='stylesheet', cssimport=0, inline=0, enabled=1 ):
+    def registerStylesheet(id, expression='', media='', rel='stylesheet', rendering='import', enabled=1 ):
         """ register a stylesheet """
         
     def getEvaluatedStylesheets(context):
@@ -18,7 +18,7 @@ class ICSSRegistry(Interface):
     def getStylesheets():
         """ get the stylesheet objects. For use in management screens"""
     
-    def manage_addStylesheet(id, expression='', media='', rel='stylesheet', cssimport=False, inline=False, enabled=True , REQUEST=None):
+    def manage_addStylesheet(id, expression='', media='', rel='stylesheet', rendering='import', enabled=True , REQUEST=None):
         """ Add stylesheet from a ZMI form"""
     
     def manage_removeStylesheet(id, REQUEST=None):

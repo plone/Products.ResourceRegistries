@@ -1,11 +1,14 @@
 PROJECTNAME = 'CSSRegistry'
 
 TOOLNAME = 'portal_css'
-TOOLTYPE = 'Stylesheeets Tool'
+TOOLTYPE = 'Stylesheeets Registry'
 
 JSTOOLNAME = 'portal_javascripts'
-JSTOOLTYPE = 'Scripts tool'
+JSTOOLTYPE = 'JavaScripts Registry'
 
 SKINS_DIR = 'skins'
 
 GLOBALS = globals()
+
+
+CSS_RENDER_METHODS = ('import','link','inline')

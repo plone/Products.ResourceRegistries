@@ -7,6 +7,8 @@ def initialize(context):
 
     TOOLS = (
         tools.CSSRegistry.CSSRegistryTool,
+        tools.JSRegistry.JSRegistryTool,
+
     )
 
     ToolInit(

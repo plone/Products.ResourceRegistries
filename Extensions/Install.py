@@ -10,6 +10,8 @@ def install(self):
     if TOOLNAME not in self.objectIds():
         factory = self.manage_addProduct['CSSRegistry']
         factory.manage_addTool(TOOLTYPE)
+        factory.manage_addTool(JSTOOLTYPE)
+
         print >> out, 'Added CSSRegistry Tool.'
     else:
         print >> out, 'CSSRegistry Tool already exists.'

@@ -45,7 +45,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         script = {}
         script['id'] = id
         script['expression'] = expression 
-        script['contenttype'] = media
+        script['contenttype'] = contenttype
         script['inline'] = inline
         script['enabled'] = enabled
         self.storeScript(script)
@@ -84,7 +84,55 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         scripts = [ item for item in self.getScripts() if item.get('id') != id ]
         self.scripts = tuple(scripts)
         self.cookScripts()
+          
         
+    ###############
+    # ZMI METHODS
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
+    def manage_addScript(self, id, expression='', media='', rel='script', cssimport=False, inline=False, enabled=True, REQUEST=None):
+        """ register a script from a TTW request"""
+        self.registerScript(id, expression, media, rel, cssimport, inline, enabled)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_saveScripts')
+    def manage_saveScripts(self, REQUEST=None):
+        """
+         save scripts from the ZMI 
+         updates the whole sequence. for editing and reordering
+        """
+        records = REQUEST.form.get('scripts')
+        self.scripts = ()
+        scripts = []
+        for r in records:
+            script = {}
+            script['id']         = r.get('id')
+            script['expression'] = r.get('expression', '') 
+            script['media']      = r.get('media', '')
+            script['rel']        = r.get('rel', 'script') 
+            script['cssimport']  = r.get('cssimport', False)
+            script['inline']     = r.get('inline', False)
+            script['enabled']    = r.get('enabled', True)
+
+            scripts.append(script)
+        self.scripts = tuple(scripts)
+        self.cookScripts()
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
+    def manage_removeScript(self, id, REQUEST=None):
+        """ remove script from the ZMI"""
+        self.unregisterScript(id)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'getScripts')
+    def getScripts(self):
+        """ get the scripts for management screens """
+        return tuple([item.copy() for item in self.scripts])     
+      
        
     def compareScripts(self, s1, s2 ):
         for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):

@@ -9,7 +9,7 @@ if __name__ == '__main__':
 from Testing import ZopeTestCase
 from Products.CSSRegistry.tests import CSSRegistryTestCase
 
-from Products.CSSRegistry.config import JSJSTOOLNAME
+from Products.CSSRegistry.config import JSTOOLNAME
 from Products.CSSRegistry.interfaces import IJSRegistry
 from Interface.Verify import verifyObject
 
@@ -34,7 +34,7 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
     def testZMIForm(self):
         tool = getattr(self.portal, JSTOOLNAME)
         self.setRoles(['Manager'])
-        self.failUnless(tool.manage_cssForm())
+        self.failUnless(tool.manage_jsForm())
         
 
 class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -48,7 +48,7 @@ class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testSkinExists(self):
         self.failUnless(getattr(self.portal, 'simple.css' ))
-
+                                           
 
 class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
     
@@ -159,9 +159,9 @@ class TestScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testMoreComplexScriptsCollapsing(self ):        
         self.tool.registerScript('ham')
-        self.tool.registerScript('spam',           media='spam')
-        self.tool.registerScript('spam spam',      media='spam')
-        self.tool.registerScript('spam spam spam', media='spam')
+        self.tool.registerScript('spam',           expression='string:spam')
+        self.tool.registerScript('spam spam',      expression='string:spam')
+        self.tool.registerScript('spam spam spam', expression='string:spam')
         self.tool.registerScript('eggs')
         self.assertEqual(len(self.tool.getEvaluatedScripts(self.folder)) , 3 )
         ids = [item.get('id') for item in self.tool.getEvaluatedScripts(self.folder)]
@@ -188,14 +188,14 @@ class TestScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testCollapsingScriptsLookup(self):        
         self.tool.registerScript('ham')
-        self.tool.registerScript('spam',           media='spam')
-        self.tool.registerScript('spam spam',      media='spam')
+        self.tool.registerScript('spam',           expression='string:spam')
+        self.tool.registerScript('spam spam',      expression='string:spam')
         evaluated = self.tool.getEvaluatedScripts(self.folder)
         self.assertEqual(len(evaluated), 2)
         
     def testRenderingIsInTheRightOrder(self):
-        self.tool.registerScript('ham' , media='ham')
-        self.tool.registerScript('spam', media='spam')
+        self.tool.registerScript('ham' , expression='string:ham')
+        self.tool.registerScript('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedScripts(self.folder)
         evaluatedids = [item['id'] for item in evaluated]
         self.failUnless(evaluatedids[1]=='spam')
@@ -206,7 +206,7 @@ class TestScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     def testRenderingScriptLinks(self):        
         self.tool.registerScript('ham')
         self.tool.registerScript('ham 2 b merged')
-        self.tool.registerScript('spam', media='print')
+        self.tool.registerScript('spam', expression='string:spam')
         self.tool.registerScript('simple.css', inline='1')
         all = getattr(self.portal, 'renderAllTheScripts')()
         self.failUnless('background-color' in all)

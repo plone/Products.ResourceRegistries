@@ -267,6 +267,11 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
     
+    def testClearingScripts(self):
+        self.failUnless(self.tool.getScripts())
+        self.tool.clearScripts()
+        self.failIf(self.tool.getScripts())   
+    
     def testDefaultsInstall(self):
         scriptids = [item['id'] for item in self.tool.getScripts()]
         self.failUnless('plone_menu.js' in scriptids)

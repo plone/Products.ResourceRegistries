@@ -98,6 +98,13 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.scripts = tuple(scripts)
         self.cookScripts()
           
+          
+    security.declarePrivate('clearScripts')
+    def clearScripts(self):
+        """ Clears all script data. convenience for Plone migrations"""
+        self.scripts = ()
+        self.cookedscripts = ()
+        self.concatenatedscripts = {}
         
     ###############
     # ZMI METHODS

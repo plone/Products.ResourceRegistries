@@ -5,7 +5,7 @@
 
       
       <fieldset tal:repeat="stylesheet here/getStylesheets">
-            <button tal:attributes="onclick string:window.location='unregisterStylesheet?sheetid=${stylesheet/id}';;return false">REMOvE</button>
+            <button tal:attributes="onclick string:window.location=' manage_removeStylesheet?id=${stylesheet/id}';;return false">Remove</button>
             
             <div>
                 <label>id</label>
@@ -28,18 +28,18 @@
             </div>
 
             <div>
-                <label>cssimport</label>
-                <input type="text" name="stylesheets.cssimport:records.boolean" tal:attributes="value stylesheet/cssimport">    
+                <label>css-import</label>
+                <input type="checkbox" name="stylesheets.cssimport:records.boolean" tal:attributes="checked stylesheet/cssimport">    
             </div>
 
             <div>
                 <label>inline</label>
-                <input type="text" name="stylesheets.inline:records.boolean" tal:attributes="value stylesheet/inline">    
+                <input type="checkbox" name="stylesheets.inline:records.boolean" tal:attributes="checked stylesheet/inline">    
             </div>
 
             <div>
                 <label>enabled</label>
-                <input type="text" name="stylesheets.enabled:records.boolean" tal:attributes="value stylesheet/enabled">    
+                <input type="checkbox" name="stylesheets.enabled:records.boolean" tal:attributes="checked stylesheet/enabled">    
             </div>
 
       </fieldset>
@@ -54,7 +54,7 @@
 
 
 
-    <form action="manage_registerStylesheet" tal:attributes="action python:here.absolute_url()+'/manage_registerStylesheet'" method="post">
+    <form action="manage_addStylesheet" tal:attributes="action python:here.absolute_url()+'/manage_addStylesheet'" method="post">
 
       
       <fieldset>
@@ -84,17 +84,17 @@
                                          
             <div>                        
                 <label>cssimport</label> 
-                <input type="text" name="cssimport:boolean" value="0">    
+                <input type="checkbox" name="cssimport:boolean" value="0">    
             </div>                       
                                          
             <div>                        
                 <label>inline</label>    
-                <input type="text" name="inline:boolean" value="0">    
+                <input type="checkbox" name="inline:boolean" value="0">    
             </div>                       
                                          
             <div>                        
                 <label>enabled</label>   
-                <input type="text" name="enabled:boolean" value="1">    
+                <input type="checkbox" name="enabled:boolean" value="1">    
             </div>
 
       </fieldset>

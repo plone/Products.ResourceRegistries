@@ -36,23 +36,31 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Manager'])
         self.failUnless(tool.manage_cssForm())
         
-    def testPprintZMIForm(self):
-        # Does not really test anything. just debugprints
-        
-        tool = getattr(self.portal, TOOLNAME)
-        self.setRoles(['Manager'])
-        tool.registerStylesheet('simple.css') 
-        print tool.manage_cssForm()
-
 
 class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         pass
 
+    def testSkins(self):
+        skins = self.portal.portal_skins.objectIds()
+        self.failUnless('CSSRegistry' in skins) 
+
     def testSkinExists(self):
         self.failUnless(getattr(self.portal, 'simple.css' ))
 
+
+class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
+    
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, TOOLNAME)
+                             
+                
+    def testAdd(self):
+        self.tool.manage_addStylesheet(id='joe')
+        self.assertEqual(len(self.tool.getStylesheets()),1)
+        self.failUnless(self.tool.getStylesheets())
+ 
 
 class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -160,7 +168,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('ham' in ids )
         self.failUnless('eggs' in ids )
         self.failIf('spam' in ids )
-        self.failIf('spam spam' in ids ) # xxxxx failing here
+        self.failIf('spam spam' in ids )
         self.failIf('spam spam spam' in ids )
         
     def testGetEvaluatedStylesheetsWithExpression(self ):        
@@ -184,8 +192,6 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('spam spam',      media='spam')
         evaluated = self.tool.getEvaluatedStylesheets(self.folder)
         self.assertEqual(len(evaluated), 2)
-        ids = [item.get('id') for item in evaluated]
-        # XXX this needs updating for proper lookup
         
     def testRenderingIsInTheRightOrder(self):
         self.tool.registerStylesheet('ham' , media='ham')
@@ -194,6 +200,8 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         evaluatedids = [item['id'] for item in evaluated]
         self.failUnless(evaluatedids[1]=='spam')
         self.failUnless(evaluatedids[0]=='ham')
+        
+        # can you tell we had good fun writing these tests ? 
         
     def testRenderingStylesheetLinks(self):        
         self.tool.registerStylesheet('ham')
@@ -228,6 +236,7 @@ def test_suite():
     suite.addTest(makeSuite(TestImplementation))
     suite.addTest(makeSuite(TestTool))
     suite.addTest(makeSuite(TestSkin))
+    suite.addTest(makeSuite(testZMIMethods))
     suite.addTest(makeSuite(TestStylesheetRegistration))
     suite.addTest(makeSuite(TestToolSecurity))
     suite.addTest(makeSuite(TestToolExpression))

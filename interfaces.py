@@ -13,13 +13,21 @@ class ICSSRegistry(Interface):
         appropriate to the context for rendering
         """
         
-    def unregisterStylesheet(sheetid):
+    def unregisterStylesheet(id):
         """unregister a registered stylesheet"""
+                    
+                    
                     
     def getStylesheets():
         """ get the stylesheet objects. For use in management screens"""
-                
-    def manage_saveStylesheets(data):
+    
+    def manage_addStylesheet(id, expression='', media='', rel='stylesheet', cssimport=False, inline=False, enabled=True , REQUEST=None):
+        """ Add stylesheet from a ZMI form"""
+    
+    def manage_removeStylesheet(id, REQUEST=None):
+        """ remove stylesheet from the ZMI"""
+                          
+    def manage_saveStylesheets(REQUEST=None):
         """ 
         save stylesheet data from form submission
         data should be a list or tuple of records or dictionaries

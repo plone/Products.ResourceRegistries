@@ -24,7 +24,10 @@ import random
 
 
 class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
-    """An example tool.
+    """ A Plone registry for managing the linking to css files.
+        Prioritize, categorize and link by media. 
+        Adjacent stylesheets with equal conditions will be concatenated to larger 
+        composite stylesheets 
     """
 
     id = config.TOOLNAME
@@ -65,13 +68,6 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         stylesheet['enabled'] = enabled
         self.storeStylesheet(stylesheet )
 
-    security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
-    def manage_registerStylesheet(self, REQUEST):
-        """ register a stylesheet from a TTW request"""
-        self.registerStylesheet(REQUEST.get('id'), REQUEST.get('expression'), REQUEST.get('media'), REQUEST.get('rel'), 0,0, 1)
-        if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-
 
     security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
     def unregisterStylesheet(self, sheetid):
@@ -80,11 +76,55 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.stylesheets = tuple(stylesheets)
         self.cookStylesheets()
 
-    security.declareProtected(permissions.ManagePortal, 'manage_saveStylesheets')
-    def manage_saveStylesheets(self, data):
-        print data
+    
+    ###############
+    # ZMI METHODS
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
+    def manage_addStylesheet(self, id, expression='', media='', rel='stylesheet', cssimport=False, inline=False, enabled=True, REQUEST=None):
+        """ register a stylesheet from a TTW request"""
+        self.registerStylesheet(id, expression, media, rel, cssimport, inline, enabled)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_saveStylesheets')
+    def manage_saveStylesheets(self, REQUEST=None):
+        """
+         save stylesheets from the ZMI 
+         updates the whole sequence. for editing and reordering
+        """
+        records = REQUEST.form.get('stylesheets')
+        self.stylesheets = ()
+        stylesheets = []
+        for r in records:
+            stylesheet = {}
+            stylesheet['id']         = r.get('id')
+            stylesheet['expression'] = r.get('expression', '') 
+            stylesheet['media']      = r.get('media', '')
+            stylesheet['rel']        = r.get('rel', 'stylesheet') 
+            stylesheet['cssimport']  = r.get('cssimport', False)
+            stylesheet['inline']     = r.get('inline', False)
+            stylesheet['enabled']    = r.get('enabled', True)
+
+            stylesheets.append(stylesheet)
+        self.stylesheets = tuple(stylesheets)
+        self.cookStylesheets()
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
+    def manage_removeStylesheet(self, id, REQUEST=None):
+        """ remove stylesheet from the ZMI"""
+        self.unregisterStylesheet(id)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'getStylesheets')
+    def getStylesheets(self):
+        """ get the stylesheets for management screens """
+        return tuple([item.copy() for item in self.stylesheets])
+
+
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', contenttype='text/javascript', inline=0, enabled=1):
@@ -132,23 +172,21 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.scripts = tuple(scripts)
         self.cookScripts()
     
-    security.declareProtected(permissions.ManagePortal, 'getStylesheets')
-    def getStylesheets(self ):
-        """ get the stylesheets for management screens """
-        return tuple([item.copy() for item in self.stylesheets])
         
-    
+    security.declarePrivate('compareStylesheets')            
     def compareStylesheets(self, sheet1, sheet2 ):
         for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
             if sheet1.get(attr) != sheet2.get(attr):
                 return 0
         return 1
-                            
+
+    security.declarePrivate('generateId')            
     def generateId(self):
         base = "ploneStyles"
         appendix = ".css"
         return "%s%04d%s" % (base, random.randint(0, 9999), appendix)
-                            
+                                       
+    security.declarePrivate('cookStylesheets')            
     def cookStylesheets(self ):
         stylesheets = self.getStylesheets()
         self.concatenatedstylesheets = {}

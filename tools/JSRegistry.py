@@ -7,7 +7,9 @@ from OFS.PropertyManager import PropertyManager
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
-from Acquisition import aq_base, aq_parent 
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
+from Acquisition import aq_base, aq_parent, aq_inner
 
 from Products.CSSRegistry import config
 from Products.CSSRegistry import permissions
@@ -31,6 +33,17 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     security = ClassSecurityInfo()
 
     __implements__ = (SimpleItem.__implements__, IJSRegistry,)
+
+    # ZMI stuff
+    manage_jsForm = PageTemplateFile('www/jsconfig', config.GLOBALS)
+    
+    manage_options=(
+        ({ 'label'  : 'Javascript Registry',
+           'action' : 'manage_jsForm',
+           },
+         ) + SimpleItem.manage_options
+        )    
+        
 
     def __init__(self ):
         """ add the storages """

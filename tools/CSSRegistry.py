@@ -125,19 +125,6 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         return tuple([item.copy() for item in self.stylesheets])
 
 
-
-    security.declareProtected(permissions.ManagePortal, 'registerScript')
-    def registerScript(self, id, expression='', contenttype='text/javascript', inline=0, enabled=1):
-        """ register a script"""
-        script = {}
-        script['id'] = id
-        script['expression'] = expression 
-        script['contenttype'] = media
-        script['inline'] = inline
-        script['enabled'] = enabled
-        self.storeScript(script)
-
-
     security.declarePrivate('validateId')
     def validateId(self, id, existing):
         """ safeguard against dulicate ids"""
@@ -159,19 +146,6 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.stylesheets = tuple(stylesheets)
         self.cookStylesheets()
 
-
-    security.declarePrivate('storeScript')            
-    def storeScript(self, script ):
-        """ store a script"""        
-        self.validateId(script.get('id'), self.getScripts())
-        scripts = list(self.scripts)
-        if len(scripts) and scripts[0].get('id') == 'ploneCustom.css':
-            scripts.insert(1, script)
-        else:
-            scripts.insert(0, script )
-        self.scripts = tuple(scripts)
-        self.cookScripts()
-    
         
     security.declarePrivate('compareStylesheets')            
     def compareStylesheets(self, sheet1, sheet2 ):

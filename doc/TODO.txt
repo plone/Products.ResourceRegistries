@@ -1,6 +1,8 @@
 
 Things to do in the near future: 
 
+  - Add support for IE-only-hack for stylesheets
+
   - Make the zmi forms align a bit nicer. Have descriptions for the form elements there.
 
   - Stylesheet and script ordering in the ZMI panels
@@ -14,6 +16,8 @@ Things to do in the near future:
   - Write install instructions
   
   - Force Limi to add better icons
+  
+  - Split the Plone Javascripts into components and include in the skin
   
 
 Thoughts for the future that are not explicitly plannned for: 

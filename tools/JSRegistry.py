@@ -7,7 +7,9 @@ from OFS.PropertyManager import PropertyManager
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
-from Acquisition import aq_base, aq_parent 
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
+from Acquisition import aq_base, aq_parent, aq_inner
 
 from Products.CSSRegistry import config
 from Products.CSSRegistry import permissions
@@ -32,6 +34,17 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
     __implements__ = (SimpleItem.__implements__, IJSRegistry,)
 
+    # ZMI stuff
+    manage_jsForm = PageTemplateFile('www/jsconfig', config.GLOBALS)
+    
+    manage_options=(
+        ({ 'label'  : 'Javascript Registry',
+           'action' : 'manage_jsForm',
+           },
+         ) + SimpleItem.manage_options
+        )    
+        
+
     def __init__(self ):
         """ add the storages """
         self.scripts = ()
@@ -45,7 +58,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         script = {}
         script['id'] = id
         script['expression'] = expression 
-        script['contenttype'] = media
+        script['contenttype'] = contenttype
         script['inline'] = inline
         script['enabled'] = enabled
         self.storeScript(script)
@@ -73,77 +86,118 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.cookScripts()
 
     
-    security.declareProtected(permissions.ManagePortal, 'getStylesheets')
+    security.declareProtected(permissions.ManagePortal, 'getScripts')
     def getScripts(self ):
-        """ sdf """
+        """ get the script data, uncooked. for management screens """
+        return tuple([item.copy() for item in self.scripts])
         
-        raise NotImplemented
-        #return tuple([item.copy() for item in self.scripts])
-        
-    security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
+    security.declareProtected(permissions.ManagePortal, 'unregisterScript')        
     def unregisterScript(self, id ):
         """ unreginster a registered script """
+        scripts = [ item for item in self.getScripts() if item.get('id') != id ]
+        self.scripts = tuple(scripts)
+        self.cookScripts()
+          
         
-        raise NotImplemented
-        #scripts = [ item for item in self.getStylesheets() if item.get('id') != id ]
-        #self.scripts = tuple(scripts)
-        #self.cookStylesheets()
-        
-    
-    
-    def compareScripts(self, sheet1, sheet2 ):
-        
-        raise NotImplemented
-        #for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
-        #    if sheet1.get(attr) != sheet2.get(attr):
-        #        return 0
-        #return 1
+    ###############
+    # ZMI METHODS
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
+    def manage_addScript(self,id, expression='', contenttype='text/javascript', inline=False, enabled=True, REQUEST=None):
+        """ register a script from a TTW request"""
+        self.registerScript(id, expression, contenttype, inline, enabled)
+                            
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_saveScripts')
+    def manage_saveScripts(self, REQUEST=None):
+        """
+         save scripts from the ZMI 
+         updates the whole sequence. for editing and reordering
+        """
+        records = REQUEST.form.get('scripts')
+        self.scripts = ()
+        scripts = []
+        for r in records:
+            script = {}
+            script['id']         = r.get('id')
+            script['expression'] = r.get('expression', '') 
+            script['media']      = r.get('media', '')
+            script['rel']        = r.get('rel', 'script') 
+            script['cssimport']  = r.get('cssimport', False)
+            script['inline']     = r.get('inline', False)
+            script['enabled']    = r.get('enabled', True)
+
+            scripts.append(script)
+        self.scripts = tuple(scripts)
+        self.cookScripts()
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
+    def manage_removeScript(self, id, REQUEST=None):
+        """ remove script from the ZMI"""
+        self.unregisterScript(id)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'getScripts')
+    def getScripts(self):
+        """ get the scripts for management screens """
+        return tuple([item.copy() for item in self.scripts])     
+      
+       
+    def compareScripts(self, s1, s2 ):
+        for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
+            if s1.get(attr) != s2.get(attr):
+                return 0
+        return 1
                             
     def generateId(self):
-        base = "ploneJavascripts"
+        base = "ploneScripts"
         appendix = ".js"
         return "%s%04d%s" % (base, random.randint(0, 9999), appendix)
                             
     def cookScripts(self ):
-        raise NotImplemented
-        #scripts = self.getStylesheets()
-        #self.concatenatedscripts = {}
-        #self.cookedscripts = ()
-        #results = []
-        #for script in scripts:
-        #    #self.concatenatedscripts[script['id']] = [script['id']]
-        #    if results:
-        #        previtem = results[-1]
-        #        if self.compareStylesheets(script, previtem):
-        #            previd = previtem.get('id')
-        #
-        #            if self.concatenatedscripts.has_key(previd):
-        #                self.concatenatedscripts[previd].append(script.get('id'))
-        #            else:
-        #                magicId = self.generateId()
-        #                self.concatenatedscripts[magicId] = [previd, script.get('id')]
-        #                previtem['id'] = magicId
-        #        else:
-        #            results.append(script)    
-        #    else:
-        #        results.append(script)
-        ##for entry in self.concatenatedscripts.:
-        #    
-        #    
-        #scripts = self.getStylesheets()
-        #for script in scripts:
-        #    self.concatenatedscripts[script['id']] = [script['id']]
-        #self.cookedscripts = tuple(results)
+
+        scripts = self.getScripts()
+        self.concatenatedscripts = {}
+        self.cookedscripts = ()
+        results = []
+        for script in scripts:
+            #self.concatenatedscripts[script['id']] = [script['id']]
+            if results:
+                previtem = results[-1]
+                if self.compareScripts(script, previtem):
+                    previd = previtem.get('id')
+        
+                    if self.concatenatedscripts.has_key(previd):
+                        self.concatenatedscripts[previd].append(script.get('id'))
+                    else:
+                        magicId = self.generateId()
+                        self.concatenatedscripts[magicId] = [previd, script.get('id')]
+                        previtem['id'] = magicId
+                else:
+                    results.append(script)    
+            else:
+                results.append(script)
+        #for entry in self.concatenatedscripts.:
+            
+            
+        scripts = self.getScripts()
+        for script in scripts:
+            self.concatenatedscripts[script['id']] = [script['id']]
+        self.cookedscripts = tuple(results)
         
         
     security.declareProtected(permissions.View, 'getEvaluatedScripts')        
     def getEvaluatedScripts(self, context ):
-        raise NotImplemented
-        #results = self.cookedscripts
-        ## filter results by expression
-        #results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    
-        #results.reverse()
-        #return results
+        results = self.cookedscripts
+        # filter results by expression
+        results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    
+        results.reverse()
+        return results
          
     security.declarePrivate('evaluateExpression')
     def evaluateExpression(self, expression, context):

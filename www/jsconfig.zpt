@@ -1,0 +1,93 @@
+<div tal:replace="structure here/manage_page_header"/>
+<div tal:replace="structure here/manage_tabs"/>
+
+    <form action="manage_saveScripts" tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'" method="post">
+
+      
+      <fieldset tal:repeat="script here/getScripts">
+            <button tal:attributes="onclick string:window.location=' manage_removeScript?id=${script/id}';;return false">Remove</button>
+            
+            <div>
+                <label>id</label>
+                <input type="text" name="scripts.id:records" tal:attributes="value script/id">    
+            </div>
+
+            <div>
+                <label>expression</label>
+                <input type="text" name="scripts.expression:records" tal:attributes="value script/expression">    
+            </div>
+
+            
+            <div>
+                <label>content type</label>
+                <input type="text" name="scripts.contenttype:records" tal:attributes="value script/contenttype">    
+            </div>
+
+            
+            <div>
+                <label>inline</label>
+                <input type="checkbox" name="scripts.inline:records.boolean" tal:attributes="checked script/inline">    
+            </div>
+
+            <div>
+                <label>enabled</label>
+                <input type="checkbox" name="scripts.enabled:records.boolean" tal:attributes="checked script/enabled">    
+            </div>
+
+      </fieldset>
+      
+       
+        
+        <input type=submit i18n:attributes="value" value="Save" />
+    </form>
+
+
+
+
+
+
+    <form action="manage_addScript" tal:attributes="action python:here.absolute_url()+'/manage_addScript'" method="post">
+
+      
+      <fieldset>
+            
+            
+            <h3> Add a new script</h3>
+            
+            <div>
+                <label>id</label>
+                <input type="text" name="id">    
+            </div>
+
+            <div>
+                <label>expression</label>
+                <input type="text" name="expression">    
+            </div>                       
+                      
+                                         
+            <div>                        
+                <label>Content Type</label>       
+                <input type="text" name="contenttype" value="text/javascript">    
+            </div>                       
+                                         
+            <div>                        
+                <label>inline</label>    
+                <input type="checkbox" name="inline:boolean" value="0">    
+            </div>                       
+                                         
+            <div>                        
+                <label>enabled</label>   
+                <input type="checkbox" name="enabled:boolean" value="1">    
+            </div>
+
+      </fieldset>
+        <input type=submit i18n:attributes="value" value="Add" />
+    </form>
+
+
+
+
+
+
+
+<div tal:replace="structure here/manage_page_footer"/>

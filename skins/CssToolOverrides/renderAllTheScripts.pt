@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xml:lang="en">
+    <metal:alljs define-macro="jsrenderer" >
+        <tal:fetcher define="scripts python:here.portal_javascripts.getEvaluatedScripts(here);
+                             global portal_url here/portal_url;">
+            <tal:renderer tal:repeat="script scripts">
+                <script tal:condition="python:not script['inline']"
+                        type="text/javascript" 
+                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/id};" />
+                    
+                <tal:inline tal:condition="python:script['inline']">
+                <script 
+                    type="text/javascript"
+                    tal:define="jsstring python:str(here.portal_javascripts[script.get('id')])"
+                    tal:content="structure string:<!--  ${jsstring}  -->">">
+                </script>
+                </tal:inline>
+            </tal:renderer>    
+        </tal:fetcher>
+    </metal:alljs>
+</html>
+
+
+<!-- 
+
+-->

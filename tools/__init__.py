@@ -1,1 +1,2 @@
 import CSSRegistry
+import JSRegistry

@@ -9,12 +9,12 @@
                 type="text/css" 
                     tal:attributes="href string:${portal_url}/portal_css/${stylesheet/id};
                                     media python:path('stylesheet/media|nothing') or nothing;
-                                    
+                                    rel python:path('stylesheet/rel|nothing') or nothing
                                     ">
                 <tal:import condition="stylesheet/cssimport">
                     <style type="text/css" 
                         tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"
-                        tal:content="structure string:<!-- @import url(${portal_url}/portal_css/${stylesheet/id};); -->">
+                        tal:content="structure string:<!-- @import url(${portal_url}/portal_css/${stylesheet/id}); -->">
                     </style>
                 </tal:import> 
                 <tal:inline condition="stylesheet/inline">

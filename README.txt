@@ -42,12 +42,15 @@ CSSRegistry
     rel -- link relation. defaults to 'stylesheet', and should almost always
     stay that way. For designating alternative stylesheets.
 
-    cssimport -- if the stylesheet should be linked as a css-import instead of a
-    link-tag. Only important to manipulate browser-incompatibilities.
-
-    inline -- render the stylesheet inline instead of linking it externally. Use
-    sparingly. Costs bandwidth, but is very useful for style that vary for
-    example on a per-folder-basis, like those famous header graphics bars.
+    rendering -- how to link the stylesheet from the html page
+    
+        - import : the default. normal css import
+    
+        - link : works better for old browsers an alternate stylesheets
+        
+        - inline : render the stylesheet inline instead of linking it externally. Use
+          sparingly. Costs bandwidth, but is very useful for style that vary for
+          example on a per-folder-basis, like those famous header graphics bars.
 
 
 

@@ -1,11 +1,34 @@
 <div tal:replace="structure here/manage_page_header"/>
+    
+    <style type="text/css">
+    label{ width : 9em;
+            text-align : right;
+            float: left; 
+            padding : 0.2em 0.4em;
+        }
+    
+    fieldset div {
+        clear:both;
+        margin : 0.2em;
+    }
+
+    p.delete-button{
+        float: right;
+    }
+
+</style>    
+
+    
+    
+    
 <div tal:replace="structure here/manage_tabs"/>
 
     <form action="manage_saveScripts" tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'" method="post">
 
       
       <fieldset tal:repeat="script here/getScripts">
-            <button tal:attributes="onclick string:window.location=' manage_removeScript?id=${script/id}';;return false">Remove</button>
+                 <p class="delete-button">
+            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/id}'">** Remove this script **</a></p>
             
             <div>
                 <label>id</label>

@@ -15,6 +15,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.stylesheets = []
         self.tool.registerStylesheet('simple.css')
 
     def testGetItemTraversal(self):

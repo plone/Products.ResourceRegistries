@@ -47,14 +47,14 @@ class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('CSSRegistry' in skins) 
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'simple.css' ))
+        self.failUnless(getattr(self.portal, 'renderAllTheStylesheets' ))
 
 
 class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-                             
+        self.tool.stylesheets = []
                 
     def testAdd(self):
         self.tool.manage_addStylesheet(id='joe')
@@ -66,6 +66,7 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.stylesheets = []
 
     def testStoringStylesheet(self):
         self.tool.registerStylesheet('foo')
@@ -96,6 +97,7 @@ class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.stylesheets = []
 
     def testRegistrationSecurity(self):
         from AccessControl import Unauthorized
@@ -113,6 +115,7 @@ class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.stylesheets = []
 
     def testSimplestExpression(self):
         context = self.portal
@@ -133,6 +136,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.stylesheets = []
         
     def testStylesheetCooking(self):
         self.tool.registerStylesheet('ham')
@@ -230,6 +234,36 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
 
+
+class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.stylesheets = []
+        self.tool.registerStylesheet('simple.css')
+
+    def testGetItemTraversal(self):
+        self.failUnless(self.tool['simple.css'])
+        
+    def testGetItemTraversalContent(self):
+        self.failUnless('background-color' in str(self.tool['simple.css']))
+        
+    def testRestrictedTraverseContent(self):
+        self.failUnless('background-color' in str(self.portal.restrictedTraverse('portal_css/simple.css')))
+
+
+    def testRestricedTraverseComposition(self):
+        self.tool.registerStylesheet('simple2.css')
+        styles = self.tool.getEvaluatedStylesheets(self.portal)
+        self.assertEqual(len(styles), 1)
+        magicId = styles[0].get('id')
+        
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        self.failUnless('background-color' in content)
+        self.failUnless('blue' in content)
+
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -241,6 +275,7 @@ def test_suite():
     suite.addTest(makeSuite(TestToolSecurity))
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))
+    suite.addTest(makeSuite(TestTraversal))
     return suite
 
 if __name__ == '__main__':

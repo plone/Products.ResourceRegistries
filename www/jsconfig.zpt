@@ -1,0 +1,110 @@
+<div tal:replace="structure here/manage_page_header"/>
+<div tal:replace="structure here/manage_tabs"/>
+
+    <form action="manage_saveStylesheets" tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'" method="post">
+
+      
+      <fieldset tal:repeat="stylesheet here/getStylesheets">
+            <button tal:attributes="onclick string:window.location=' manage_removeStylesheet?id=${stylesheet/id}';;return false">Remove</button>
+            
+            <div>
+                <label>id</label>
+                <input type="text" name="stylesheets.id:records" tal:attributes="value stylesheet/id">    
+            </div>
+
+            <div>
+                <label>expression</label>
+                <input type="text" name="stylesheets.expression:records" tal:attributes="value stylesheet/expression">    
+            </div>
+
+            <div>
+                <label>media</label>
+                <input type="text" name="stylesheets.media:records" tal:attributes="value stylesheet/media">    
+            </div>
+
+            <div>
+                <label>rel</label>
+                <input type="text" name="stylesheets.rel:records" tal:attributes="value stylesheet/rel">    
+            </div>
+
+            <div>
+                <label>css-import</label>
+                <input type="checkbox" name="stylesheets.cssimport:records.boolean" tal:attributes="checked stylesheet/cssimport">    
+            </div>
+
+            <div>
+                <label>inline</label>
+                <input type="checkbox" name="stylesheets.inline:records.boolean" tal:attributes="checked stylesheet/inline">    
+            </div>
+
+            <div>
+                <label>enabled</label>
+                <input type="checkbox" name="stylesheets.enabled:records.boolean" tal:attributes="checked stylesheet/enabled">    
+            </div>
+
+      </fieldset>
+      
+       
+        
+        <input type=submit i18n:attributes="value" value="Save" />
+    </form>
+
+
+
+
+
+
+    <form action="manage_addStylesheet" tal:attributes="action python:here.absolute_url()+'/manage_addStylesheet'" method="post">
+
+      
+      <fieldset>
+            
+            
+            <h3> Add a new stylesheet</h3>
+            
+            <div>
+                <label>id</label>
+                <input type="text" name="id">    
+            </div>
+
+            <div>
+                <label>expression</label>
+                <input type="text" name="expression">    
+            </div>                       
+                                         
+            <div>                        
+                <label>media</label>     
+                <input type="text" name="media">    
+            </div>                       
+                                         
+            <div>                        
+                <label>rel</label>       
+                <input type="text" name="rel" value="stylesheet">    
+            </div>                       
+                                         
+            <div>                        
+                <label>cssimport</label> 
+                <input type="checkbox" name="cssimport:boolean" value="0">    
+            </div>                       
+                                         
+            <div>                        
+                <label>inline</label>    
+                <input type="checkbox" name="inline:boolean" value="0">    
+            </div>                       
+                                         
+            <div>                        
+                <label>enabled</label>   
+                <input type="checkbox" name="enabled:boolean" value="1">    
+            </div>
+
+      </fieldset>
+        <input type=submit i18n:attributes="value" value="Add" />
+    </form>
+
+
+
+
+
+
+
+<div tal:replace="structure here/manage_page_footer"/>

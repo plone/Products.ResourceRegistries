@@ -35,6 +35,15 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
         tool = getattr(self.portal, TOOLNAME)
         self.setRoles(['Manager'])
         self.failUnless(tool.manage_cssForm())
+        
+    def testPprintZMIForm(self):
+        # Does not really test anything. just debugprints
+        
+        tool = getattr(self.portal, TOOLNAME)
+        self.setRoles(['Manager'])
+        tool.registerStylesheet('simple.css') 
+        print tool.manage_cssForm()
+
 
 class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 

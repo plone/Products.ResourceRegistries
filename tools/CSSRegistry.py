@@ -9,7 +9,7 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from Acquisition import aq_base, aq_parent 
+from Acquisition import aq_base, aq_parent, aq_inner
 
 from Products.CSSRegistry import config
 from Products.CSSRegistry import permissions
@@ -64,6 +64,14 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         stylesheet['inline'] = inline
         stylesheet['enabled'] = enabled
         self.storeStylesheet(stylesheet )
+
+    security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
+    def manage_registerStylesheet(self, REQUEST):
+        """ register a stylesheet from a TTW request"""
+        self.registerStylesheet(REQUEST.get('id'), REQUEST.get('expression'), REQUEST.get('media'), REQUEST.get('rel'), 0,0, 1)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
 
     security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')        
     def unregisterStylesheet(self, sheetid):

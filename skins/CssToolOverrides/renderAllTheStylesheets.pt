@@ -4,10 +4,12 @@
         <tal:fetcher define="stylesheets python:here.portal_css.getEvaluatedStylesheets(here);
                              global portal_url here/portal_url;">
             <tal:renderer tal:repeat="stylesheet stylesheets">
-                <link tal:condition="python: not (path('stylesheet/cssimport') or path('stylesheet/inline'))"
-                    tal:attributes="src string:${portal_url}/portal_css/${stylesheet/id};
+                <link tal:condition="python: not path('stylesheet/cssimport') and not path('stylesheet/inline')"
+                rel="stylesheet"
+                type="text/css" 
+                    tal:attributes="href string:${portal_url}/portal_css/${stylesheet/id};
                                     media python:path('stylesheet/media|nothing') or nothing;
-                                    rel stylesheet/rel;
+                                    
                                     ">
                 <tal:import condition="stylesheet/cssimport">
                     <style type="text/css" 

@@ -1,0 +1,9 @@
+
+0.5
+=====================
+
+ * Cleaned up forms. Better alignment.
+   [elvix]
+   
+ * Started HISTORY.txt (..somewhat late perhaps, but better than never)
+   [elvix]

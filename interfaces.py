@@ -16,7 +16,7 @@ class ICSSRegistry(Interface):
         """
         
     def getStylesheets():
-        """ get the styleseet objects. For us in management screens"""
+        """ get the styleseet objects. For use in management screens"""
                 
     def manage_saveStylesheet(data):
         """ 
@@ -40,7 +40,7 @@ class IJSRegistry(Interface):
         """
 
     def getScripts():
-        """ get the scripts. For us in management screens"""
+        """ get the scripts. For use in management screens"""
 
     def manage_saveScripts(data):
         """"

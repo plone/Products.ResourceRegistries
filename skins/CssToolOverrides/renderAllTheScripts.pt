@@ -13,7 +13,7 @@
                     type="text/javascript"
                     tal:define="jsstring python:str(here.portal_javascripts.getInlineScript(script.get('id'), here))"                
                     tal:content="structure string:<!--  ${jsstring}  
-                     // -->">">
+                     // -->">
                 </script>
                 </tal:inline>
             </tal:renderer>    

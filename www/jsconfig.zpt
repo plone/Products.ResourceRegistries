@@ -66,29 +66,31 @@ function shiftBlocks(fieldset, previousBlock){
             
             <div>
                 <label>id</label>
-                <input type="text" name="scripts.id:records" tal:attributes="value script/id">    
+                <input type="text" name="scripts.id:records:string" tal:attributes="value script/id">    
             </div>
 
             <div>
                 <label>expression</label>
-                <input type="text" name="scripts.expression:records" tal:attributes="value script/expression">    
+                <input type="text" name="scripts.expression:records:string" tal:attributes="value script/expression">    
             </div>
 
             
             <div>
                 <label>content type</label>
-                <input type="text" name="scripts.contenttype:records" tal:attributes="value script/contenttype">    
+                <input type="text" name="scripts.contenttype:records:string" tal:attributes="value script/contenttype">    
             </div>
 
             
             <div>
                 <label>inline</label>
-                <input type="checkbox" name="scripts.inline:records.boolean" tal:attributes="checked script/inline">    
+                <input type="checkbox" name="scripts.inline:records:boolean" tal:attributes="checked script/inline">
+                <input type="hidden" name="scripts.inline:records:boolean:default" value="False">
             </div>
 
             <div>
                 <label>enabled</label>
-                <input type="checkbox" name="scripts.enabled:records.boolean" tal:attributes="checked script/enabled">    
+                <input type="checkbox" name="scripts.enabled:records:boolean" tal:attributes="checked script/enabled">
+                <input type="hidden" name="scripts.enabled:records:boolean:default" value="False">
             </div>
 
       </fieldset>

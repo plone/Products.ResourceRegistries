@@ -53,7 +53,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
-    def registerScript(self, id, expression='', contenttype='text/javascript', inline=0, enabled=1):
+    def registerScript(self, id, expression='', contenttype='text/javascript', inline=False, enabled=True):
         """ register a script"""
         script = {}
         script['id'] = id
@@ -130,11 +130,9 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             script = {}
             script['id']         = r.get('id')
             script['expression'] = r.get('expression', '') 
-            script['media']      = r.get('media', '')
-            script['rel']        = r.get('rel', 'script') 
-            script['cssimport']  = r.get('cssimport', False)
-            script['inline']     = r.get('inline', False)
-            script['enabled']    = r.get('enabled', True)
+            script['contenttype']= r.get('contenttype', 'text/javascript')
+            script['inline']     = r.get('inline')
+            script['enabled']    = r.get('enabled')
 
             scripts.append(script)
         self.scripts = tuple(scripts)
@@ -181,7 +179,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.concatenatedscripts = {}
         self.cookedscripts = ()
         results = []
-        for script in scripts:
+        for script in [s for s in scripts if s.get('enabled')]:
             #self.concatenatedscripts[script['id']] = [script['id']]
             if results:
                 previtem = results[-1]
@@ -248,17 +246,16 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             return 1
         
     
-    def __getitem__(self, item):
-        """ Return a script from the registry """
+    def getScript(self, item, context):
+        """ fetch script for delivery"""
         ids = self.concatenatedscripts[item]
-        ids.reverse()
         output = ""
         
         scripts = self.getScriptsDict()
         
         for id in ids:
             try:
-                obj = getattr(self.aq_parent, id)
+                obj = getattr(context, id)
             except AttributeError:
                 output += "\n/* XXX ERROR -- could not find '%s' XXX */\n"%(id)
                 content=""
@@ -279,10 +276,25 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             # add start/end notes to the stylesheet
             # makes for better understanding and debugging
             if content:
-                output += "/* ----- start %s ----- */\n" % (id,)
+                output += "\n/* ----- start %s ----- */\n" % (id,)
                 output += content
-                output += "/* ----- end %s ----- */\n" % (id,)
-        
+                output += "\n/* ----- end %s ----- */\n" % (id,)
+        return output
+    
+    def getInlineScript(self, item, context):
+        """ return a script as inline code, not as a file object"""
+        headers = self.REQUEST.RESPONSE.headers.copy()
+        # save the RESPONSE headers 
+        output = self.getScript(item, context)
+        # file objects and other might manipulate the headers, 
+        # something we don't want. we set the saved headers back.
+        self.REQUEST.RESPONSE.headers = headers
+        # this should probably be solved a cleaner way.
+        return str(output)
+    
+    def __getitem__(self, item):
+        """ Return a script from the registry """
+        output = self.getScript(item, self)    
         return File(item, item, output, "text/javascript").__of__(self)
         
 InitializeClass(JSRegistryTool)

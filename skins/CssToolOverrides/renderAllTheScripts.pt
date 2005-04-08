@@ -6,7 +6,8 @@
             <tal:renderer tal:repeat="script scripts">
                 <script tal:condition="python:not script['inline']"
                         type="text/javascript" 
-                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/id};" />
+                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/id};" >
+                </script>
                     
                 <tal:inline tal:condition="python:script['inline']">
                 <script 

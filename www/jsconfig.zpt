@@ -62,7 +62,7 @@ function shiftBlocks(fieldset, previousBlock){
       
       <fieldset tal:repeat="script here/getScripts">
                  <p class="delete-button">
-            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/id}'">** Remove this script **</a></p>
+            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/id}">** Remove this script **</a></p>
             
             <div>
                 <label>id</label>

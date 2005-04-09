@@ -36,11 +36,17 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
     # ZMI stuff
     manage_jsForm = PageTemplateFile('www/jsconfig', config.GLOBALS)
+    manage_jsComposition = PageTemplateFile('www/jscomposition', config.GLOBALS)
+
+    
     
     manage_options=(
         ({ 'label'  : 'Javascript Registry',
            'action' : 'manage_jsForm',
            },
+        { 'label'  : 'Merged JS Composition',
+           'action' : 'manage_jsComposition',
+           } 
          ) + SimpleItem.manage_options
         )    
         

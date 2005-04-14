@@ -1,5 +1,5 @@
 
-Things to do in the near future: 
+Things to do in the near future (not in order of priority): 
 
   - Add support for IE-only-hack for stylesheets
 
@@ -7,16 +7,21 @@ Things to do in the near future:
 
   - Stylesheet and script ordering in the ZMI panels
 
-  - Change from dicts to classes to hold the registry information
+  - Change from dicts to classes to hold the registry information?
   
   - Find a way to let Limi enforce pretty URLs for stylesheets instead of the magic numbered ones. 
 
   - Write install instructions
   
-  - Force Limi to add better icons
+  - Better icons
   
-  - Split the Plone Javascripts into components and include in the skin
+  - Make sure http-headers are not messed up with inline css/js
   
+  - add some handling of cache-headers   
+
+  - functional tests to check that the http-header handling is correct? 
+
+  - clean up ZMI forms
 
 Thoughts for the future that are not explicitly plannned for: 
 

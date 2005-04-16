@@ -24,11 +24,12 @@ import random
 
 
 class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
-    """An example tool.
+    """ A Plone registry for managing the linking to Javascript files.
     """
 
     id = config.JSTOOLNAME
     meta_type = config.JSTOOLTYPE
+    title = "JavaScript Registry"
 
     security = ClassSecurityInfo()
 
@@ -94,12 +95,12 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     
     security.declareProtected(permissions.ManagePortal, 'getScripts')
     def getScripts(self ):
-        """ get the script data, uncooked. for management screens """
+        """ get all the registered script data, uncooked. for management screens """
         return tuple([item.copy() for item in self.scripts])
         
     security.declareProtected(permissions.ManagePortal, 'unregisterScript')        
     def unregisterScript(self, id ):
-        """ unreginster a registered script """
+        """ unregister a registered script """
         scripts = [ item for item in self.getScripts() if item.get('id') != id ]
         self.scripts = tuple(scripts)
         self.cookScripts()
@@ -107,19 +108,19 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
           
     security.declarePrivate('clearScripts')
     def clearScripts(self):
-        """ Clears all script data. convenience for Plone migrations"""
+        """ Clears all script data. Convenience funtion for Plone migrations and tests"""
         self.scripts = ()
         self.cookedscripts = ()
         self.concatenatedscripts = {}
         
-    ###############
+    ##################################
     # ZMI METHODS
+    #
 
     security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
     def manage_addScript(self,id, expression='', contenttype='text/javascript', inline=False, enabled=True, REQUEST=None):
         """ register a script from a TTW request"""
         self.registerScript(id, expression, contenttype, inline, enabled)
-                            
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -148,7 +149,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
     security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
     def manage_removeScript(self, id, REQUEST=None):
-        """ remove script from the ZMI"""
+        """ remove script with ZMI button"""
         self.unregisterScript(id)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
@@ -160,7 +161,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
      
     security.declarePrivate('getScriptsDict')
     def getScriptsDict(self):
-        """ get the scripts as a disctionary insterad of an ordered list. Good for lookups. internal"""
+        """ get the scripts as a disctionary instead of an ordered list. Good for lookups. internal"""
         scripts = self.getScripts()
         d = {}
         for s in scripts:
@@ -288,7 +289,9 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         return output
     
     def getInlineScript(self, item, context):
-        """ return a script as inline code, not as a file object"""
+        """ return a script as inline code, not as a file object. 
+            Needs to take care not to mess up http headers    
+        """
         headers = self.REQUEST.RESPONSE.headers.copy()
         # save the RESPONSE headers 
         output = self.getScript(item, context)

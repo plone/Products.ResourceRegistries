@@ -25,13 +25,12 @@ import random
 
 class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     """ A Plone registry for managing the linking to css files.
-        Prioritize, categorize and link by media. 
-        Adjacent stylesheets with equal conditions will be concatenated to larger 
-        composite stylesheets 
     """
 
     id = config.TOOLNAME
     meta_type = config.TOOLTYPE
+    title = "CSS Registry"
+
 
     security = ClassSecurityInfo()
 

@@ -60,12 +60,11 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
-    def registerScript(self, id, expression='', contenttype='text/javascript', inline=False, enabled=True):
+    def registerScript(self, id, expression='', inline=False, enabled=True):
         """ register a script"""
         script = {}
         script['id'] = id
         script['expression'] = expression 
-        script['contenttype'] = contenttype
         script['inline'] = inline
         script['enabled'] = enabled
         self.storeScript(script)
@@ -118,9 +117,9 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     #
 
     security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
-    def manage_addScript(self,id, expression='', contenttype='text/javascript', inline=False, enabled=True, REQUEST=None):
+    def manage_addScript(self,id, expression='', inline=False, enabled=True, REQUEST=None):
         """ register a script from a TTW request"""
-        self.registerScript(id, expression, contenttype, inline, enabled)
+        self.registerScript(id, expression, inline, enabled)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -137,7 +136,6 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             script = {}
             script['id']         = r.get('id')
             script['expression'] = r.get('expression', '') 
-            script['contenttype']= r.get('contenttype', 'text/javascript')
             script['inline']     = r.get('inline')
             script['enabled']    = r.get('enabled')
 
@@ -170,7 +168,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
  
        
     def compareScripts(self, s1, s2 ):
-        for attr in ('expression', 'media', 'rel', 'cssimport', 'inline'):
+        for attr in ('expression', 'inline'):
             if s1.get(attr) != s2.get(attr):
                 return 0
         return 1
@@ -280,7 +278,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                 else:
                     content = str(obj)
             
-            # add start/end notes to the stylesheet
+            # add start/end notes to the script
             # makes for better understanding and debugging
             if content:
                 output += "\n/* ----- start %s ----- */\n" % (id,)
@@ -303,7 +301,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     
     def __getitem__(self, item):
         """ Return a script from the registry """
-        output = self.getScript(item, self)    
-        return File(item, item, output, "text/javascript").__of__(self)
+        output = self.getScript(item, self)
+        return File(item, item, output, "application/x-javascript").__of__(self)
         
 InitializeClass(JSRegistryTool)

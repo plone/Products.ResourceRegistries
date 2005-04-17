@@ -56,7 +56,7 @@ class testJSZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-        self.tool.scripts = []    
+        self.tool.clearScripts()
                 
     def testAdd(self):
         self.tool.manage_addScript(id='joe')
@@ -68,7 +68,7 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-        self.tool.scripts = []    
+        self.tool.clearScripts()
 
 
     def testStoringScript(self):
@@ -77,7 +77,6 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(self.tool.getScripts()), 1)
         script = self.tool.getScripts()[0]
         self.assertEqual(script.get('id'), 'foo')
-        self.assertEqual(script.get('contenttype'), 'text/javascript')
         self.assertEqual(script.get('expression'), '')
         self.assertEqual(script.get('inline'), False)
         self.assertEqual(script.get('enabled'), True)
@@ -105,7 +104,7 @@ class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-        self.tool.scripts = []    
+        self.tool.clearScripts()
 
     def testRegistrationSecurity(self):
         from AccessControl import Unauthorized
@@ -123,7 +122,7 @@ class TestJSToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-        self.tool.scripts = []    
+        self.tool.clearScripts()
 
     def testSimplestExpression(self):
         context = self.portal
@@ -144,7 +143,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-        self.tool.scripts = []    
+        self.tool.clearScripts()
         
     def testScriptCooking(self):
         self.tool.registerScript('ham')
@@ -246,7 +245,7 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
-        self.tool.scripts = []    
+        self.tool.clearScripts()
         self.tool.registerScript('plone_javascripts.js')
 
     def testGetItemTraversal(self):
@@ -268,14 +267,32 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('plone_javascripts.js' in content)
         self.failUnless('registerPloneFunction' in content)
 
-    def testCompositesWithBrokedId(self):
+    def testCompositesWithBrokenId(self):
         self.tool.registerScript('nonexistant.js')
         scripts = self.tool.getEvaluatedScripts(self.portal)
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
 
+class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
+    """Integration tests. - testing http headers etc."""
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearScripts()
+        self.toolpath = '/'+self.tool.absolute_url(1)
+        self.tool.registerScript('plone_javascripts.js')
+
+    def testPublishJSThroughTool(self):
+        response = self.publish(self.toolpath+'/plone_javascripts.js')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript')
+
+
+
+
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
+    """ Test the defualt install for plone 2.0.x series """
+    # these do not run for plone 2.1 + 
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -332,6 +349,7 @@ def test_suite():
     suite.addTest(makeSuite(TestJSToolExpression))
     suite.addTest(makeSuite(TestJSScriptCooking))
     suite.addTest(makeSuite(TestJSTraversal))
+    suite.addTest(makeSuite(TestPublishing))
 
     if not PLONE21:
         # we must not test for the defaults in Plone 2.1 because they are all different

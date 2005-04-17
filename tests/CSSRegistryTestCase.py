@@ -24,7 +24,7 @@ PRODUCTS = ['CSSRegistry']
 PloneTestCase.setupPloneSite(products=PRODUCTS)
 
 
-class CSSRegistryTestCase(PloneTestCase.PloneTestCase):
+class CSSRegistryTestCase(ZopeTestCase.Functional, PloneTestCase.PloneTestCase):
 
     class Session(dict):
         def set(self, key, value):

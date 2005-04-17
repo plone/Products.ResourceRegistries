@@ -32,7 +32,7 @@ class ICSSRegistry(Interface):
         
 class IJSRegistry(Interface):
     
-    def registerScript(id, expression='', contenttype='text/javascript', inline=False, enabled=True):
+    def registerScript(id, expression='', inline=False, enabled=True):
         """ register a script"""
             
     def unregisterScript(id):
@@ -52,7 +52,7 @@ class IJSRegistry(Interface):
         save script data from form submission
         """
 
-    def manage_addScript(id, expression='', contenttype='text/javascript', inline=False, enabled=True , REQUEST=None):
+    def manage_addScript(id, expression='', inline=False, enabled=True , REQUEST=None):
         """ Add script from a ZMI form"""
     
     def manage_removeScript(id, REQUEST=None):

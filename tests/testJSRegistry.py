@@ -11,6 +11,7 @@ from Products.CSSRegistry.tests import CSSRegistryTestCase
 
 from Products.CSSRegistry.config import JSTOOLNAME
 from Products.CSSRegistry.interfaces import IJSRegistry
+from Products.CMFCore.utils import getToolByName
 from Interface.Verify import verifyObject
 
 from Products.PloneTestCase.PloneTestCase import PLONE21        
@@ -280,6 +281,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearScripts()
         self.toolpath = '/'+self.tool.absolute_url(1)
+        self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
         self.tool.registerScript('plone_javascripts.js')
 
     def testPublishJSThroughTool(self):
@@ -287,7 +289,26 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript')
 
+    def testPublishNonMagicJSThroughTool(self):
+        #this one fails because of the broken traversal hook
+        self.setRoles(['Manager'])
+        body = '''<dtml-var "'joined' + 'string'">'''
+        self.portal.addDTMLMethod('testmethod', file=body)
+        response = self.publish(self.toolpath+'/testmethod')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript')
 
+    def testPublishPageWithInlineJS(self):
+        # this one fails from string/utf-8 concatenation
+        response = self.publish(self.portalpath)
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.tool.clearScripts()
+        self.tool.registerScript('plone_javascripts.js', inline=True)
+        # test that the main page retains its content-type
+        response = self.publish(self.portalpath)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getStatus(), 200)
 
 
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):

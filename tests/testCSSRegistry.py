@@ -12,6 +12,7 @@ from Products.CSSRegistry.tests import CSSRegistryTestCase
 from Products.CSSRegistry.config import TOOLNAME
 from Products.CSSRegistry.interfaces import ICSSRegistry
 from Interface.Verify import verifyObject
+from Products.CMFCore.utils import getToolByName
 
 from Products.PloneTestCase.PloneTestCase import PLONE21
 
@@ -312,6 +313,41 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless("background-color : red" in content)
         self.failUnless("H1 { color: blue; }" in content)
 
+class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
+    """Integration tests. - testing http headers etc."""
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.clearStylesheets()
+        self.toolpath = '/'+self.tool.absolute_url(1)
+        self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
+        self.tool.registerStylesheet('plone_styles.css')
+
+    def testPublishJSThroughTool(self):
+        response = self.publish(self.toolpath+'/plone_styles.css')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+
+    def testPublishNonMagicJSThroughTool(self):
+        #this one fails because of the broken traversal hook
+        self.setRoles(['Manager'])
+        body = '''<dtml-var "'joined' + 'string'">'''
+        self.portal.addDTMLMethod('testmethod', file=body)
+        response = self.publish(self.toolpath+'/testmethod')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+
+    def testPublishPageWithInlineJS(self):
+        # this one fails from string/utf-8 concatenation
+        response = self.publish(self.portalpath)
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.tool.clearScripts()
+        self.tool.registerStylesheet('poneStyles', inline=True)
+        # test that the main page retains its content-type
+        #response = self.publish(self.portalpath)
+        #print response.getBody()
+        #self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        #self.assertEqual(response.getStatus(), 200)
 
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -366,6 +402,7 @@ def test_suite():
     suite.addTest(makeSuite(TestToolSecurity))
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))
+    suite.addTest(makeSuite(TestPublishing))
     suite.addTest(makeSuite(TestTraversal))
     
     if not PLONE21:

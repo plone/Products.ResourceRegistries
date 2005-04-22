@@ -12,9 +12,9 @@ ZopeTestCase.installProduct('CMFFormController', quiet=1)
 ZopeTestCase.installProduct('GroupUserFolder', quiet=1)
 ZopeTestCase.installProduct('ZCTextIndex', quiet=1)
 ZopeTestCase.installProduct('ExtendedPathIndex')
+ZopeTestCase.installProduct('UnicodeDetector')
 
 ZopeTestCase.installProduct('CMFPlone')
-
 ZopeTestCase.installProduct('CSSRegistry')
 
 from Products.PloneTestCase import PloneTestCase

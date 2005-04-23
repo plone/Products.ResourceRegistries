@@ -322,12 +322,12 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
         self.tool.registerStylesheet('plone_styles.css')
 
-    def testPublishJSThroughTool(self):
+    def testPublishCSSThroughTool(self):
         response = self.publish(self.toolpath+'/plone_styles.css')
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
 
-    def testPublishNonMagicJSThroughTool(self):
+    def testPublishNonMagicCSSThroughTool(self):
         #this one fails because of the broken traversal hook
         self.setRoles(['Manager'])
         body = '''<dtml-var "'joined' + 'string'">'''
@@ -341,8 +341,8 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         response = self.publish(self.portalpath)
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
-        self.tool.clearScripts()
-        self.tool.registerStylesheet('poneStyles', inline=True)
+        self.tool.clearStylesheets()
+        self.tool.registerStylesheet('ploneStyles.css', rendering='inline')
         # test that the main page retains its content-type
         #response = self.publish(self.portalpath)
         #print response.getBody()

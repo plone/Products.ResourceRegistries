@@ -280,7 +280,6 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             if obj is not None:
                 if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
                     content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
-            
                 # we should add more explicit type-matching checks.    
                 elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                     content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
@@ -291,7 +290,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             
             # add start/end notes to the stylesheet
             # makes for better understanding and debugging
-            if content:
+            if content is not None:
                 output += "/* ----- start %s ----- */\n" % (id,)
                 m = sheets[id].get('media')
                 if not m:

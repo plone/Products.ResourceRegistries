@@ -337,18 +337,19 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
 
-    def testPublishPageWithInlineJS(self):
-        # this one fails from string/utf-8 concatenation
+    def testPublishPageWithInlineCSS(self):
         response = self.publish(self.portalpath)
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.tool.clearStylesheets()
-        self.tool.registerStylesheet('ploneStyles.css', rendering='inline')
         # test that the main page retains its content-type
-        #response = self.publish(self.portalpath)
-        #print response.getBody()
-        #self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
-        #self.assertEqual(response.getStatus(), 200)
+        self.setRoles(['Manager'])
+        body = """<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/css')">/*and some css comments too*/ """
+        self.portal.addDTMLMethod('testmethod', file=body)
+        self.tool.registerStylesheet('testmethod', rendering='inline')    
+        response = self.publish(self.portalpath)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getStatus(), 200)
 
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 

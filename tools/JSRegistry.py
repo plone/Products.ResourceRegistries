@@ -253,15 +253,14 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     
     def getScript(self, item, context):
         """ fetch script for delivery"""
-        ids = self.concatenatedscripts[item]
-        output = ""
-        
+        ids = self.concatenatedscripts.get(item,None)        
         scripts = self.getScriptsDict()
+        output = ""
         
         for id in ids:
             try:
                 obj = getattr(context, id)
-            except AttributeError:
+            except AttributeError, KeyError:
                 output += "\n/* XXX ERROR -- could not find '%s' XXX */\n"%(id)
                 content=""
                 obj = None
@@ -303,5 +302,15 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ Return a script from the registry """
         output = self.getScript(item, self)
         return File(item, item, output, "application/x-javascript").__of__(self)
+        
+    def __bobo_traverse__(self, REQUEST, name):
+        """ traversal hook"""
+        if REQUEST is not None and self.concatenatedscripts.get(name,None) is not None:
+            return self.__getitem__(name)
+        obj = getattr(self, name, None)
+        if obj is not None:
+            return obj
+        raise AttributeError('%s'%(name,))
+        
         
 InitializeClass(JSRegistryTool)

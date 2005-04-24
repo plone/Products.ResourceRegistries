@@ -332,6 +332,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Manager'])
         body = '''<dtml-var "'joined' + 'string'">'''
         self.portal.addDTMLMethod('testmethod', file=body)
+        self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath+'/testmethod')
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')

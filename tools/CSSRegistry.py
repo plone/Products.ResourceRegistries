@@ -302,5 +302,17 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                 output += "/* ----- end %s ----- */\n" % (id,)
         
         return File(item, item, output, "text/css").__of__(self)
+
+    def __bobo_traverse__(self, REQUEST, name):
+        """ traversal hook"""
+        if REQUEST is not None and self.concatenatedstylesheets.get(name,None) is not None:
+            return self.__getitem__(name)
+        obj = getattr(self, name, None)
+        if obj is not None:
+            return obj
+        raise AttributeError('%s'%(name,))
+        
+
+
         
 InitializeClass(CSSRegistryTool)    

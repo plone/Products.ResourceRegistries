@@ -255,8 +255,11 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def getScript(self, item, context):
         """ fetch script for delivery"""
         ids = self.concatenatedscripts.get(item,None)        
-        scripts = self.getScriptsDict()
+        if ids is not None:
+            ids = ids[:]
+            ids.reverse()
         output = ""
+        scripts = self.getScriptsDict()
         
         for id in ids:
             try:
@@ -268,8 +271,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
             if obj is not None:
                 if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
-                    content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
-            
+                    content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)            
                 # we should add more explicit type-matching checks.    
                 elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                     content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
@@ -299,11 +301,13 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         # this should probably be solved a cleaner way.
         return str(output)
     
+    
     def __getitem__(self, item):
         """ Return a script from the registry """
         output = self.getScript(item, self)
         self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.JS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))        
         return File(item, item, output, "application/x-javascript").__of__(self)
+        
         
     def __bobo_traverse__(self, REQUEST, name):
         """ traversal hook"""

@@ -361,7 +361,6 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.clearStylesheets()
         self.failIf(self.tool.getStylesheets())
     
-
     def testDefaultsInstall(self):
         stylesheetids = [item['id'] for item in self.tool.getStylesheets()]
         self.failUnless('plone.css' in stylesheetids)
@@ -389,9 +388,7 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf("&lt;dtml-call" in o)            
         self.failIf("&amp;dtml-fontBaseSize;" in o)            
         self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)            
-        
-        
-                
+                    
 
 def test_suite():
     from unittest import TestSuite, makeSuite

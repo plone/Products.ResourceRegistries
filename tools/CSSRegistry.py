@@ -20,6 +20,8 @@ from Products.CMFCore.Expression import createExprContext
 
 from OFS.Image import File
 
+from DateTime import DateTime
+
 import random
 
 
@@ -97,6 +99,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
+
     security.declareProtected(permissions.ManagePortal, 'manage_saveStylesheets')
     def manage_saveStylesheets(self, REQUEST=None):
         """
@@ -122,6 +125,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
+
     security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
     def manage_removeStylesheet(self, id, REQUEST=None):
         """ remove stylesheet from the ZMI"""
@@ -129,10 +133,12 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
+
     security.declareProtected(permissions.ManagePortal, 'getStylesheets')
     def getStylesheets(self):
         """ get the stylesheets for management screens """
         return tuple([item.copy() for item in self.stylesheets])
+
 
     security.declarePrivate('getStylesheetsDict')
     def getStylesheetsDict(self):
@@ -143,10 +149,12 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             d[s['id']]=s
         return d
 
+
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):
         """rendering methods for use in ZMI forms"""
         return config.CSS_RENDER_METHODS
+
 
     security.declarePrivate('validateId')
     def validateId(self, id, existing):
@@ -180,11 +188,13 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                 # this part needs a test
         return 1
 
+
     security.declarePrivate('generateId')            
     def generateId(self):
         base = "ploneStyles"
         appendix = ".css"
         return "%s%04d%s" % (base, random.randint(0, 9999), appendix)
+
                                        
     security.declarePrivate('cookStylesheets')            
     def cookStylesheets(self ):
@@ -227,6 +237,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]    
         results.reverse()
         return results
+
          
     security.declarePrivate('evaluateExpression')
     def evaluateExpression(self, expression, context):
@@ -260,19 +271,20 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         except AttributeError:
             return 1
         
-    
-    def __getitem__(self, item):
+
+    def getStylesheet(self, item, context):
         """ Return a stylesheet from the registry """
-        ids = self.concatenatedstylesheets[item][:]
-        ids.reverse()
-        output = ""
-        
+        ids = self.concatenatedstylesheets.get(item,None)
+        if ids is not None:
+            ids = ids[:]
+            ids.reverse()
+        output = ""        
         sheets = self.getStylesheetsDict()
         
         for id in ids:
             try:
-                obj = getattr(self.aq_parent, id)
-            except AttributeError:
+                obj = getattr(context, id)
+            except AttributeError, KeyError:
                 output += "\n/* XXX ERROR -- could not find '%s' XXX */\n"%(id)
                 content=""
                 obj = None
@@ -299,8 +311,29 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                     output += "@media %s {\n%s\n}\n"%(m, content)
 
                 output += "/* ----- end %s ----- */\n" % (id,)
+        return output
         
+    
+    def getInlineStylesheet(self, item, context):
+        """ return a stylesheet as inline code, not as a file object. 
+            Needs to take care not to mess up http headers    
+        """
+        headers = self.REQUEST.RESPONSE.headers.copy()
+        # save the RESPONSE headers 
+        output = self.getStylesheet(item, context)
+        # file objects and other might manipulate the headers, 
+        # something we don't want. we set the saved headers back.
+        self.REQUEST.RESPONSE.headers = headers
+        # this should probably be solved a cleaner way.
+        return str(output)
+
+
+    def __getitem__(self, item):
+        """ Return a script from the registry """
+        output = self.getStylesheet(item, self)
+        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.CSS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))        
         return File(item, item, output, "text/css").__of__(self)
+
 
     def __bobo_traverse__(self, REQUEST, name):
         """ traversal hook"""

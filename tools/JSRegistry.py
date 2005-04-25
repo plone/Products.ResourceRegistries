@@ -19,6 +19,7 @@ from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
 
 from OFS.Image import File
+from DateTime import DateTime
 
 import random
 
@@ -301,6 +302,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def __getitem__(self, item):
         """ Return a script from the registry """
         output = self.getScript(item, self)
+        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.JS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))        
         return File(item, item, output, "application/x-javascript").__of__(self)
         
     def __bobo_traverse__(self, REQUEST, name):

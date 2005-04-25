@@ -307,10 +307,21 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.clearScripts()
         self.tool.registerScript('plone_javascripts.js', inline=True)
         # test that the main page retains its content-type
-        #response = self.publish(self.portalpath)
-        #print response.getBody()
-        #self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
-        #self.assertEqual(response.getStatus(), 200)
+        response = self.publish(self.portalpath)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getStatus(), 200)
+
+    def testPublishPageWithInlineJS2(self):
+        self.tool.clearScripts()
+        # test that the main page retains its content-type
+        self.setRoles(['Manager'])
+        body = """<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/javascript')">/*and some js comments too*/ """
+        self.portal.addDTMLMethod('testmethod', file=body)
+        self.tool.registerScript('testmethod', inline=True)    
+        response = self.publish(self.portalpath)
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getStatus(), 200)
+
 
 
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):

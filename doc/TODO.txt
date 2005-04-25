@@ -8,18 +8,12 @@ Things to do in the near future (not in order of priority):
   - Stylesheet and script ordering in the ZMI panels
 
   - Change from dicts to classes to hold the registry information?
-  
-  - Find a way to let Limi enforce pretty URLs for stylesheets instead of the magic numbered ones. 
 
   - Write install instructions
   
   - Better icons
   
-  - Make sure http-headers are not messed up with inline css/js
-  
   - add some handling of cache-headers   
-
-  - functional tests to check that the http-header handling is correct? 
 
   - clean up ZMI forms
 

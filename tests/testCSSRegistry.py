@@ -1,5 +1,5 @@
 #
-# CSSRegistryTestCase 
+# CSSRegistryTestCase
 #
 
 import os, sys
@@ -34,7 +34,7 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testToolExists(self):
         self.failUnless(TOOLNAME in self.portal.objectIds())
-        
+
     def testZMIForm(self):
         tool = getattr(self.portal, TOOLNAME)
         self.setRoles(['Manager'])
@@ -49,23 +49,23 @@ class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
-        self.failUnless('CSSRegistry' in skins) 
+        self.failUnless('CSSRegistry' in skins)
 
     def testSkinExists(self):
         self.failUnless(getattr(self.portal, 'renderAllTheStylesheets' ))
 
 
 class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
-    
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
         self.tool.clearStylesheets()
-                
+
     def testAdd(self):
         self.tool.manage_addStylesheet(id='joe')
         self.assertEqual(len(self.tool.getStylesheets()),1)
         self.failUnless(self.tool.getStylesheets())
- 
+
 
 class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -75,31 +75,31 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testStoringStylesheet(self):
         self.tool.registerStylesheet('foo')
-        
+
         self.assertEqual(len(self.tool.getStylesheets()), 1)
         self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
 
     def testDisallowingDuplicateIds(self):
         self.tool.registerStylesheet('foo')
         self.assertRaises(ValueError , self.tool.registerStylesheet , 'foo')
-        
+
     def testPloneCustomStaysOnTop(self):
 
-        self.tool.registerStylesheet('foo')        
+        self.tool.registerStylesheet('foo')
         self.tool.registerStylesheet('ploneCustom.css')
         self.assertEqual(len(self.tool.getStylesheets()), 2)
         self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'ploneCustom.css')
         self.assertEqual(self.tool.getStylesheets()[1].get('id'), 'foo')
 
     def testUnregisterStylesheet(self):
-        self.tool.registerStylesheet('foo')        
+        self.tool.registerStylesheet('foo')
         self.assertEqual(len(self.tool.getStylesheets()), 1)
         self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
         self.tool.unregisterStylesheet('foo')
         self.assertEqual(len(self.tool.getStylesheets()), 0)
-        
+
     def testStylesheetsDict(self):
-        self.tool.registerStylesheet('spam')        
+        self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('ham')
         keys = self.tool.getStylesheetsDict().keys()
         keys.sort()
@@ -107,27 +107,27 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         res.sort()
         self.assertEqual(res,keys)
         self.assertEqual(self.tool.getStylesheetsDict()['ham']['id'], 'ham')
-        
+
 class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
-    
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
         self.tool.clearStylesheets()
 
     def testRegistrationSecurity(self):
         from AccessControl import Unauthorized
-        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'registerStylesheet')        
-        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'unregisterStylesheet')        
+        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'registerStylesheet')
+        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'unregisterStylesheet')
         self.setRoles(['Manager'])
         try:
-            self.tool.restrictedTraverse('registerStylesheet')  
-            self.tool.restrictedTraverse('unregisterStylesheet')  
+            self.tool.restrictedTraverse('registerStylesheet')
+            self.tool.restrictedTraverse('unregisterStylesheet')
         except Unauthorized:
-            self.fail()      
+            self.fail()
 
 
 class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
-    
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
         self.tool.clearStylesheets()
@@ -146,18 +146,18 @@ class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
         self.folder.invokeFactory('Document', 'eggs')
         context = self.folder
         self.failUnless(self.tool.evaluateExpression('python:"eggs" in object.objectIds()', context ))
-        
+
 class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
-    
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
         self.tool.clearStylesheets()
-        
+
     def testStylesheetCooking(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
-                
+
         self.assertEqual(len(self.tool.getStylesheets()), 3)
         self.assertEqual(len(self.tool.cookedstylesheets), 1)
         self.assertEqual(len(self.tool.concatenatedstylesheets.keys()), 4)
@@ -168,15 +168,15 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('eggs')
 
         self.assertEqual(self.tool.concatenatedstylesheets[self.tool.cookedstylesheets[0].get('id')], ['eggs', 'spam', 'ham'] )
-        
-        
-    def testGetEvaluatedStylesheetsCollapsing(self ):        
+
+
+    def testGetEvaluatedStylesheetsCollapsing(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)) , 1 )
 
-    def testMoreComplexStylesheetsCollapsing(self ):        
+    def testMoreComplexStylesheetsCollapsing(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',           expression='string:spam')
         self.tool.registerStylesheet('spam spam',      expression='string:spam')
@@ -189,13 +189,13 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf('spam' in ids )
         self.failIf('spam spam' in ids )
         self.failIf('spam spam spam' in ids )
-        
-    def testGetEvaluatedStylesheetsWithExpression(self ):        
+
+    def testGetEvaluatedStylesheetsWithExpression(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',expression='python:1')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 2 )
 
-    def testGetEvaluatedStylesheetsWithFailingExpression(self ):        
+    def testGetEvaluatedStylesheetsWithFailingExpression(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',expression='python:0')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
@@ -205,13 +205,13 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('spam',expression='python:"eggs" in object.objectIds()')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
 
-    def testCollapsingStylesheetsLookup(self):        
+    def testCollapsingStylesheetsLookup(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',           expression='string:ham')
         self.tool.registerStylesheet('spam spam',      expression='string:ham')
         evaluated = self.tool.getEvaluatedStylesheets(self.folder)
         self.assertEqual(len(evaluated), 2)
-        
+
     def testRenderingIsInTheRightOrder(self):
         self.tool.registerStylesheet('ham' , expression='string:ham')
         self.tool.registerStylesheet('spam', expression='string:spam')
@@ -219,7 +219,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         evaluatedids = [item['id'] for item in evaluated]
         self.failUnless(evaluatedids[1]=='spam')
         self.failUnless(evaluatedids[0]=='ham')
-        
+
     def testConcatenatedSheetsAreInTheRightOrderToo(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
@@ -229,8 +229,8 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(results[2]=='ham')
         self.failUnless(results[1]=='spam')
         self.failUnless(results[0]=='eggs')
-        
-    def testRenderingStylesheetLinks(self):        
+
+    def testRenderingStylesheetLinks(self):
         self.tool.registerStylesheet('ham',                 rendering='link')
         self.tool.registerStylesheet('ham 2 b merged',      rendering='link')
         self.tool.registerStylesheet('spam', expression='string:ham', rendering='link')
@@ -240,28 +240,28 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('<link' in all)
         self.failUnless('/spam' in all)
         self.failIf('/simple.css' in all)
-        
-        
+
+
     def testReenderingConcatenatesInline(self):
         self.tool.registerStylesheet('simple.css',  rendering='inline')
         self.tool.registerStylesheet('simple2.css', rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
-        self.failUnless('blue' in all)        
+        self.failUnless('blue' in all)
 
     def testDifferentMediaAreCollapsed(self):
         self.tool.registerStylesheet('simple.css',  media='print')
         self.tool.registerStylesheet('simple2.css', media='all')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)),1)
 
-        
+
     def testRenderingWorksInMainTemplate(self):
 
         renderedpage = getattr(self.portal, 'index_html')()
         self.failIf('background-color' in renderedpage)
-        
+
         self.tool.registerStylesheet('simple.css', rendering='inline')
-        
+
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
 
@@ -275,10 +275,10 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testGetItemTraversal(self):
         self.failUnless(self.tool['simple.css'])
-        
+
     def testGetItemTraversalContent(self):
         self.failUnless('background-color' in str(self.tool['simple.css']))
-        
+
     def testRestrictedTraverseContent(self):
         self.failUnless('background-color' in str(self.portal.restrictedTraverse('portal_css/simple.css')))
 
@@ -288,7 +288,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         styles = self.tool.getEvaluatedStylesheets(self.portal)
         self.assertEqual(len(styles), 1)
         magicId = styles[0].get('id')
-        
+
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
         self.failUnless('background-color' in content)
         self.failUnless('blue' in content)
@@ -306,9 +306,9 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         styles = self.tool.getEvaluatedStylesheets(self.portal)
         self.assertEqual(len(styles), 1)
         magicId = styles[0].get('id')
-        
+
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        
+
         self.failUnless("@media print" in content)
         self.failUnless("background-color : red" in content)
         self.failUnless("H1 { color: blue; }" in content)
@@ -346,7 +346,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Manager'])
         body = """<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/css')">/*and some css comments too*/ """
         self.portal.addDTMLMethod('testmethod', file=body)
-        self.tool.registerStylesheet('testmethod', rendering='inline')    
+        self.tool.registerStylesheet('testmethod', rendering='inline')
         response = self.publish(self.portalpath)
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
@@ -355,12 +355,12 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, TOOLNAME)
-    
+
     def testClearingStylesheets(self):
         self.failUnless(self.tool.getStylesheets())
         self.tool.clearStylesheets()
         self.failIf(self.tool.getStylesheets())
-    
+
     def testDefaultsInstall(self):
         stylesheetids = [item['id'] for item in self.tool.getStylesheets()]
         self.failUnless('plone.css' in stylesheetids)
@@ -376,7 +376,7 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
             except KeyError:
                 self.fail()
 
-    def testCallingOfConcatenatedStylesheets(self):     
+    def testCallingOfConcatenatedStylesheets(self):
         stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
         for s in stylesheets:
             if 'ploneStyles' in s.get('id'):
@@ -385,10 +385,10 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         if not output:
             self.fail()
         o = str(output)[:]
-        self.failIf("&lt;dtml-call" in o)            
-        self.failIf("&amp;dtml-fontBaseSize;" in o)            
-        self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)            
-                    
+        self.failIf("&lt;dtml-call" in o)
+        self.failIf("&amp;dtml-fontBaseSize;" in o)
+        self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -403,12 +403,12 @@ def test_suite():
     suite.addTest(makeSuite(TestStylesheetCooking))
     suite.addTest(makeSuite(TestPublishing))
     suite.addTest(makeSuite(TestTraversal))
-    
+
     if not PLONE21:
         # we must not test for the defaults in Plone 2.1 because they are all different
         # Plone2.1 has tests in CMFPlone/tests for defaults and migrations
         suite.addTest(makeSuite(TestCSSDefaults))
-        
+
     return suite
 
 if __name__ == '__main__':

@@ -283,9 +283,8 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             # add start/end notes to the script
             # makes for better understanding and debugging
             if content:
-                output += "\n/* ----- start %s ----- */\n" % (id,)
+                output += "\n/* ----- %s ----- */\n" % (id,)
                 output += content
-                output += "\n/* ----- end %s ----- */\n" % (id,)
         return output
 
     def getInlineScript(self, item, context):

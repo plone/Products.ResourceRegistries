@@ -303,14 +303,12 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             # add start/end notes to the stylesheet
             # makes for better understanding and debugging
             if content is not None:
-                output += "/* ----- start %s ----- */\n" % (id,)
+                output += "\n\n/* ----- %s ----- */\n" % (id,)
                 m = sheets[id].get('media')
                 if not m:
                     output += content
                 else:
                     output += "@media %s {\n%s\n}\n"%(m, content)
-
-                output += "/* ----- end %s ----- */\n" % (id,)
         return output
 
 

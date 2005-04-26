@@ -257,7 +257,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         ids = self.concatenatedscripts.get(item,None)
         if ids is not None:
             ids = ids[:]
-            ids.reverse()
+
         output = ""
         scripts = self.getScriptsDict()
 

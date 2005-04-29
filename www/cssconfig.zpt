@@ -3,7 +3,10 @@
     
 <script type="text/javascript">
 function moveDown(node){
-    fieldset = node.parentNode.parentNode
+    while (node.nodeName != 'FIELDSET'){
+        node = node.parentNode    
+    }
+    fieldset=node
     nextBlock = fieldset.nextSibling
     if (nextBlock){
     shiftBlocks( nextBlock, fieldset)
@@ -11,7 +14,10 @@ function moveDown(node){
 }
 
 function moveUp(node){
-    fieldset = node.parentNode.parentNode
+    while (node.nodeName != 'FIELDSET'){
+        node = node.parentNode    
+    }
+    fieldset=node
     previousBlock = fieldset.previousSibling
     if (previousBlock){
     shiftBlocks(fieldset, previousBlock)
@@ -36,7 +42,9 @@ function shiftBlocks(fieldset, previousBlock){
     
 <style type="text/css">
 
-    div.stylesheetform{float:left;}
+    div.stylesheetform{
+        width : 50%;
+    }
 
     label, input, select{   font-size : 80%;
             font-family : sans-serif;}
@@ -47,15 +55,18 @@ function shiftBlocks(fieldset, previousBlock){
             padding : 0.2em 0.4em;
         }
     
-    fieldset div {
-        clear:both;
+    fieldset {
         margin : 0.2em;
-
+        width : 60%;
     }
 
-    p.delete-button, p.updown-buttons{
-        float: right;
-        clear: right
+
+    
+    .stylesheets-buttons{
+        text-align : left;        
+        float : right;
+        width : 30%;
+        
     }
 
 </style>    
@@ -67,8 +78,28 @@ function shiftBlocks(fieldset, previousBlock){
 
       
       <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records" tal:attributes="value repeat/stylesheet/index" />
+     
+        <div class="stylesheets-buttons">
+    <p class="updown-buttons">
+                <button onclick="moveUp(this);return false;"> <!-- condition="not:repeat/stylesheet/start"-->
+                    move UP
+                </button>
+</p>
+            <p class="delete-button">
+                <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}'">
+                    ** Remove this stylesheet **
+                </a>
+            </p>
+
+    <p>             
+                <button onclick="moveDown(this);return false;"> <!-- :condition="not:repeat/stylesheet/end"-->
+                    move DOWN
+                </button>             
+            </p>
+            
       
-            <div class="stylesheetform">
+        </div>
+        <div class="stylesheetform">
             <div>
                 <label>id</label>
                 <input type="text" name="stylesheets.id:records" tal:attributes="value stylesheet/id">    
@@ -105,30 +136,8 @@ function shiftBlocks(fieldset, previousBlock){
                 <input type="checkbox" name="stylesheets.enabled:records.boolean" tal:attributes="checked stylesheet/enabled">    
             </div>
 
-
-
-    <div class="stylesheets-buttons">
-    <p class="updown-buttons">
-                <button onclick="moveUp(this);return false;"> <!-- condition="not:repeat/stylesheet/start"-->
-                    move UP
-                </button>
-                 
-                <button onclick="moveDown(this);return false;"> <!-- :condition="not:repeat/stylesheet/end"-->
-                    move DOWN
-                </button>             
-            </p>
-            
-            <p class="delete-button">
-                <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}'">
-                    ** Remove this stylesheet **
-                </a>
-            </p>
-      
-        </div>
-
       </fieldset>
-      
-       
+            
         
         <input type=submit i18n:attributes="value" value="Save" />
     </form>

@@ -1,6 +1,6 @@
 from StringIO import StringIO
 from Products.Archetypes.Extensions.utils import install_subskin
-from Products.CSSRegistry.config import *
+from Products.ResourceRegistries.config import *
 from Products.CMFCore.utils import getToolByName
 
 
@@ -11,7 +11,7 @@ def install(self):
 
     # Install the CSSRegistry
     if TOOLNAME not in self.objectIds():
-        factory = self.manage_addProduct['CSSRegistry']
+        factory = self.manage_addProduct['ResourceRegistries']
         factory.manage_addTool(TOOLTYPE)
         print >> out, 'Added CSSRegistry'
     else:
@@ -19,7 +19,7 @@ def install(self):
 
     # Install the JSRegistry
     if JSTOOLNAME not in self.objectIds():
-        factory = self.manage_addProduct['CSSRegistry']
+        factory = self.manage_addProduct['ResourceRegistries']
         factory.manage_addTool(JSTOOLTYPE)
         print >> out, 'Added JSRegistry'
     else:

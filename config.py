@@ -1,4 +1,4 @@
-PROJECTNAME = 'CSSRegistry'
+PROJECTNAME = 'ResourceRegistries'
 
 TOOLNAME = 'portal_css'
 TOOLTYPE = 'Stylesheeets Registry'

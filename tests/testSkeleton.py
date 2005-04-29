@@ -7,7 +7,7 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from Products.CSSRegistry.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests import CSSRegistryTestCase
 
 
 class TestSomething(CSSRegistryTestCase.CSSRegistryTestCase):

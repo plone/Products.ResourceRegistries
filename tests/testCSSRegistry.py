@@ -7,10 +7,10 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from Products.CSSRegistry.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests import CSSRegistryTestCase
 
-from Products.CSSRegistry.config import TOOLNAME
-from Products.CSSRegistry.interfaces import ICSSRegistry
+from Products.ResourceRegistries.config import TOOLNAME
+from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Interface.Verify import verifyObject
 from Products.CMFCore.utils import getToolByName
 

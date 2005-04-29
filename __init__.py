@@ -1,8 +1,8 @@
 from Products.CMFCore.utils import ToolInit
 
 from Products.CMFCore.DirectoryView import registerDirectory
-from Products.CSSRegistry.config import PROJECTNAME, SKINS_DIR, GLOBALS
-from Products.CSSRegistry import tools
+from Products.ResourceRegistries.config import PROJECTNAME, SKINS_DIR, GLOBALS
+from Products.ResourceRegistries import tools
 
 registerDirectory(SKINS_DIR, GLOBALS)
 

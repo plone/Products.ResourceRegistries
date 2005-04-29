@@ -11,9 +11,9 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Acquisition import aq_base, aq_parent, aq_inner
 
-from Products.CSSRegistry import config
-from Products.CSSRegistry import permissions
-from Products.CSSRegistry.interfaces import IJSRegistry
+from Products.ResourceRegistries import config
+from Products.ResourceRegistries import permissions
+from Products.ResourceRegistries.interfaces import IJSRegistry
 
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext

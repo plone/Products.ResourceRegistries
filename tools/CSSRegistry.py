@@ -117,7 +117,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             stylesheet['media']      = r.get('media', '')
             stylesheet['rel']        = r.get('rel', 'stylesheet')
             stylesheet['rendering']  = r.get('rendering','import')
-            stylesheet['enabled']    = r.get('enabled', True)
+            stylesheet['enabled']    = r.get('enabled', False)
 
             stylesheets.append(stylesheet)
         self.stylesheets = tuple(stylesheets)
@@ -203,6 +203,8 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.cookedstylesheets = ()
         results = []
         for stylesheet in stylesheets:
+            if not stylesheet['enabled']:
+                continue
             #self.concatenatedstylesheets[stylesheet['id']] = [stylesheet['id']]
             if results:
                 previtem = results[-1]

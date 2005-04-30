@@ -86,7 +86,7 @@ function shiftBlocks(fieldset, previousBlock){
                 </button>
 </p>
             <p class="delete-button">
-                <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}'">
+                <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}">
                     ** Remove this stylesheet **
                 </a>
             </p>
@@ -133,7 +133,7 @@ function shiftBlocks(fieldset, previousBlock){
 
             <div>
                 <label>enabled</label>
-                <input type="checkbox" name="stylesheets.enabled:records.boolean" tal:attributes="checked stylesheet/enabled">    
+                <input type="checkbox" name="stylesheets.enabled:records" tal:attributes="checked stylesheet/enabled">    
             </div>
 
       </fieldset>

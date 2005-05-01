@@ -256,14 +256,15 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         ids = self.concatenatedscripts.get(item,None)
         if ids is not None:
             ids = ids[:]
-
-        output =  "/* Merged Plone Javascript file \n"
-        output += " * This file is dynamically assembled from separate parts.\n"
-        output += " * Some of these parts have 3rd party licenses or copyright information attached\n"
-        output += " * Such information is valid for that section, \n"
-        output += " * not for the entire composite file\n"
-        output += " * originating files are separated by ----- filename.js ----- \n"
-        output += " */\n"
+        output = ""
+        if len(ids)>1:
+            output += "/* Merged Plone Javascript file \n"
+            output += " * This file is dynamically assembled from separate parts.\n"
+            output += " * Some of these parts have 3rd party licenses or copyright information attached\n"
+            output += " * Such information is valid for that section, \n"
+            output += " * not for the entire composite file\n"
+            output += " * originating files are separated by ----- filename.js ----- \n"
+            output += " */\n"
         scripts = self.getScriptsDict()
 
         for id in ids:

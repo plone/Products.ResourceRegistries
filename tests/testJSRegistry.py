@@ -47,7 +47,7 @@ class TestJSSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
-        self.failUnless('CSSRegistry' in skins)
+        self.failUnless('ResourceRegistries' in skins)
 
     def testSkinExists(self):
         self.failUnless(getattr(self.portal, 'renderAllTheScripts' ))
@@ -85,14 +85,6 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
     def testDisallowingDuplicateIds(self):
         self.tool.registerScript('foo')
         self.assertRaises(ValueError , self.tool.registerScript , 'foo')
-
-    def testPloneCustomStaysOnTop(self):
-
-        self.tool.registerScript('foo')
-        self.tool.registerScript('ploneCustom.css')
-        self.assertEqual(len(self.tool.getScripts()), 2)
-        self.assertEqual(self.tool.getScripts()[0].get('id'), 'ploneCustom.css')
-        self.assertEqual(self.tool.getScripts()[1].get('id'), 'foo')
 
     def testUnregisterScript(self):
         self.tool.registerScript('foo')
@@ -160,7 +152,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
 
-        self.assertEqual(self.tool.concatenatedscripts[self.tool.cookedscripts[0].get('id')], ['eggs', 'spam', 'ham'] )
+        self.assertEqual(self.tool.concatenatedscripts[self.tool.cookedscripts[0].get('id')], ['ham', 'spam', 'eggs'] )
 
 
     def testGetEvaluatedScriptsCollapsing(self ):
@@ -210,8 +202,8 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedScripts(self.folder)
         evaluatedids = [item['id'] for item in evaluated]
-        self.failUnless(evaluatedids[1]=='spam')
-        self.failUnless(evaluatedids[0]=='ham')
+        self.failUnless(evaluatedids[0]=='spam')
+        self.failUnless(evaluatedids[1]=='ham')
 
         # can you tell we had good fun writing these tests ?
 

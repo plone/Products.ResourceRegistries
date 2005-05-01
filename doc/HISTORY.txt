@@ -1,9 +1,66 @@
 
-0.5
+0.8
 =====================
-
- * Cleaned up forms. Better alignment.
+ * Renamed to ResourceRegistries instead of the historical and wrong
+   CSSRegistry
    [elvix]
    
+ * Upgraded JSRegistry to have a more proper ZMI form, now with reordering support
+   [elvix]
+   
+ * Changed the order elements are added to the JSRegistry
+   [elvix]
+
+ * Added license/copyright notice to composite files
+   (neccesary for including for third party stuff)
+   [elvix]
+
+ * Bugfix fixing ZMI form for CSSRegistry
+   [fschulze]
+
+
+0.7
+=====================
+
+ * Added to Plone 2.1 migrations, added installation of the default
+   Plone javascripts and stylesheets
+   [elvix]
+
+ * Make sure we intecept all requests for objects, even those already 
+   present in the acquisition chain. Override __bobo_traverse__
+   [elvix]
+
+ * Handle cache settings in http headers for served files
+   [elvix]
+
+ * Handle http headers for inline scripts and stylesheets
+   [elvix]
+ 
+ * Use explicit </script> tag since these pages are being served as
+   text/html. Both IE and firefox will have problems otherwise
+   [bmh] 
+ 
+0.6 and earlier
+=====================
+ 
+ * Added a simple readme with basic documentation
+   [elvix]
+
  * Started HISTORY.txt (..somewhat late perhaps, but better than never)
    [elvix]
+   
+ 
+ * Cleaned up forms. Better alignment.
+   [elvix]
+
+ * Separate JSRegistry and CSSRegistry to two tools
+   [elvix]
+   
+ * Lots of changes, numerous fixes.
+   [elvix]
+
+Snowsprint 2005
+=====================
+  * Designed and built first version of the CSSregistry
+    [HammerToe] [elvix]
+

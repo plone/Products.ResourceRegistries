@@ -49,7 +49,7 @@ class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
-        self.failUnless('CSSRegistry' in skins)
+        self.failUnless('ResourceRegistries' in skins)
 
     def testSkinExists(self):
         self.failUnless(getattr(self.portal, 'renderAllTheStylesheets' ))

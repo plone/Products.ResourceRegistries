@@ -85,10 +85,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ store a script"""
         self.validateId(script.get('id'), self.getScripts())
         scripts = list(self.scripts)
-        if len(scripts) and scripts[0].get('id') == 'ploneCustom.css':
-            scripts.insert(1, script)
-        else:
-            scripts.insert(0, script )
+        scripts.append(script)
         self.scripts = tuple(scripts)
         self.cookScripts()
 
@@ -131,6 +128,8 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
          updates the whole sequence. for editing and reordering
         """
         records = REQUEST.form.get('scripts')
+        records.sort()
+
         self.scripts = ()
         scripts = []
         for r in records:
@@ -258,7 +257,13 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if ids is not None:
             ids = ids[:]
 
-        output = ""
+        output =  "/* Merged Plone Javascript file \n"
+        output += " * This file is dynamically assembled from separate parts.\n"
+        output += " * Some of these parts have 3rd party licenses or copyright information attached\n"
+        output += " * Such information is valid for that section, \n"
+        output += " * not for the entire composite file\n"
+        output += " * originating files are separated by ----- filename.js ----- \n"
+        output += " */\n"
         scripts = self.getScriptsDict()
 
         for id in ids:
@@ -285,6 +290,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             if content:
                 output += "\n/* ----- %s ----- */\n" % (id,)
                 output += content
+                output += "\n"
         return output
 
     def getInlineScript(self, item, context):

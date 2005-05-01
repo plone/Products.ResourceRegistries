@@ -77,21 +77,21 @@ function shiftBlocks(fieldset, previousBlock){
         <input type=submit i18n:attributes="value" value="Save" />
 
       
-      <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records" tal:attributes="value repeat/stylesheet/index" />
+      <fieldset tal:repeat="stylesheet here/getStylesheets">
+         <input type="hidden" name="stylesheets.sort:records" tal:attributes="value repeat/stylesheet/index" />
      
         <div class="stylesheets-buttons">
-    <p class="updown-buttons">
+        <p class="updown-buttons">
                 <button onclick="moveUp(this);return false;"> <!-- condition="not:repeat/stylesheet/start"-->
                     move UP
                 </button>
-</p>
-            <p class="delete-button">
+        </p>
+        <p class="delete-button">
                 <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}">
-                    ** Remove this stylesheet **
+                    Remove this stylesheet
                 </a>
-            </p>
-
-    <p>             
+        </p>
+        <p>             
                 <button onclick="moveDown(this);return false;"> <!-- :condition="not:repeat/stylesheet/end"-->
                     move DOWN
                 </button>             

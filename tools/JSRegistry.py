@@ -312,7 +312,9 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ Return a script from the registry """
         output = self.getScript(item, self)
         self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.JS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
-        return File(item, item, output, "application/x-javascript").__of__(self)
+        encoding = getToolByName(self, 'plone_utils').getSiteEncoding()
+        contenttype = "application/x-javascript;charset="+encoding
+        return File(item, item, output, contenttype).__of__(self)
 
 
     def __bobo_traverse__(self, REQUEST, name):

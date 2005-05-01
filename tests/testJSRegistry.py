@@ -289,7 +289,9 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('testmethod')
         response = self.publish(self.toolpath+'/testmethod')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript')
+        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript;charset=utf-8')
+        
+
 
     def testPublishPageWithInlineJS(self):
         # this one fails from string/utf-8 concatenation
@@ -313,7 +315,6 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         response = self.publish(self.portalpath)
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
-
 
 
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):

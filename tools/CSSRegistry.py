@@ -208,6 +208,11 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             #self.concatenatedstylesheets[stylesheet['id']] = [stylesheet['id']]
             if results:
                 previtem = results[-1]
+                
+                # XXX this will cause erroneous composition if there are 
+                # disabled stylesheets in the middle of a stack
+                # make sure to add a better test for the previtem
+                 
                 if self.compareStylesheets(stylesheet, previtem):
                     # the two sheets match , and should be concatenated
                     previd = previtem.get('id')

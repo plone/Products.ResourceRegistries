@@ -1,6 +1,16 @@
 
+
+0.8 +
+=====================
+
+
+ * Added bugfix for handling disabled items when cooking stylesheets.
+   [fschulze]
+
 0.8
 =====================
+
+
  * Renamed to ResourceRegistries instead of the historical and wrong
    CSSRegistry
    [elvix]

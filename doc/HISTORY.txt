@@ -3,6 +3,9 @@
 0.8 +
 =====================
 
+ * Added new debugmode where stylesheets are not concatenated. 
+   This will let things like the DOM inspector in Mozilla point to the right line-number. 
+   [ldr][elvix]
 
  * Added bugfix for handling disabled items when cooking stylesheets.
    [fschulze]

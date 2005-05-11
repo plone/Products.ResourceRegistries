@@ -351,6 +351,23 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
+class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool.clearStylesheets()
+
+
+    def testDebugMode(self ):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
+        self.tool.setDebugMode(True)
+        self.tool.cookStylesheets()
+        #print self.tool.getEvaluatedStylesheets(self.folder)
+        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 2 )
+
+
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -390,6 +407,9 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)
 
 
+
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -403,6 +423,7 @@ def test_suite():
     suite.addTest(makeSuite(TestStylesheetCooking))
     suite.addTest(makeSuite(TestPublishing))
     suite.addTest(makeSuite(TestTraversal))
+    suite.addTest(makeSuite(TestDebugMode))
 
     if not PLONE21:
         # we must not test for the defaults in Plone 2.1 because they are all different

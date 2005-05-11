@@ -76,6 +76,9 @@ function shiftBlocks(fieldset, previousBlock){
     <form action="manage_saveStylesheets" tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'" method="get">
         <input type=submit i18n:attributes="value" value="Save" />
 
+        <p>Debug mode (don't merge stylesheets)
+            <input type="checkbox" name="debugmode:boolean" tal:attributes="checked here/getDebugMode" />
+        </p>
       
       <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records" tal:attributes="value repeat/stylesheet/index" />
      

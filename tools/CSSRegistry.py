@@ -59,7 +59,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.stylesheets = ()
         self.cookedstylesheets = ()
         self.concatenatedstylesheets = {}
-
+        self.debugmode = False
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet', rendering='import',  enabled=1 ):
@@ -106,6 +106,9 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
          save stylesheets from the ZMI
          updates the whole sequence. for editing and reordering
         """
+        debugmode = REQUEST.get('debugmode',False)
+        self.setDebugMode(debugmode)
+ 
         records = REQUEST.get('stylesheets')
         records.sort()
         self.stylesheets = ()
@@ -148,6 +151,24 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         for s in stylesheets:
             d[s['id']]=s
         return d
+
+
+
+    security.declareProtected(permissions.ManagePortal, 'getDebugMode')
+    def getDebugMode(self):
+        """stylesheet merging disabled?"""
+        try:
+            return self.debugmode
+        except AttributeError:
+            # fallback for old installs. should we even care?
+            return False
+
+
+    security.declareProtected(permissions.ManagePortal, 'setDebugMode')
+    def setDebugMode(self, value):
+        """set whether stylesheet merging should be disabled"""
+        self.debugmode = value
+    
 
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
@@ -207,7 +228,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             if results:
                 previtem = results[-1]
                  
-                if self.compareStylesheets(stylesheet, previtem):
+                if not self.getDebugMode() and self.compareStylesheets(stylesheet, previtem):
                     # the two sheets match , and should be concatenated
                     previd = previtem.get('id')
 

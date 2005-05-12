@@ -110,7 +110,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.setDebugMode(debugmode)
  
         records = REQUEST.get('stylesheets')
-        records.sort()
+        records.sort(lambda a, b: a.sort-b.sort)
         self.stylesheets = ()
         stylesheets = []
         for r in records:

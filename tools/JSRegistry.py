@@ -128,7 +128,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
          updates the whole sequence. for editing and reordering
         """
         records = REQUEST.form.get('scripts')
-        records.sort()
+        records.sort(lambda a, b: a.sort-b.sort)
 
         self.scripts = ()
         scripts = []

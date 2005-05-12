@@ -83,7 +83,7 @@ function shiftBlocks(fieldset, previousBlock){
     <form action="manage_saveScripts" tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'" method="post">
       <input type=submit i18n:attributes="value" value="Save" />
       
-      <fieldset tal:repeat="script here/getScripts"><input type="hidden" name="scripts.sort:records" tal:attributes="value repeat/script/index" />     
+      <fieldset tal:repeat="script here/getScripts"><input type="hidden" name="scripts.sort:records:int" tal:attributes="value repeat/script/index" />     
         <div class="script-buttons">
         <p class="updown-buttons">
                 <button onclick="moveUp(this);return false;"> <!-- condition="not:repeat/stylesheet/start"-->

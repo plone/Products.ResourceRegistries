@@ -80,7 +80,7 @@ function shiftBlocks(fieldset, previousBlock){
             <input type="checkbox" name="debugmode:boolean" tal:attributes="checked here/getDebugMode" />
         </p>
       
-      <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records" tal:attributes="value repeat/stylesheet/index" />
+      <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records:int" tal:attributes="value repeat/stylesheet/index" />
      
         <div class="stylesheets-buttons">
         <p class="updown-buttons">

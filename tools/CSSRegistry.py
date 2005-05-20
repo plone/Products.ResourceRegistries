@@ -62,13 +62,14 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.debugmode = False
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
-    def registerStylesheet(self, id, expression='', media='', rel='stylesheet', rendering='import',  enabled=1 ):
+    def registerStylesheet(self, id, expression='', media='', rel='stylesheet', title='', rendering='import',  enabled=1 ):
         """ register a stylesheet"""
         stylesheet = {}
         stylesheet['id'] = id
         stylesheet['expression'] = expression
         stylesheet['media'] = media
         stylesheet['rel'] = rel
+        stylesheet['title'] = title
         stylesheet['rendering'] = rendering
         stylesheet['enabled'] = enabled
         self.storeStylesheet(stylesheet )
@@ -93,9 +94,9 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     # ZMI METHODS
 
     security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
-    def manage_addStylesheet(self, id, expression='', media='', rel='stylesheet', rendering='import', enabled=True, REQUEST=None):
+    def manage_addStylesheet(self, id, expression='', media='', rel='stylesheet', title='', rendering='import', enabled=True, REQUEST=None):
         """ register a stylesheet from a TTW request"""
-        self.registerStylesheet(id, expression, media, rel, rendering, enabled)
+        self.registerStylesheet(id, expression, media, rel, title, rendering, enabled)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -119,6 +120,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             stylesheet['expression'] = r.get('expression', '')
             stylesheet['media']      = r.get('media', '')
             stylesheet['rel']        = r.get('rel', 'stylesheet')
+            stylesheet['title']      = r.get('title', '')
             stylesheet['rendering']  = r.get('rendering','import')
             stylesheet['enabled']    = r.get('enabled', False)
 

@@ -27,7 +27,7 @@ def install(self):
 
     installPloneDefaultJS(self, out)
     
-    installPloneDeafultCSS(self, out)
+    installPloneDefaultCSS(self, out)
     
     return out.getvalue()
 
@@ -36,15 +36,15 @@ def install(self):
 
 
 # the default-values-installers
-def installPloneDeafultCSS(self, out):
+def installPloneDefaultCSS(self, out):
     csstool = getToolByName(self, TOOLNAME)    
     csstool.registerStylesheet('ploneColumns.css', media="screen", rendering='import')
     csstool.registerStylesheet('plone.css', media="screen", rendering='import')
-    csstool.registerStylesheet('ploneTextSmall.css', media="screen", rel='alternate stylesheet', rendering='link')
-    csstool.registerStylesheet('ploneTextLarge.css', media="screen", rel='alternate stylesheet', rendering='link')
     csstool.registerStylesheet('plonePrint.css', media="print", rendering='import')
     csstool.registerStylesheet('plonePresentation.css', media="projection", rendering='import')
     csstool.registerStylesheet('ploneCustom.css', media="all", rendering='import')    
+    csstool.registerStylesheet('ploneTextSmall.css', media="screen", rel='alternate stylesheet', title='Small Text', rendering='link')
+    csstool.registerStylesheet('ploneTextLarge.css', media="screen", rel='alternate stylesheet', title='Large Text', rendering='link')
     print >> out, 'installed the Plone default styles'
     
     

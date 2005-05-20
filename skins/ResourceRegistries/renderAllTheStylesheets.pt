@@ -10,8 +10,9 @@
                     type="text/css" 
                         tal:attributes="href string:${portal_url}/portal_css/${stylesheet/id};
                                         media python:path('stylesheet/media|nothing') or nothing;
-                                        rel python:path('stylesheet/rel|nothing') or nothing
-                                        ">
+                                        rel python:path('stylesheet/rel|nothing') or nothing;
+                                        title stylesheet/title | nothing;
+                                        " />
                     <tal:import tal:condition="python: render == 'import'">
                         <style type="text/css" 
                             tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"

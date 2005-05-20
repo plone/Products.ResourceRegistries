@@ -79,6 +79,29 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(self.tool.getStylesheets()), 1)
         self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
 
+    def testDefaultStylesheetAttributes(self):
+        self.tool.registerStylesheet('foodefault')
+        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foodefault')
+        self.assertEqual(self.tool.getStylesheets()[0].get('expression'), '')
+        self.assertEqual(self.tool.getStylesheets()[0].get('media'), '')
+        self.assertEqual(self.tool.getStylesheets()[0].get('rel'), 'stylesheet')
+        self.assertEqual(self.tool.getStylesheets()[0].get('title'), '')
+        self.assertEqual(self.tool.getStylesheets()[0].get('rendering'), 'import')
+        self.failUnless(self.tool.getStylesheets()[0].get('enabled'))
+
+
+    def testStylesheetAttributes(self):        
+        self.tool.registerStylesheet('foo', expression='python:1', media='print', rel='alternate stylesheet', title='Foo', rendering='inline',  enabled=0 )
+        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
+        self.assertEqual(self.tool.getStylesheets()[0].get('expression'), 'python:1')
+        self.assertEqual(self.tool.getStylesheets()[0].get('media'), 'print')
+        self.assertEqual(self.tool.getStylesheets()[0].get('rel'), 'alternate stylesheet')
+        self.assertEqual(self.tool.getStylesheets()[0].get('title'), 'Foo')
+        self.assertEqual(self.tool.getStylesheets()[0].get('rendering'), 'inline')
+        self.failIf(self.tool.getStylesheets()[0].get('enabled'))
+
+
+
     def testDisallowingDuplicateIds(self):
         self.tool.registerStylesheet('foo')
         self.assertRaises(ValueError , self.tool.registerStylesheet , 'foo')
@@ -107,6 +130,8 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         res.sort()
         self.assertEqual(res,keys)
         self.assertEqual(self.tool.getStylesheetsDict()['ham']['id'], 'ham')
+
+
 
 class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 

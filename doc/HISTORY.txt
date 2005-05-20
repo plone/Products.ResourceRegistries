@@ -3,6 +3,9 @@
 0.8 +
 =====================
 
+ * Removing superflous skins directories
+   [elvix]
+
  * Added new debugmode where stylesheets are not concatenated. 
    This will let things like the DOM inspector in Mozilla point to the right line-number. 
    [ldr][elvix]

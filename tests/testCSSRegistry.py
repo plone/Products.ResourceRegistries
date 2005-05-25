@@ -9,7 +9,7 @@ if __name__ == '__main__':
 from Testing import ZopeTestCase
 from Products.ResourceRegistries.tests import CSSRegistryTestCase
 
-from Products.ResourceRegistries.config import TOOLNAME
+from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Interface.Verify import verifyObject
 from Products.CMFCore.utils import getToolByName
@@ -23,7 +23,7 @@ class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
         pass
 
     def test_interfaces(self):
-        tool = getattr(self.portal, TOOLNAME)
+        tool = getattr(self.portal, CSSTOOLNAME)
         self.failUnless(ICSSRegistry.isImplementedBy(tool))
         self.failUnless(verifyObject(ICSSRegistry, tool))
 
@@ -33,10 +33,10 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
         pass
 
     def testToolExists(self):
-        self.failUnless(TOOLNAME in self.portal.objectIds())
+        self.failUnless(CSSTOOLNAME in self.portal.objectIds())
 
     def testZMIForm(self):
-        tool = getattr(self.portal, TOOLNAME)
+        tool = getattr(self.portal, CSSTOOLNAME)
         self.setRoles(['Manager'])
         self.failUnless(tool.manage_cssForm())
         self.failUnless(tool.manage_cssComposition())
@@ -58,7 +58,7 @@ class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
 
     def testAdd(self):
@@ -70,7 +70,7 @@ class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
 
     def testStoringStylesheet(self):
@@ -136,7 +136,7 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
 
     def testRegistrationSecurity(self):
@@ -154,7 +154,7 @@ class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
 
     def testSimplestExpression(self):
@@ -175,7 +175,7 @@ class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
 
     def testStylesheetCooking(self):
@@ -294,7 +294,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
         self.tool.registerStylesheet('simple.css')
 
@@ -341,7 +341,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
     """Integration tests. - testing http headers etc."""
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
         self.toolpath = '/'+self.tool.absolute_url(1)
         self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
@@ -379,7 +379,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
 
 
@@ -396,7 +396,7 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, TOOLNAME)
+        self.tool = getattr(self.portal, CSSTOOLNAME)
 
     def testClearingStylesheets(self):
         self.failUnless(self.tool.getStylesheets())

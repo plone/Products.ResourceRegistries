@@ -29,8 +29,8 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     """ A Plone registry for managing the linking to css files.
     """
 
-    id = config.TOOLNAME
-    meta_type = config.TOOLTYPE
+    id = config.CSSTOOLNAME
+    meta_type = config.CSSTOOLTYPE
     title = "CSS Registry"
 
 

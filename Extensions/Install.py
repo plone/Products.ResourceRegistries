@@ -10,9 +10,9 @@ def install(self):
     install_subskin(self, out, GLOBALS)
 
     # Install the CSSRegistry
-    if TOOLNAME not in self.objectIds():
+    if CSSTOOLNAME not in self.objectIds():
         factory = self.manage_addProduct['ResourceRegistries']
-        factory.manage_addTool(TOOLTYPE)
+        factory.manage_addTool(CSSTOOLTYPE)
         print >> out, 'Added CSSRegistry'
     else:
         print >> out, 'CSSRegistry already exists.'
@@ -37,7 +37,7 @@ def install(self):
 
 # the default-values-installers
 def installPloneDefaultCSS(self, out):
-    csstool = getToolByName(self, TOOLNAME)    
+    csstool = getToolByName(self, CSSTOOLNAME)    
     csstool.registerStylesheet('ploneColumns.css', media="screen", rendering='import')
     csstool.registerStylesheet('plone.css', media="screen", rendering='import')
     csstool.registerStylesheet('plonePrint.css', media="print", rendering='import')

@@ -1,7 +1,7 @@
 PROJECTNAME = 'ResourceRegistries'
 
-TOOLNAME = 'portal_css'
-TOOLTYPE = 'Stylesheets Registry'
+CSSTOOLNAME = 'portal_css'
+CSSTOOLTYPE = 'Stylesheets Registry'
 
 JSTOOLNAME = 'portal_javascripts'
 JSTOOLTYPE = 'JavaScripts Registry'

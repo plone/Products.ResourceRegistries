@@ -19,6 +19,9 @@
  * Added bugfix for handling disabled items when cooking stylesheets.
    [fschulze]
 
+ * renamed config.TOOLNAME to config.CSSTOOLNAME 
+   and config.TOOLTYPE to config.CSSTOOLTYPE
+   [batlogg]
 
 0.8
 =====================

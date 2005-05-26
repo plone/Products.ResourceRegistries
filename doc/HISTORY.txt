@@ -2,6 +2,16 @@
 
 0.8 +
 =====================
+ * Removed duplicate getScripts function definition in tools/JSRegistry.py
+   [fschulze]
+
+ * Fixed JSRegistry for Plone < 2.1 where plone_utils.getSiteEncoding is not
+   available.
+   [fschulze]
+
+ * renamed config.TOOLNAME to config.CSSTOOLNAME 
+   and config.TOOLTYPE to config.CSSTOOLTYPE
+   [batlogg]
 
  * Added tests for attributes on stylesheets. About time. 
    [elvix]
@@ -19,13 +29,9 @@
  * Added bugfix for handling disabled items when cooking stylesheets.
    [fschulze]
 
- * renamed config.TOOLNAME to config.CSSTOOLNAME 
-   and config.TOOLTYPE to config.CSSTOOLTYPE
-   [batlogg]
 
 0.8
 =====================
-
 
  * Renamed to ResourceRegistries instead of the historical and wrong
    CSSRegistry

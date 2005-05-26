@@ -51,13 +51,12 @@ def installPloneDefaultCSS(self, out):
 def installPloneDefaultJS(self, out):
     """ Install all the jaascripts plne comes with normally"""
     jstool = getToolByName(self, JSTOOLNAME)    
-    jstool.registerScript('plone_menu.js', expression='not:portal/portal_membership/isAnonymousUser')
-    print >> out, 'installed the menu-javascript'
-    
-    jstool.registerScript('plone_javascripts.js')
-    print >> out, 'installed the global plone javascripts'
 
     jstool.registerScript('plone_javascript_variables.js')
     print >> out, 'installed the javascript variables'
 
-    
+    jstool.registerScript('plone_javascripts.js')
+    print >> out, 'installed the global plone javascripts'
+
+    jstool.registerScript('plone_menu.js', expression='not:portal/portal_membership/isAnonymousUser')
+    print >> out, 'installed the menu-javascript'

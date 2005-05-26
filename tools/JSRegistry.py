@@ -152,11 +152,6 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
-    security.declareProtected(permissions.ManagePortal, 'getScripts')
-    def getScripts(self):
-        """ get the scripts for management screens """
-        return tuple([item.copy() for item in self.scripts])
-
     security.declarePrivate('getScriptsDict')
     def getScriptsDict(self):
         """ get the scripts as a disctionary instead of an ordered list. Good for lookups. internal"""
@@ -312,7 +307,17 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """ Return a script from the registry """
         output = self.getScript(item, self)
         self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.JS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
-        encoding = getToolByName(self, 'plone_utils').getSiteEncoding()
+        plone_utils = getToolByName(self, 'plone_utils')
+        try:
+            encoding = plone_utils.getSiteEncoding()
+        except AttributeError:
+            # For Plone < 2.1
+            pprop   = getToolByName(self, 'portal_properties')
+            default = 'utf-8'
+            try:
+                encoding = pprop.site_properties.getProperty('default_charset', default)
+            except AttributeError:
+                encoding = default
         contenttype = "application/x-javascript;charset="+encoding
         return File(item, item, output, contenttype).__of__(self)
 

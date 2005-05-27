@@ -295,7 +295,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         except AttributeError:
             return 1
 
-
+    security.declareProtected(permissions.View, 'getStylesheet')
     def getStylesheet(self, item, context):
         """ Return a stylesheet from the registry """
         ids = self.concatenatedstylesheets.get(item,None)
@@ -335,7 +335,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                     output += "@media %s {\n%s\n}\n"%(m, content)
         return output
 
-
+    security.declareProtected(permissions.View, 'getInlineStylesheet')
     def getInlineStylesheet(self, item, context):
         """ return a stylesheet as inline code, not as a file object.
             Needs to take care not to mess up http headers

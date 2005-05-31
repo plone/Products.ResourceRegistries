@@ -102,6 +102,29 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.scripts = tuple(scripts)
         self.cookScripts()
 
+    security.declareProtected(permissions.ManagePortal, 'moveScript')
+    def moveScript(self, id, direction):
+        """ move a registered script in given direction"""
+        scripts = list(self.getScripts())
+        script_ids = [ item.get('id') for item in scripts ]
+        index = script_ids.index(id)
+        if direction == 'up':
+            if index<=0:
+                return
+            temp = scripts[index]
+            scripts[index] = scripts[index-1]
+            scripts[index-1] = temp
+        elif direction == 'down':
+            if index>=len(scripts)-1:
+                return
+            temp = scripts[index]
+            scripts[index] = scripts[index+1]
+            scripts[index+1] = temp
+        else:
+            raise ValueError
+        self.scripts = tuple(scripts)
+        self.cookScripts()
+
 
     security.declarePrivate('clearScripts')
     def clearScripts(self):
@@ -149,6 +172,13 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def manage_removeScript(self, id, REQUEST=None):
         """ remove script with ZMI button"""
         self.unregisterScript(id)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_moveScript')
+    def manage_moveScript(self, id, direction, REQUEST=None):
+        """ move script direction='up'|'down' via the ZMI"""
+        self.moveScript(id, direction)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 

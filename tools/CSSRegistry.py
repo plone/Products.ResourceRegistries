@@ -83,6 +83,30 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.cookStylesheets()
 
 
+    security.declareProtected(permissions.ManagePortal, 'moveStylesheet')
+    def moveStylesheet(self, id, direction):
+        """ move a registered script in given direction"""
+        stylesheets = list(self.getStylesheets())
+        stylesheet_ids = [ item.get('id') for item in stylesheets ]
+        index = stylesheet_ids.index(id)
+        if direction == 'up':
+            if index<=0:
+                return
+            temp = stylesheets[index]
+            stylesheets[index] = stylesheets[index-1]
+            stylesheets[index-1] = temp
+        elif direction == 'down':
+            if index>=len(stylesheets)-1:
+                return
+            temp = stylesheets[index]
+            stylesheets[index] = stylesheets[index+1]
+            stylesheets[index+1] = temp
+        else:
+            raise ValueError
+        self.stylesheets = tuple(stylesheets)
+        self.cookStylesheets()
+
+
     security.declarePrivate('clearStylesheets')
     def clearStylesheets(self):
         """ Clears all stylesheet data. convenience for Plone migrations"""
@@ -135,6 +159,14 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def manage_removeStylesheet(self, id, REQUEST=None):
         """ remove stylesheet from the ZMI"""
         self.unregisterStylesheet(id)
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+
+    security.declareProtected(permissions.ManagePortal, 'manage_moveStylesheet')
+    def manage_moveStylesheet(self, id, direction, REQUEST=None):
+        """ move script direction='up'|'down' via the ZMI"""
+        self.moveStylesheet(id, direction)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 

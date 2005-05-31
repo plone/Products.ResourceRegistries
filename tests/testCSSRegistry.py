@@ -291,6 +291,70 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in renderedpage)
 
 
+class TestStylesheetMoving(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.tool.clearStylesheets()
+
+    def testStylesheetMoveDown(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+        self.tool.moveStylesheet('spam','down')
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'ham', 'spam'] )
+
+    def testStylesheetMoveDownAtEnd(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+        self.tool.moveStylesheet('ham','down')
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+    def testStylesheetMoveUp(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+        self.tool.moveStylesheet('spam','up')
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['spam', 'eggs', 'ham'] )
+
+    def testStylesheetMoveUpAtStart(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+        self.tool.moveStylesheet('eggs','up')
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+    def testStylesheetMoveIllegalId(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+        self.assertRaises(ValueError, self.tool.moveStylesheet, 'foo', 'up')
+
+    def testStylesheetMoveIllegalDirection(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+
+        self.assertRaises(ValueError, self.tool.moveStylesheet, 'ham', 'somewhere')
+
 class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -447,6 +511,7 @@ def test_suite():
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))
     suite.addTest(makeSuite(TestPublishing))
+    suite.addTest(makeSuite(TestStylesheetMoving))
     suite.addTest(makeSuite(TestTraversal))
     suite.addTest(makeSuite(TestDebugMode))
 

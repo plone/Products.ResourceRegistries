@@ -234,6 +234,70 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
 
+class TestScriptMoving(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearScripts()
+
+    def testScriptMoveDown(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+        self.tool.moveScript('ham','down')
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['spam', 'ham', 'eggs'] )
+
+    def testScriptMoveDownAtEnd(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+        self.tool.moveScript('eggs','down')
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+    def testScriptMoveUp(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+        self.tool.moveScript('spam','up')
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['spam', 'ham', 'eggs'] )
+
+    def testScriptMoveUpAtStart(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+        self.tool.moveScript('ham','up')
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+    def testScriptMoveIllegalId(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+        self.assertRaises(ValueError, self.tool.moveScript, 'foo', 'up')
+
+    def testScriptMoveIllegalDirection(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getScripts()], ['ham', 'spam', 'eggs'] )
+
+        self.assertRaises(ValueError, self.tool.moveScript, 'ham', 'somewhere')
+
 class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -375,6 +439,7 @@ def test_suite():
     suite.addTest(makeSuite(TestJSToolSecurity))
     suite.addTest(makeSuite(TestJSToolExpression))
     suite.addTest(makeSuite(TestJSScriptCooking))
+    suite.addTest(makeSuite(TestScriptMoving))
     suite.addTest(makeSuite(TestJSTraversal))
     suite.addTest(makeSuite(TestPublishing))
 

@@ -89,9 +89,9 @@ function shiftBlocks(fieldset, previousBlock){
       <fieldset tal:repeat="script here/getScripts"><input type="hidden" name="scripts.sort:records:int" tal:attributes="value repeat/script/index" />     
         <div class="script-buttons">
         <p class="updown-buttons">
-                <button onclick="moveUp(this);return false;"> <!-- condition="not:repeat/stylesheet/start"-->
-                    move UP
-                </button>
+                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:manage_moveScript?id=${script/id}&direction=up">
+                     move UP
+                </a>
         </p>
         <p class="delete-button">
                 <a href="#" tal:attributes="href string:manage_removeScript?id=${script/id}">
@@ -99,9 +99,9 @@ function shiftBlocks(fieldset, previousBlock){
                 </a>
         </p>
         <p>             
-                <button onclick="moveDown(this);return false;"> <!-- :condition="not:repeat/stylesheet/end"-->
-                    move DOWN
-                </button>             
+                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:manage_moveScript?id=${script/id}&direction=down">
+                     move DOWN
+                </a>
             </p>
             
       

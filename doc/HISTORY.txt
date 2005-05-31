@@ -2,6 +2,10 @@
 
 0.8 +
 =====================
+ * Made moving of stylesheets and javascripts in ZMI possible without javascript
+   being enabled in the browser.
+   [fschulze]
+
  * Moved 2.0.5 header.pt to skins/ResourceRegistries_20compatibility and
    remove ResourceRegistries_20compatibility when Plone != 2.0.x
    [fschulze]

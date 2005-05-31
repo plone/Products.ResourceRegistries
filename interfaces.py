@@ -15,6 +15,9 @@ class ICSSRegistry(Interface):
     def unregisterStylesheet(id):
         """unregister a registered stylesheet"""
 
+    def moveStylesheet(id, direction):
+        """ move a registered stylesheet in given direction"""
+
     def getStylesheets():
         """ get the stylesheet objects. For use in management screens"""
 
@@ -29,6 +32,9 @@ class ICSSRegistry(Interface):
         save stylesheet data from form submission
         """
 
+    def manage_moveStylesheet(id, direction, REQUEST=None):
+        """ move stylesheet direction='up'|'down' via the ZMI"""
+
 
 class IJSRegistry(Interface):
 
@@ -37,6 +43,9 @@ class IJSRegistry(Interface):
 
     def unregisterScript(id):
         """ unregister e registered script"""
+
+    def moveScript(id, direction):
+        """ move a registered script in given direction"""
 
     def getEvaluatedScripts(context):
         """
@@ -57,4 +66,7 @@ class IJSRegistry(Interface):
 
     def manage_removeScript(id, REQUEST=None):
         """ remove script via the ZMI"""
+
+    def manage_moveScript(id, direction, REQUEST=None):
+        """ move script direction='up'|'down' via the ZMI"""
 

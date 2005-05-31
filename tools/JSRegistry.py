@@ -137,7 +137,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     # ZMI METHODS
     #
 
-    security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
+    security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self,id, expression='', inline=False, enabled=True, REQUEST=None):
         """ register a script from a TTW request"""
         self.registerScript(id, expression, inline, enabled)
@@ -168,7 +168,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
-    security.declareProtected(permissions.ManagePortal, 'manage_registerScript')
+    security.declareProtected(permissions.ManagePortal, 'manage_removeScript')
     def manage_removeScript(self, id, REQUEST=None):
         """ remove script with ZMI button"""
         self.unregisterScript(id)

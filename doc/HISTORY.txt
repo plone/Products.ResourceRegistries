@@ -2,6 +2,9 @@
 
 0.8 +
 =====================
+ * Fixed some security declarations.
+   [fschulze]
+
  * Made moving of stylesheets and javascripts in ZMI possible without javascript
    being enabled in the browser.
    [fschulze]

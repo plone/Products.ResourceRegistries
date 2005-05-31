@@ -117,7 +117,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     ###############
     # ZMI METHODS
 
-    security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
+    security.declareProtected(permissions.ManagePortal, 'manage_addStylesheet')
     def manage_addStylesheet(self, id, expression='', media='', rel='stylesheet', title='', rendering='import', enabled=True, REQUEST=None):
         """ register a stylesheet from a TTW request"""
         self.registerStylesheet(id, expression, media, rel, title, rendering, enabled)
@@ -155,7 +155,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
 
-    security.declareProtected(permissions.ManagePortal, 'manage_registerStylesheet')
+    security.declareProtected(permissions.ManagePortal, 'manage_removeStylesheet')
     def manage_removeStylesheet(self, id, REQUEST=None):
         """ remove stylesheet from the ZMI"""
         self.unregisterStylesheet(id)

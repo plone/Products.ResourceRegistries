@@ -15,7 +15,7 @@ from Interface.Verify import verifyObject
 from Products.CMFCore.utils import getToolByName
 
 from Products.PloneTestCase.PloneTestCase import PLONE21
-
+from DateTime import DateTime
 
 class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -410,6 +410,9 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.toolpath = '/'+self.tool.absolute_url(1)
         self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
         self.tool.registerStylesheet('plone_styles.css')
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('Document','index_html')
+        self.setRoles(['Member'])
 
     def testPublishCSSThroughTool(self):
         response = self.publish(self.toolpath+'/plone_styles.css')
@@ -445,9 +448,11 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearStylesheets()
+        self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
+        self.toolpath = '/'+self.tool.absolute_url(1)
 
 
-    def testDebugMode(self ):
+    def testDebugModeSplitting(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
@@ -456,6 +461,21 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
         #print self.tool.getEvaluatedStylesheets(self.folder)
         self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 2 )
 
+    def testDebugModeSplitting(self ):
+        self.tool.registerStylesheet('ham')
+        # publish in normal mode
+        response = self.publish(self.toolpath+'/ham')
+        now = DateTime()
+        soon = now + 7
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        # set debug mode
+        self.tool.setDebugMode(True)
+        self.tool.cookStylesheets()
+        # publish in debug mode
+        response = self.publish(self.toolpath+'/ham')
+        self.failIfEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        self.assertEqual(response.getHeader('Expires'), now.strftime('%a, %d %b %Y %H:%M:%S %Z'))
 
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
 

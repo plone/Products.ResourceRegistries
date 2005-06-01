@@ -339,6 +339,9 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.toolpath = '/'+self.tool.absolute_url(1)
         self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
         self.tool.registerScript('plone_javascripts.js')
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('Document','index_html')
+        self.setRoles(['Member'])
 
     def testPublishJSThroughTool(self):
         response = self.publish(self.toolpath+'/plone_javascripts.js')

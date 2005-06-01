@@ -385,7 +385,11 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def __getitem__(self, item):
         """ Return a script from the registry """
         output = self.getStylesheet(item, self)
-        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.CSS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        if self.getDebugMode():
+            duration = 0
+        else:
+            duration = config.CSS_CACHE_DURATION
+        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(duration)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
         return File(item, item, output, "text/css").__of__(self)
 
 

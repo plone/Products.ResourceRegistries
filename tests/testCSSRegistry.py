@@ -215,6 +215,12 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf('spam spam' in ids )
         self.failIf('spam spam spam' in ids )
 
+    def testConcatenatedStylesheetsHaveNoMedia(self ):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam',media='print')
+        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
+        self.failIf(self.tool.getEvaluatedStylesheets(self.folder)[0].get('media'))
+
     def testGetEvaluatedStylesheetsWithExpression(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',expression='python:1')

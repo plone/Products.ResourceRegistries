@@ -2,6 +2,10 @@
 
 0.8 +
 =====================
+ * Fixed cooking of stylesheets so that composite stylesheets get correct media settings.
+   Thanks a lot to Denis Mishunoff[spliter] for discovery, investigation and suggested fix
+   [elvix]
+
  * Fixed some security declarations.
    [fschulze]
 

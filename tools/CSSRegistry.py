@@ -265,7 +265,10 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                 if not self.getDebugMode() and self.compareStylesheets(stylesheet, previtem):
                     # the two sheets match , and should be concatenated
                     previd = previtem.get('id')
-
+                    # if we concatenate stylesheets with different media, makes sure to 
+                    # not serve with media on the composite
+                    if previtem.get('media') != stylesheet.get('media'):
+                        previtem['media'] = None
                     if self.concatenatedstylesheets.has_key(previd):
                         self.concatenatedstylesheets[previd].append(stylesheet.get('id'))
                     else:

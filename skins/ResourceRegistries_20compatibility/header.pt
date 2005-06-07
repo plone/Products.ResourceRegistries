@@ -13,10 +13,14 @@
           tal:attributes="content string:text/html;;charset=${charset}" />
 
     <title tal:define="portal_title portal_properties/title;
-                       page_title here/title_or_id" >
-        <tal:page_title tal:replace="page_title" />
+                       page_title here/title_or_id">
+        <tal:pagetitle replace="page_title">
+            Inserts page title
+        </tal:pagetitle>
         &mdash;
-        <tal:portal_title tal:replace="portal_title" />
+        <tal:portaltitle replace="portal_title">
+            Inserts portal title
+        </tal:portaltitle>
     </title>
 
     <metal:baseslot define-slot="base" />
@@ -29,12 +33,9 @@
           tal:attributes="name python:keyval[0];
                           content python:keyval[1];" />
 
-
-
     <metal:css metal:use-macro="here/renderAllTheStylesheets/macros/cssrenderer">
-        <!-- Fetch stylesheets from the CSS tool -->
+        <!-- Fetch stylesheets from the CSS Registry -->
     </metal:css>
-
 
     <!-- Internet Explorer CSS Fixes -->
     <tal:iefixstart replace="structure string:&lt;!--[if IE]&gt;" />
@@ -42,7 +43,6 @@
            tal:content="string:@import url($portal_url/ploneIEFixes.css);">
     </style>
     <tal:iefixend replace="structure string:&lt;![endif]--&gt;" />
-
 
     <link rel="shortcut icon" href="" type="image/x-icon" tal:attributes="href string:$portal_url/favicon.ico" />
 
@@ -79,15 +79,11 @@
       Inserts javascript specified from a page.
     </metal:block>
 
-    <!-- Common Plone ECMAScripts -->
-
-
-
+    <!-- Plone ECMAScripts -->
     <metal:js metal:use-macro="here/renderAllTheScripts/macros/jsrenderer">
-        <!-- Fetch stylesheets from the CSS tool -->
+        <!-- Fetch scripts from the Javascript Registry -->
     </metal:js>
-                  
-                                                                                       
+
   </head>
 
   <body>

@@ -6,6 +6,7 @@ import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
+from zExceptions import NotFound
 from Testing import ZopeTestCase
 from Products.ResourceRegistries.tests import CSSRegistryTestCase
 
@@ -59,46 +60,46 @@ class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
 
     def testAdd(self):
         self.tool.manage_addStylesheet(id='joe')
-        self.assertEqual(len(self.tool.getStylesheets()),1)
-        self.failUnless(self.tool.getStylesheets())
+        self.assertEqual(len(self.tool.getResources()),1)
+        self.failUnless(self.tool.getResources())
 
 
 class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
 
     def testStoringStylesheet(self):
         self.tool.registerStylesheet('foo')
 
-        self.assertEqual(len(self.tool.getStylesheets()), 1)
-        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
+        self.assertEqual(len(self.tool.getResources()), 1)
+        self.assertEqual(self.tool.getResources()[0].get('id'), 'foo')
 
     def testDefaultStylesheetAttributes(self):
         self.tool.registerStylesheet('foodefault')
-        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foodefault')
-        self.assertEqual(self.tool.getStylesheets()[0].get('expression'), '')
-        self.assertEqual(self.tool.getStylesheets()[0].get('media'), '')
-        self.assertEqual(self.tool.getStylesheets()[0].get('rel'), 'stylesheet')
-        self.assertEqual(self.tool.getStylesheets()[0].get('title'), '')
-        self.assertEqual(self.tool.getStylesheets()[0].get('rendering'), 'import')
-        self.failUnless(self.tool.getStylesheets()[0].get('enabled'))
+        self.assertEqual(self.tool.getResources()[0].get('id'), 'foodefault')
+        self.assertEqual(self.tool.getResources()[0].get('expression'), '')
+        self.assertEqual(self.tool.getResources()[0].get('media'), '')
+        self.assertEqual(self.tool.getResources()[0].get('rel'), 'stylesheet')
+        self.assertEqual(self.tool.getResources()[0].get('title'), '')
+        self.assertEqual(self.tool.getResources()[0].get('rendering'), 'import')
+        self.failUnless(self.tool.getResources()[0].get('enabled'))
 
 
     def testStylesheetAttributes(self):        
         self.tool.registerStylesheet('foo', expression='python:1', media='print', rel='alternate stylesheet', title='Foo', rendering='inline',  enabled=0 )
-        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
-        self.assertEqual(self.tool.getStylesheets()[0].get('expression'), 'python:1')
-        self.assertEqual(self.tool.getStylesheets()[0].get('media'), 'print')
-        self.assertEqual(self.tool.getStylesheets()[0].get('rel'), 'alternate stylesheet')
-        self.assertEqual(self.tool.getStylesheets()[0].get('title'), 'Foo')
-        self.assertEqual(self.tool.getStylesheets()[0].get('rendering'), 'inline')
-        self.failIf(self.tool.getStylesheets()[0].get('enabled'))
+        self.assertEqual(self.tool.getResources()[0].get('id'), 'foo')
+        self.assertEqual(self.tool.getResources()[0].get('expression'), 'python:1')
+        self.assertEqual(self.tool.getResources()[0].get('media'), 'print')
+        self.assertEqual(self.tool.getResources()[0].get('rel'), 'alternate stylesheet')
+        self.assertEqual(self.tool.getResources()[0].get('title'), 'Foo')
+        self.assertEqual(self.tool.getResources()[0].get('rendering'), 'inline')
+        self.failIf(self.tool.getResources()[0].get('enabled'))
 
 
 
@@ -107,29 +108,28 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertRaises(ValueError , self.tool.registerStylesheet , 'foo')
 
     def testPloneCustomStaysOnTop(self):
-
         self.tool.registerStylesheet('foo')
         self.tool.registerStylesheet('ploneCustom.css')
-        self.assertEqual(len(self.tool.getStylesheets()), 2)
-        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'ploneCustom.css')
-        self.assertEqual(self.tool.getStylesheets()[1].get('id'), 'foo')
+        self.tool.registerStylesheet('bar')
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['foo', 'bar', 'ploneCustom.css'] )
 
     def testUnregisterStylesheet(self):
         self.tool.registerStylesheet('foo')
-        self.assertEqual(len(self.tool.getStylesheets()), 1)
-        self.assertEqual(self.tool.getStylesheets()[0].get('id'), 'foo')
-        self.tool.unregisterStylesheet('foo')
-        self.assertEqual(len(self.tool.getStylesheets()), 0)
+        self.assertEqual(len(self.tool.getResources()), 1)
+        self.assertEqual(self.tool.getResources()[0].get('id'), 'foo')
+        self.tool.unregisterResource('foo')
+        self.assertEqual(len(self.tool.getResources()), 0)
 
     def testStylesheetsDict(self):
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('ham')
-        keys = self.tool.getStylesheetsDict().keys()
+        keys = self.tool.getResourcesDict().keys()
         keys.sort()
         res = ['ham','spam']
         res.sort()
         self.assertEqual(res,keys)
-        self.assertEqual(self.tool.getStylesheetsDict()['ham']['id'], 'ham')
+        self.assertEqual(self.tool.getResourcesDict()['ham']['id'], 'ham')
 
 
 
@@ -137,16 +137,16 @@ class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
 
     def testRegistrationSecurity(self):
         from AccessControl import Unauthorized
         self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'registerStylesheet')
-        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'unregisterStylesheet')
+        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'unregisterResource')
         self.setRoles(['Manager'])
         try:
             self.tool.restrictedTraverse('registerStylesheet')
-            self.tool.restrictedTraverse('unregisterStylesheet')
+            self.tool.restrictedTraverse('unregisterResource')
         except Unauthorized:
             self.fail()
 
@@ -155,7 +155,7 @@ class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
 
     def testSimplestExpression(self):
         context = self.portal
@@ -176,30 +176,30 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
 
     def testStylesheetCooking(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual(len(self.tool.getStylesheets()), 3)
-        self.assertEqual(len(self.tool.cookedstylesheets), 1)
-        self.assertEqual(len(self.tool.concatenatedstylesheets.keys()), 4)
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 1)
+        self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
 
     def testStylesheetCookingValues(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual(self.tool.concatenatedstylesheets[self.tool.cookedstylesheets[0].get('id')], ['eggs', 'spam', 'ham'] )
+        self.assertEqual(self.tool.concatenatedresources[self.tool.cookedresources[0].get('id')], ['ham', 'spam', 'eggs'] )
 
 
     def testGetEvaluatedStylesheetsCollapsing(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)) , 1 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)) , 1 )
 
     def testMoreComplexStylesheetsCollapsing(self ):
         self.tool.registerStylesheet('ham')
@@ -207,8 +207,8 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('spam spam',      expression='string:spam')
         self.tool.registerStylesheet('spam spam spam', expression='string:spam')
         self.tool.registerStylesheet('eggs')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)) , 3 )
-        ids = [item.get('id') for item in self.tool.getEvaluatedStylesheets(self.folder)]
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)) , 3 )
+        ids = [item.get('id') for item in self.tool.getEvaluatedResources(self.folder)]
         self.failUnless('ham' in ids )
         self.failUnless('eggs' in ids )
         self.failIf('spam' in ids )
@@ -218,48 +218,48 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     def testConcatenatedStylesheetsHaveNoMedia(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',media='print')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
-        self.failIf(self.tool.getEvaluatedStylesheets(self.folder)[0].get('media'))
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
+        self.failIf(self.tool.getEvaluatedResources(self.folder)[0].get('media'))
 
     def testGetEvaluatedStylesheetsWithExpression(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',expression='python:1')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 2 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2 )
 
     def testGetEvaluatedStylesheetsWithFailingExpression(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',expression='python:0')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
 
     def testGetEvaluatedStylesheetsWithContextualExpression(self ):
         self.folder.invokeFactory('Document', 'eggs')
         self.tool.registerStylesheet('spam',expression='python:"eggs" in object.objectIds()')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
 
     def testCollapsingStylesheetsLookup(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam',           expression='string:ham')
         self.tool.registerStylesheet('spam spam',      expression='string:ham')
-        evaluated = self.tool.getEvaluatedStylesheets(self.folder)
+        evaluated = self.tool.getEvaluatedResources(self.folder)
         self.assertEqual(len(evaluated), 2)
 
     def testRenderingIsInTheRightOrder(self):
         self.tool.registerStylesheet('ham' , expression='string:ham')
         self.tool.registerStylesheet('spam', expression='string:spam')
-        evaluated = self.tool.getEvaluatedStylesheets(self.folder)
+        evaluated = self.tool.getEvaluatedResources(self.folder)
         evaluatedids = [item['id'] for item in evaluated]
-        self.failUnless(evaluatedids[1]=='spam')
         self.failUnless(evaluatedids[0]=='ham')
+        self.failUnless(evaluatedids[1]=='spam')
 
     def testConcatenatedSheetsAreInTheRightOrderToo(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
-        evaluated = self.tool.getEvaluatedStylesheets(self.folder)
-        results = self.tool.concatenatedstylesheets[evaluated[0]['id']]
-        self.failUnless(results[2]=='ham')
+        evaluated = self.tool.getEvaluatedResources(self.folder)
+        results = self.tool.concatenatedresources[evaluated[0]['id']]
+        self.failUnless(results[0]=='ham')
         self.failUnless(results[1]=='spam')
-        self.failUnless(results[0]=='eggs')
+        self.failUnless(results[2]=='eggs')
 
     def testRenderingStylesheetLinks(self):
         self.tool.registerStylesheet('ham',                 rendering='link')
@@ -283,7 +283,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     def testDifferentMediaAreCollapsed(self):
         self.tool.registerStylesheet('simple.css',  media='print')
         self.tool.registerStylesheet('simple2.css', media='all')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)),1)
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)),1)
 
 
     def testRenderingWorksInMainTemplate(self):
@@ -301,71 +301,124 @@ class TestStylesheetMoving(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
 
     def testStylesheetMoveDown(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
-        self.tool.moveStylesheet('spam','down')
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'ham', 'spam'] )
+        self.tool.moveResourceDown('spam')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'eggs', 'spam'] )
 
     def testStylesheetMoveDownAtEnd(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
-        self.tool.moveStylesheet('ham','down')
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.tool.moveResourceDown('eggs')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
     def testStylesheetMoveUp(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
-        self.tool.moveStylesheet('spam','up')
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['spam', 'eggs', 'ham'] )
+        self.tool.moveResourceUp('spam')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'ham', 'eggs'] )
 
     def testStylesheetMoveUpAtStart(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
-        self.tool.moveStylesheet('eggs','up')
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.tool.moveResourceUp('ham')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
     def testStylesheetMoveIllegalId(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
-        self.assertRaises(ValueError, self.tool.moveStylesheet, 'foo', 'up')
+        self.assertRaises(NotFound, self.tool.moveResourceUp, 'foo')
 
-    def testStylesheetMoveIllegalDirection(self):
+    def testStylesheetMoveToBottom(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
 
-        self.assertEqual([s.get('id') for s in self.tool.getStylesheets()], ['eggs', 'spam', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
 
-        self.assertRaises(ValueError, self.tool.moveStylesheet, 'ham', 'somewhere')
+        self.tool.moveResourceToBottom('ham')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'eggs', 'ham'] )
+
+    def testStylesheetMoveToTop(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
+
+        self.tool.moveResourceToTop('eggs')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['eggs', 'ham', 'spam'] )
+
+    def testStylesheetMoveBefore(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        self.tool.registerStylesheet('bacon')
+
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs', 'bacon'] )
+
+        self.tool.moveResourceBefore('bacon', 'ham')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['bacon', 'ham', 'spam', 'eggs'] )
+
+        self.tool.moveResourceBefore('bacon', 'eggs')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'bacon', 'eggs'] )
+
+    def testStylesheetMoveAfter(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        self.tool.registerStylesheet('bacon')
+
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs', 'bacon'] )
+
+        self.tool.moveResourceAfter('bacon', 'ham')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'bacon', 'spam', 'eggs'] )
+
+        self.tool.moveResourceAfter('bacon', 'spam')
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'bacon', 'eggs'] )
+
+    def testStylesheetMove(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        self.tool.registerStylesheet('bacon')
+
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs', 'bacon'] )
+
+        self.tool.moveResource('ham', 2)
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'eggs', 'ham', 'bacon'] )
+
+        self.tool.moveResource('bacon', 0)
+        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['bacon', 'spam', 'eggs', 'ham'] )
 
 class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
         self.tool.registerStylesheet('simple.css')
 
     def testGetItemTraversal(self):
@@ -380,7 +433,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testRestrictedTraverseComposition(self):
         self.tool.registerStylesheet('simple2.css')
-        styles = self.tool.getEvaluatedStylesheets(self.portal)
+        styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 1)
         magicId = styles[0].get('id')
 
@@ -391,14 +444,14 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testCompositesWithBrokedId(self):
         self.tool.registerStylesheet('nonexistant.css')
-        stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
+        stylesheets = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(stylesheets), 1)
         magicId = stylesheets[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
 
     def testMediadescriptorsInConcatenatedStylesheets(self):
         self.tool.registerStylesheet('simple2.css', media='print')
-        styles = self.tool.getEvaluatedStylesheets(self.portal)
+        styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 1)
         magicId = styles[0].get('id')
 
@@ -412,7 +465,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
     """Integration tests. - testing http headers etc."""
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
         self.toolpath = '/'+self.tool.absolute_url(1)
         self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
         self.tool.registerStylesheet('plone_styles.css')
@@ -439,7 +492,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         response = self.publish(self.portalpath)
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
         # test that the main page retains its content-type
         self.setRoles(['Manager'])
         body = """<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/css')">/*and some css comments too*/ """
@@ -453,7 +506,7 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
-        self.tool.clearStylesheets()
+        self.tool.clearResources()
         self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
         self.toolpath = '/'+self.tool.absolute_url(1)
 
@@ -461,11 +514,11 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
     def testDebugModeSplitting(self ):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 1 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
         self.tool.setDebugMode(True)
-        self.tool.cookStylesheets()
-        #print self.tool.getEvaluatedStylesheets(self.folder)
-        self.assertEqual(len(self.tool.getEvaluatedStylesheets(self.folder)), 2 )
+        self.tool.cookResources()
+        #print self.tool.getEvaluatedResources(self.folder)
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2 )
 
     def testDebugModeSplitting(self ):
         self.tool.registerStylesheet('ham')
@@ -477,7 +530,7 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
         # set debug mode
         self.tool.setDebugMode(True)
-        self.tool.cookStylesheets()
+        self.tool.cookResources()
         # publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.failIfEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
@@ -489,18 +542,18 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool = getattr(self.portal, CSSTOOLNAME)
 
     def testClearingStylesheets(self):
-        self.failUnless(self.tool.getStylesheets())
-        self.tool.clearStylesheets()
-        self.failIf(self.tool.getStylesheets())
+        self.failUnless(self.tool.getResources())
+        self.tool.clearResources()
+        self.failIf(self.tool.getResources())
 
     def testDefaultsInstall(self):
-        stylesheetids = [item['id'] for item in self.tool.getStylesheets()]
+        stylesheetids = [item['id'] for item in self.tool.getResources()]
         self.failUnless('plone.css' in stylesheetids)
         self.failUnless('ploneColumns.css' in stylesheetids)
         self.failUnless('ploneCustom.css' in stylesheetids)
 
     def testTraverseToConcatenatedDefaults(self):
-        stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
+        stylesheets = self.tool.getEvaluatedResources(self.portal)
         for s in stylesheets:
             try:
                 magicId = s.get('id')
@@ -509,7 +562,7 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
                 self.fail()
 
     def testCallingOfConcatenatedStylesheets(self):
-        stylesheets = self.tool.getEvaluatedStylesheets(self.portal)
+        stylesheets = self.tool.getEvaluatedResources(self.portal)
         for s in stylesheets:
             if 'ploneStyles' in s.get('id'):
                 output = self.portal.restrictedTraverse('portal_css/%s' % s.get('id'))

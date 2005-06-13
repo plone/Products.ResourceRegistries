@@ -2,6 +2,13 @@
 
 0.8 +
 =====================
+ * Refactored the two registries to use one common base class.
+   [fschulze]
+
+ * Refactored moving functions, so we have more possibilities. The api reflects
+   the IOrderedContainer one.
+   [fschulze]
+
  * Fix order of javascripts, the topmost in the management screen also needs
    to be the topmost in the resulting source.
    [fschulze]

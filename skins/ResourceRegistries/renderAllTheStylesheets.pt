@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xml:lang="en">
     <metal:allcss define-macro="cssrenderer" >
-        <tal:fetcher define="stylesheets python:here.portal_css.getEvaluatedStylesheets(here);
+        <tal:fetcher define="stylesheets python:here.portal_css.getEvaluatedResources(here);
                              global portal_url here/portal_url;">
             <tal:renderer tal:repeat="stylesheet stylesheets">
                 <tal:typedef tal:define="render python:stylesheet.get('rendering','import')">
@@ -22,7 +22,7 @@
                     <tal:inline tal:condition="python: render == 'inline'">
                         <style type="text/css" 
                             tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"
-                            tal:define="stylestring python:str(here.portal_css.getInlineStylesheet(stylesheet.get('id'), here))"
+                            tal:define="stylestring python:str(here.portal_css.getInlineResource(stylesheet.get('id'), here))"
                             tal:content="structure string:<!--  ${stylestring}  -->">
                         </style>
                 </tal:inline>

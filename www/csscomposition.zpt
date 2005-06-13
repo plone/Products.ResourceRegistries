@@ -11,13 +11,13 @@
 
    
 <ul tal:define="portal_url python:here.portal_url()">
-    <li tal:repeat="entry python:here.getEvaluatedStylesheets(here)">
+    <li tal:repeat="entry python:here.getEvaluatedResources(here)">
         <div>
             <a href="" tal:attributes="href string:${portal_url}/portal_css/${entry/id}">
                 <b tal:content="entry/id">ploneCustom.css</b>
             </a>
         </div>
-        <ul tal:define="sheets here/concatenatedstylesheets">
+        <ul tal:define="sheets here/concatenatedresources">
             <li tal:repeat="subentry python:sheets.get(entry['id'])">
                 <a href="" tal:attributes="href string:${portal_url}/portal_css/${subentry}"
                             tal:content="subentry">

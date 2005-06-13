@@ -50,7 +50,7 @@ def install(self):
 # the default-values-installers
 def installPloneDefaultCSS(self, out):
     csstool = getToolByName(self, CSSTOOLNAME)    
-    stylesheets = csstool.getStylesheets()
+    stylesheets = csstool.getResources()
     stylesheet_ids = [x.get('id', None) for x in stylesheets]
     if 'ploneColumns.css' not in stylesheet_ids:
         csstool.registerStylesheet('ploneColumns.css', media="screen", rendering='import')
@@ -73,7 +73,7 @@ def installPloneDefaultJS(self, out):
     """ Install all the jaascripts plne comes with normally"""
     jstool = getToolByName(self, JSTOOLNAME)    
 
-    scripts = jstool.getScripts()
+    scripts = jstool.getResources()
     script_ids = [x.get('id', None) for x in scripts]
 
     if 'plone_javascript_variables.js' not in script_ids:

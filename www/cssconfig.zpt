@@ -79,12 +79,14 @@ function shiftBlocks(fieldset, previousBlock){
         <p>Debug mode (don't merge stylesheets)
             <input type="checkbox" name="debugmode:boolean" tal:attributes="checked here/getDebugMode" />
         </p>
+
+        <p>The order of the stylesheets in this form is the same as the order in the header of the resulting html code.</p>
       
-      <fieldset tal:repeat="stylesheet here/getStylesheets"><input type="hidden" name="stylesheets.sort:records:int" tal:attributes="value repeat/stylesheet/index" />
+      <fieldset tal:repeat="stylesheet here/getResources"><input type="hidden" name="stylesheets.sort:records:int" tal:attributes="value repeat/stylesheet/index" />
      
         <div class="stylesheets-buttons">
         <p class="updown-buttons">
-                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:manage_moveStylesheet?id=${stylesheet/id}&direction=up">
+                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:moveResourceUp?id=${stylesheet/id}">
                      move UP
                 </a>
         </p>
@@ -94,7 +96,7 @@ function shiftBlocks(fieldset, previousBlock){
                 </a>
         </p>
         <p>             
-                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:manage_moveStylesheet?id=${stylesheet/id}&direction=down">
+                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:moveResourceDown?id=${stylesheet/id}">
                      move DOWN
                 </a>
             </p>

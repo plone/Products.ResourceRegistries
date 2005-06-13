@@ -89,11 +89,13 @@ function shiftBlocks(fieldset, previousBlock){
         <p>Debug mode (don't merge javascripts)
             <input type="checkbox" name="debugmode:boolean" tal:attributes="checked here/getDebugMode" />
         </p>
+
+        <p>The order of the scripts in this form is the same as the order in the header of the resulting html code.</p>
       
-      <fieldset tal:repeat="script here/getScripts"><input type="hidden" name="scripts.sort:records:int" tal:attributes="value repeat/script/index" />     
+      <fieldset tal:repeat="script here/getResources"><input type="hidden" name="scripts.sort:records:int" tal:attributes="value repeat/script/index" />     
         <div class="script-buttons">
         <p class="updown-buttons">
-                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:manage_moveScript?id=${script/id}&direction=up">
+                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:moveResourceUp?id=${script/id}">
                      move UP
                 </a>
         </p>
@@ -103,7 +105,7 @@ function shiftBlocks(fieldset, previousBlock){
                 </a>
         </p>
         <p>             
-                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:manage_moveScript?id=${script/id}&direction=down">
+                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:moveResourceDown?id=${script/id}">
                      move DOWN
                 </a>
             </p>

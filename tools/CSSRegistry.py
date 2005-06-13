@@ -1,31 +1,19 @@
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
-from OFS.SimpleItem import SimpleItem
-from OFS.PropertyManager import PropertyManager
-
-from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
-
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-
-from Acquisition import aq_base, aq_parent, aq_inner
+from Products.CMFCore.utils import getToolByName
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
+
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 
-from Products.CMFCore.Expression import Expression
-from Products.CMFCore.Expression import createExprContext
-
-from OFS.Image import File
-
+from BaseRegistry import BaseRegistryTool
 from DateTime import DateTime
 
-import random
-
-
-class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
+class CSSRegistryTool(BaseRegistryTool):
     """ A Plone registry for managing the linking to css files.
     """
 
@@ -33,15 +21,13 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     meta_type = config.CSSTOOLTYPE
     title = "CSS Registry"
 
-
     security = ClassSecurityInfo()
 
-    __implements__ = (SimpleItem.__implements__, ICSSRegistry,)
+    __implements__ = (BaseRegistryTool.__implements__, ICSSRegistry,)
 
     # ZMI stuff
     manage_cssForm = PageTemplateFile('www/cssconfig', config.GLOBALS)
     manage_cssComposition = PageTemplateFile('www/csscomposition', config.GLOBALS)
-
 
     manage_options=(
         ({ 'label'  : 'CSS Registry',
@@ -50,19 +36,22 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
           { 'label'  : 'Merged CSS Composition',
            'action' : 'manage_cssComposition',
            }
-         ) + SimpleItem.manage_options
+         ) + BaseRegistryTool.manage_options
         )
 
 
-    def __init__(self ):
+    def __init__(self):
         """ add the storages """
-        self.stylesheets = ()
-        self.cookedstylesheets = ()
-        self.concatenatedstylesheets = {}
-        self.debugmode = False
+        BaseRegistryTool.__init__(self)
+        self.attributes_to_compare = ('expression', 'inline')
+        self.filename_base = "ploneStyles"
+        self.filename_appendix = ".css"
+        self.merged_output_prefix = ""
+        self.cache_duration = config.CSS_CACHE_DURATION
+
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
-    def registerStylesheet(self, id, expression='', media='', rel='stylesheet', title='', rendering='import',  enabled=1 ):
+    def registerStylesheet(self, id, expression='', media='', rel='stylesheet', title='', rendering='import',  enabled=1):
         """ register a stylesheet"""
         stylesheet = {}
         stylesheet['id'] = id
@@ -72,47 +61,22 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         stylesheet['title'] = title
         stylesheet['rendering'] = rendering
         stylesheet['enabled'] = enabled
-        self.storeStylesheet(stylesheet )
+        self.storeResource(stylesheet)
 
 
-    security.declareProtected(permissions.ManagePortal, 'unregisterStylesheet')
-    def unregisterStylesheet(self, sheetid):
-        """unregister a registered stylesheet"""
-        stylesheets = [ item for item in self.getStylesheets() if item.get('id') != sheetid ]
-        self.stylesheets = tuple(stylesheets)
-        self.cookStylesheets()
-
-
-    security.declareProtected(permissions.ManagePortal, 'moveStylesheet')
-    def moveStylesheet(self, id, direction):
-        """ move a registered script in given direction"""
-        stylesheets = list(self.getStylesheets())
-        stylesheet_ids = [ item.get('id') for item in stylesheets ]
-        index = stylesheet_ids.index(id)
-        if direction == 'up':
-            if index<=0:
-                return
-            temp = stylesheets[index]
-            stylesheets[index] = stylesheets[index-1]
-            stylesheets[index-1] = temp
-        elif direction == 'down':
-            if index>=len(stylesheets)-1:
-                return
-            temp = stylesheets[index]
-            stylesheets[index] = stylesheets[index+1]
-            stylesheets[index+1] = temp
+    security.declarePrivate('storeResource')
+    def storeResource(self, resource):
+        """ store a resource"""
+        self.validateId(resource.get('id'), self.getResources())
+        resources = list(self.resources)
+        if len(resources) and resources[-1].get('id') == 'ploneCustom.css':
+            # ploneCustom.css should be the last item
+            resources.insert(-1, resource)
         else:
-            raise ValueError
-        self.stylesheets = tuple(stylesheets)
-        self.cookStylesheets()
+            resources.append(resource)
+        self.resources = tuple(resources)
+        self.cookResources()
 
-
-    security.declarePrivate('clearStylesheets')
-    def clearStylesheets(self):
-        """ Clears all stylesheet data. convenience for Plone migrations"""
-        self.stylesheets = ()
-        self.cookedstylesheets = ()
-        self.concatenatedstylesheets = {}
 
     ###############
     # ZMI METHODS
@@ -136,7 +100,7 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
  
         records = REQUEST.get('stylesheets')
         records.sort(lambda a, b: a.sort-b.sort)
-        self.stylesheets = ()
+        self.resources = ()
         stylesheets = []
         for r in records:
             stylesheet = {}
@@ -149,8 +113,8 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             stylesheet['enabled']    = r.get('enabled', False)
 
             stylesheets.append(stylesheet)
-        self.stylesheets = tuple(stylesheets)
-        self.cookStylesheets()
+        self.resources = tuple(stylesheets)
+        self.cookResources()
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -158,79 +122,15 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     security.declareProtected(permissions.ManagePortal, 'manage_removeStylesheet')
     def manage_removeStylesheet(self, id, REQUEST=None):
         """ remove stylesheet from the ZMI"""
-        self.unregisterStylesheet(id)
+        self.unregisterResource(id)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-
-
-    security.declareProtected(permissions.ManagePortal, 'manage_moveStylesheet')
-    def manage_moveStylesheet(self, id, direction, REQUEST=None):
-        """ move script direction='up'|'down' via the ZMI"""
-        self.moveStylesheet(id, direction)
-        if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-
-
-    security.declareProtected(permissions.ManagePortal, 'getStylesheets')
-    def getStylesheets(self):
-        """ get the stylesheets for management screens """
-        return tuple([item.copy() for item in self.stylesheets])
-
-
-    security.declarePrivate('getStylesheetsDict')
-    def getStylesheetsDict(self):
-        """ get the stylesheets as a disctionary insterad of an ordered list. Good for lookups. internal"""
-        stylesheets = self.getStylesheets()
-        d = {}
-        for s in stylesheets:
-            d[s['id']]=s
-        return d
-
-
-
-    security.declareProtected(permissions.ManagePortal, 'getDebugMode')
-    def getDebugMode(self):
-        """stylesheet merging disabled?"""
-        try:
-            return self.debugmode
-        except AttributeError:
-            # fallback for old installs. should we even care?
-            return False
-
-
-    security.declareProtected(permissions.ManagePortal, 'setDebugMode')
-    def setDebugMode(self, value):
-        """set whether stylesheet merging should be disabled"""
-        self.debugmode = value
-    
 
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):
         """rendering methods for use in ZMI forms"""
         return config.CSS_RENDER_METHODS
-
-
-    security.declarePrivate('validateId')
-    def validateId(self, id, existing):
-        """ safeguard against dulicate ids"""
-        for sheet in existing:
-            if sheet.get('id') == id:
-                raise ValueError, 'Duplicate id %s' %(id)
-
-
-    security.declarePrivate('storeStylesheet')
-    def storeStylesheet(self, stylesheet ):
-        """ tupleize and store a list of styesheets"""
-        self.validateId(stylesheet.get('id'), self.getStylesheets())
-        stylesheets = list(self.stylesheets)
-        if len(stylesheets) and stylesheets[0].get('id') == 'ploneCustom.css':
-            stylesheets.insert(1, stylesheet)
-        else:
-            stylesheets.insert(0, stylesheet )
-
-        self.stylesheets = tuple(stylesheets)
-        self.cookStylesheets()
 
 
     security.declarePrivate('compareStylesheets')
@@ -244,168 +144,22 @@ class CSSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         return 1
 
 
-    security.declarePrivate('generateId')
-    def generateId(self):
-        base = "ploneStyles"
-        appendix = ".css"
-        return "%s%04d%s" % (base, random.randint(0, 9999), appendix)
+    def finalizeResourceMerging(self, resource, previtem):
+        if previtem.get('media') != resource.get('media'):
+            previtem['media'] = None
 
 
-    security.declarePrivate('cookStylesheets')
-    def cookStylesheets(self ):
-        stylesheets = [x for x in self.getStylesheets() if x['enabled']]
-        self.concatenatedstylesheets = {}
-        self.cookedstylesheets = ()
-        results = []
-        for stylesheet in stylesheets:
-            #self.concatenatedstylesheets[stylesheet['id']] = [stylesheet['id']]
-            if results:
-                previtem = results[-1]
-                 
-                if not self.getDebugMode() and self.compareStylesheets(stylesheet, previtem):
-                    # the two sheets match , and should be concatenated
-                    previd = previtem.get('id')
-                    # if we concatenate stylesheets with different media, makes sure to 
-                    # not serve with media on the composite
-                    if previtem.get('media') != stylesheet.get('media'):
-                        previtem['media'] = None
-                    if self.concatenatedstylesheets.has_key(previd):
-                        self.concatenatedstylesheets[previd].append(stylesheet.get('id'))
-                    else:
-                        magicId = self.generateId()
-                        self.concatenatedstylesheets[magicId] = [previd, stylesheet.get('id')]
-                        previtem['id'] = magicId
-                else:
-                    results.append(stylesheet)
-            else:
-                results.append(stylesheet)
-        #for entry in self.concatenatedstylesheets.:
+    def finalizeContent(self, resource, content):
+        # might be overwritten in subclasses
+        m = resource.get('media')
+        if m:
+            return "@media %s {\n%s\n}\n" % (m, content)
+        return content
 
 
-        stylesheets = self.getStylesheets()
-        for stylesheet in stylesheets:
-            self.concatenatedstylesheets[stylesheet['id']] = [stylesheet['id']]
-        self.cookedstylesheets = tuple(results)
-
-
-    security.declareProtected(permissions.View, 'getEvaluatedStyleheets')
-    def getEvaluatedStylesheets(self, context ):
-        """ get all the stylesheet references we are going to need for making proper templates"""
-        results = self.cookedstylesheets
-        # filter results by expression
-        results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]
-        results.reverse()
-        return results
-
-
-    security.declarePrivate('evaluateExpression')
-    def evaluateExpression(self, expression, context):
-        """
-        Evaluate an object's TALES condition to see if it should be
-        displayed
-        """
-        try:
-            if expression and context is not None:
-                portal = getToolByName(self, 'portal_url').getPortalObject()
-
-                # Find folder (code courtesy of CMFCore.ActionsTool)
-                if context is None or not hasattr(context, 'aq_base'):
-                    folder = portal
-                else:
-                    folder = context
-                    # Search up the containment hierarchy until we find an
-                    # object that claims it's PrincipiaFolderish.
-                    while folder is not None:
-                        if getattr(aq_base(folder), 'isPrincipiaFolderish', 0):
-                            # found it.
-                            break
-                        else:
-                            folder = aq_parent(aq_inner(folder))
-
-                __traceback_info__ = (folder, portal, context, expression)
-                ec = createExprContext(folder, portal, context)
-                return Expression(expression)(ec)
-            else:
-                return 1
-        except AttributeError:
-            return 1
-
-    security.declareProtected(permissions.View, 'getStylesheet')
-    def getStylesheet(self, item, context):
-        """ Return a stylesheet from the registry """
-        ids = self.concatenatedstylesheets.get(item,None)
-        if ids is not None:
-            ids = ids[:]
-            ids.reverse()
-        output = ""
-        sheets = self.getStylesheetsDict()
-
-        for id in ids:
-            try:
-                obj = getattr(context, id)
-            except AttributeError, KeyError:
-                output += "\n/* XXX ERROR -- could not find '%s' XXX */\n"%(id)
-                content=""
-                obj = None
-
-            if obj is not None:
-                if hasattr(aq_base(obj),'meta_type') and obj.meta_type in ['DTML Method','Filesystem DTML Method']:
-                    content = obj( client=self.aq_parent, REQUEST=self.REQUEST, RESPONSE=self.REQUEST.RESPONSE)
-                # we should add more explicit type-matching checks.
-                elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
-                    content = obj.index_html(self.REQUEST, self.REQUEST.RESPONSE)
-                elif callable(obj):
-                    content = obj(self.REQUEST, self.REQUEST.RESPONSE)
-                else:
-                    content = str(obj)
-
-            # add start/end notes to the stylesheet
-            # makes for better understanding and debugging
-            if content is not None:
-                output += "\n\n/* ----- %s ----- */\n" % (id,)
-                m = sheets[id].get('media')
-                if not m:
-                    output += content
-                else:
-                    output += "@media %s {\n%s\n}\n"%(m, content)
-        return output
-
-    security.declareProtected(permissions.View, 'getInlineStylesheet')
-    def getInlineStylesheet(self, item, context):
-        """ return a stylesheet as inline code, not as a file object.
-            Needs to take care not to mess up http headers
-        """
-        headers = self.REQUEST.RESPONSE.headers.copy()
-        # save the RESPONSE headers
-        output = self.getStylesheet(item, context)
-        # file objects and other might manipulate the headers,
-        # something we don't want. we set the saved headers back.
-        self.REQUEST.RESPONSE.headers = headers
-        # this should probably be solved a cleaner way.
-        return str(output)
-
-
-    def __getitem__(self, item):
-        """ Return a script from the registry """
-        output = self.getStylesheet(item, self)
-        if self.getDebugMode():
-            duration = 0
-        else:
-            duration = config.CSS_CACHE_DURATION
-        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(duration)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
-        return File(item, item, output, "text/css").__of__(self)
-
-
-    def __bobo_traverse__(self, REQUEST, name):
-        """ traversal hook"""
-        if REQUEST is not None and self.concatenatedstylesheets.get(name,None) is not None:
-            return self.__getitem__(name)
-        obj = getattr(self, name, None)
-        if obj is not None:
-            return obj
-        raise AttributeError('%s'%(name,))
-
-
+    def getContentType(self):
+        # should be overwritten by subclass
+        return "text/css"
 
 
 InitializeClass(CSSRegistryTool)

@@ -15,6 +15,7 @@ from Products.CMFCore.utils import getToolByName
 from Interface.Verify import verifyObject
 
 from Products.PloneTestCase.PloneTestCase import PLONE21
+from DateTime import DateTime
 
 class TestJSImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -384,6 +385,41 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
 
 
+class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearScripts()
+        self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
+        self.toolpath = '/'+self.tool.absolute_url(1)
+
+
+    def testDebugModeSplitting(self ):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.assertEqual(len(self.tool.getEvaluatedScripts(self.folder)), 1 )
+        self.tool.setDebugMode(True)
+        self.tool.cookScripts()
+        #print self.tool.getEvaluatedStylesheets(self.folder)
+        self.assertEqual(len(self.tool.getEvaluatedScripts(self.folder)), 2 )
+
+    def testDebugModeSplitting(self ):
+        self.tool.registerScript('ham')
+        # publish in normal mode
+        response = self.publish(self.toolpath+'/ham')
+        now = DateTime()
+        soon = now + 7
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        # set debug mode
+        self.tool.setDebugMode(True)
+        self.tool.cookScripts()
+        # publish in debug mode
+        response = self.publish(self.toolpath+'/ham')
+        self.failIfEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        self.assertEqual(response.getHeader('Expires'), now.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+
+
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
     """ Test the defualt install for plone 2.0.x series """
     # these do not run for plone 2.1 +
@@ -445,6 +481,7 @@ def test_suite():
     suite.addTest(makeSuite(TestScriptMoving))
     suite.addTest(makeSuite(TestJSTraversal))
     suite.addTest(makeSuite(TestPublishing))
+    suite.addTest(makeSuite(TestDebugMode))
 
     if not PLONE21:
         # we must not test for the defaults in Plone 2.1 because they are all different

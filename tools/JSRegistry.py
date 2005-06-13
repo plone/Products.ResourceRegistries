@@ -58,6 +58,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.scripts = ()
         self.cookedscripts = ()
         self.concatenatedscripts = {}
+        self.debugmode = False
 
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
@@ -150,6 +151,9 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
          save scripts from the ZMI
          updates the whole sequence. for editing and reordering
         """
+        debugmode = REQUEST.get('debugmode',False)
+        self.setDebugMode(debugmode)
+ 
         records = REQUEST.form.get('scripts')
         records.sort(lambda a, b: a.sort-b.sort)
 
@@ -191,6 +195,21 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             d[s['id']]=s
         return d
 
+    security.declareProtected(permissions.ManagePortal, 'getDebugMode')
+    def getDebugMode(self):
+        """stylesheet merging disabled?"""
+        try:
+            return self.debugmode
+        except AttributeError:
+            # fallback for old installs. should we even care?
+            return False
+
+
+    security.declareProtected(permissions.ManagePortal, 'setDebugMode')
+    def setDebugMode(self, value):
+        """set whether stylesheet merging should be disabled"""
+        self.debugmode = value
+    
 
     def compareScripts(self, s1, s2 ):
         for attr in ('expression', 'inline'):
@@ -213,7 +232,7 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             #self.concatenatedscripts[script['id']] = [script['id']]
             if results:
                 previtem = results[-1]
-                if self.compareScripts(script, previtem):
+                if not self.getDebugMode() and self.compareScripts(script, previtem):
                     previd = previtem.get('id')
 
                     if self.concatenatedscripts.has_key(previd):
@@ -336,7 +355,11 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def __getitem__(self, item):
         """ Return a script from the registry """
         output = self.getScript(item, self)
-        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(config.JS_CACHE_DURATION)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        if self.getDebugMode():
+            duration = 0
+        else:
+            duration = config.JS_CACHE_DURATION
+        self.REQUEST.RESPONSE.setHeader('Expires',(DateTime()+(duration)).strftime('%a, %d %b %Y %H:%M:%S %Z'))
         plone_utils = getToolByName(self, 'plone_utils')
         try:
             encoding = plone_utils.getSiteEncoding()

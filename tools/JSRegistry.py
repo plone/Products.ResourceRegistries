@@ -259,7 +259,6 @@ class JSRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         results = self.cookedscripts
         # filter results by expression
         results = [item for item in results if self.evaluateExpression(item.get('expression'), context )]
-        results.reverse()
         return results
 
     security.declarePrivate('evaluateExpression')

@@ -2,6 +2,10 @@
 
 0.8 +
 =====================
+ * Fix order of javascripts, the topmost in the management screen also needs
+   to be the topmost in the resulting source.
+   [fschulze]
+
  * Added debugmode where scripts are not concatenated.
    This will let things like the javascript console point to the right line-number.
    And makes it easier to develop, because there is no caching of the scripts.

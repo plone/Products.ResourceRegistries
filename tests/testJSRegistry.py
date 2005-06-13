@@ -203,8 +203,8 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedScripts(self.folder)
         evaluatedids = [item['id'] for item in evaluated]
-        self.failUnless(evaluatedids[0]=='spam')
-        self.failUnless(evaluatedids[1]=='ham')
+        self.failUnless(evaluatedids[0]=='ham')
+        self.failUnless(evaluatedids[1]=='spam')
 
         # can you tell we had good fun writing these tests ?
 

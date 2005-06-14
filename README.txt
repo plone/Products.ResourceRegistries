@@ -1,24 +1,24 @@
 ResourceRegistries
 
   A registry for linked Stylesheet files and Javascripts.
-  
+
   This registry is mainly aimed at solving the following usecases:
-  
-  - Enable product authors to register stylesheets with their product 
-    installers without having to resort to override either header.pt or 
+
+  - Enable product authors to register stylesheets with their product
+    installers without having to resort to override either header.pt or
     ploneCustom.css creating potential conflicts with other products.
-    
-  - Enable more componentialization of the stylesheets provided with Plone 
-    (and other products) without having to increase the number of http 
+
+  - Enable more componentialization of the stylesheets provided with Plone
+    (and other products) without having to increase the number of http
     requests for a Plone page.
-    
-  - Enable condition checking on stylesheets. Great for variable 
+
+  - Enable condition checking on stylesheets. Great for variable
     look-and-feel for groups/roles/folders/departments/content-types/etc
-                                                                
-  - Enable inline dynamic stylesheets. For those style rules that should 
+
+  - Enable inline dynamic stylesheets. For those style rules that should
     vary for each request. Mainly used for things like header-bar-
-    backgroundimages, department colors etc. 
-   
+    backgroundimages, department colors etc.
+
   - Enable developers to activate/deactivate their styles in a simpler way
 
 Usage
@@ -43,12 +43,12 @@ Usage
   stay that way. For designating alternative stylesheets.
 
   rendering -- How to link the stylesheet from the html page:
-  
+
       - 'import' - the default. normal css import
-  
+
       - 'link' - works better for old browsers an alternate stylesheets
-      
-      - 'inline' - render the stylesheet inline instead of linking it 
+
+      - 'inline' - render the stylesheet inline instead of linking it
         externally. Use
         sparingly. Costs bandwidth, but is very useful for style that vary for
         example on a per-folder-basis, like those famous header graphics bars.
@@ -60,7 +60,7 @@ Usage
   cacheability and minimising the number of http-requests to Plone.
 
   This tool was started at the excellent SnowSprint 2005 - Organised by
-  Telesis in the Austrian Alps. Thanks, Jodok :)
+  Telesis in the Austrian Alps. Thanks, Jodok! :)
 
 Credits
 

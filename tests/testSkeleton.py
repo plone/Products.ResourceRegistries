@@ -1,5 +1,5 @@
 #
-# CSSRegistryTestCase Skeleton
+# ResourcesRegistry Skeleton
 #
 
 import os, sys

@@ -1,215 +1,219 @@
-<div tal:replace="structure here/manage_page_header"/>
-    
-    
+<div tal:replace="structure here/manage_page_header" />
+
 <script type="text/javascript">
-function moveDown(node){
-    while (node.nodeName != 'FIELDSET'){
-        node = node.parentNode    
+function moveDown(node) {
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode
     }
-    fieldset=node
+    fieldset = node
     nextBlock = fieldset.nextSibling
-    if (nextBlock){
-    shiftBlocks( nextBlock, fieldset)
+    if (nextBlock) {
+        shiftBlocks(nextBlock, fieldset)
     }
 }
 
-function moveUp(node){
-    while (node.nodeName != 'FIELDSET'){
-        node = node.parentNode    
+function moveUp(node) {
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode
     }
-    fieldset=node
+    fieldset = node
     previousBlock = fieldset.previousSibling
-    if (previousBlock){
-    shiftBlocks(fieldset, previousBlock)
+    if (previousBlock) {
+        shiftBlocks(fieldset, previousBlock)
     }
 }
 
-function shiftBlocks(fieldset, previousBlock){
-    while (previousBlock.nodeType == 3){
+function shiftBlocks(fieldset, previousBlock) {
+    while (previousBlock.nodeType == 3) {
          previousBlock = previousBlock.previousSibling
-        }
-    while (fieldset.nodeType == 3){
+    }
+    while (fieldset.nodeType == 3) {
          fieldset = fieldset.nextSibling
-        }
+    }
     x = fieldset.firstChild.value
     y = previousBlock.firstChild.value
     fieldset.firstChild.value = y
-    previousBlock.firstChild.value= x
-    fieldset.parentNode.insertBefore(fieldset, previousBlock )
-    
+    previousBlock.firstChild.value = x
+    fieldset.parentNode.insertBefore(fieldset, previousBlock)
+
 }
 </script>
-    
+
 <style type="text/css">
+div.stylesheetform{
+    width: 50%;
+}
 
-    div.stylesheetform{
-        width : 50%;
-    }
+label, input, select {
+    font-size: 80%;
+    font-family: sans-serif;
+}
 
-    label, input, select{   font-size : 80%;
-            font-family : sans-serif;}
+label {
+    width: 9em;
+    text-align: right;
+    float: left;
+    padding: 0.2em 0.4em;
+}
 
-    label{ width : 9em;
-            text-align : right;
-            float: left; 
-            padding : 0.2em 0.4em;
-        }
-    
-    fieldset {
-        margin : 0.2em;
-        width : 60%;
-    }
+fieldset {
+    margin: 0.2em;
+    width: 60%;
+}
 
+.stylesheets-buttons {
+    text-align: left;
+    float: right;
+    width: 30%;
+}
+</style>
 
-    
-    .stylesheets-buttons{
-        text-align : left;        
-        float : right;
-        width : 30%;
-        
-    }
+<div tal:replace="structure here/manage_tabs" />
 
-</style>    
+<form action="manage_saveStylesheets"
+      tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'"
+      method="get">
 
-<div tal:replace="structure here/manage_tabs"/>
+    <input type=submit i18n:attributes="value" value="Save" />
 
-    <form action="manage_saveStylesheets" tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'" method="get">
-        <input type=submit i18n:attributes="value" value="Save" />
+    <p>
+        Debug mode (don't merge stylesheets)
+        <input type="checkbox" name="debugmode:boolean"
+               tal:attributes="checked here/getDebugMode" />
+    </p>
 
-        <p>Debug mode (don't merge stylesheets)
-            <input type="checkbox" name="debugmode:boolean" tal:attributes="checked here/getDebugMode" />
-        </p>
+    <p>The order of the stylesheets in this form is the same as the
+    order in the header of the resulting html code.</p>
 
-        <p>The order of the stylesheets in this form is the same as the order in the header of the resulting html code.</p>
-      
-      <fieldset tal:repeat="stylesheet here/getResources"><input type="hidden" name="stylesheets.sort:records:int" tal:attributes="value repeat/stylesheet/index" />
-     
+    <fieldset tal:repeat="stylesheet here/getResources">
+
+        <input type="hidden" name="stylesheets.sort:records:int"
+               tal:attributes="value repeat/stylesheet/index" />
+
         <div class="stylesheets-buttons">
-        <p class="updown-buttons">
-                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:moveResourceUp?id=${stylesheet/id}">
-                     move UP
+
+            <p class="updown-buttons">
+                <a onclick="moveUp(this);return false;" href="#"
+                   tal:attributes="href string:moveResourceUp?id=${stylesheet/id}">
+                     Move UP
                 </a>
-        </p>
-        <p class="delete-button">
+            </p>
+            <p class="delete-button">
                 <a href="#" tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/id}">
                     Remove this stylesheet
                 </a>
-        </p>
-        <p>             
-                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:moveResourceDown?id=${stylesheet/id}">
-                     move DOWN
+            </p>
+            <p>
+                <a onclick="moveDown(this);return false;" href="#"
+                   tal:attributes="href string:moveResourceDown?id=${stylesheet/id}">
+                     Move DOWN
                 </a>
             </p>
-            
-      
+
         </div>
+
         <div class="stylesheetform">
             <div>
                 <label>id</label>
-                <input type="text" name="stylesheets.id:records" tal:attributes="value stylesheet/id">    
+                <input type="text" name="stylesheets.id:records"
+                       tal:attributes="value stylesheet/id">
             </div>
 
             <div>
                 <label>expression</label>
-                <input type="text" name="stylesheets.expression:records" tal:attributes="value stylesheet/expression">    
+                <input type="text" name="stylesheets.expression:records"
+                       tal:attributes="value stylesheet/expression">
             </div>
 
             <div>
                 <label>media</label>
-                <input type="text" name="stylesheets.media:records" tal:attributes="value stylesheet/media">    
+                <input type="text" name="stylesheets.media:records"
+                       tal:attributes="value stylesheet/media">
             </div>
 
             <div>
                 <label>rel</label>
-                <input type="text" name="stylesheets.rel:records" tal:attributes="value stylesheet/rel">    
+                <input type="text" name="stylesheets.rel:records"
+                       tal:attributes="value stylesheet/rel">
             </div>
 
             <div>
                 <label>title</label>
-                <input type="text" name="stylesheets.title:records" tal:attributes="value stylesheet/title|nothing">    
+                <input type="text" name="stylesheets.title:records"
+                       tal:attributes="value stylesheet/title|nothing">
             </div>
 
             <div>
                 <label>rendering</label>
                 <select name="stylesheets.rendering:records">
-                    <option tal:repeat="r here/getRenderingOptions" 
+                    <option tal:repeat="r here/getRenderingOptions"
                             tal:attributes="value r;
-                                            selected python:r == stylesheet.get('rendering')" 
-                            tal:content="r">import</option>                    
-                </select>    
+                                            selected python:r == stylesheet.get('rendering')"
+                            tal:content="r">import</option>
+                </select>
             </div>
-            </div>
-
-            <div>
-                <label>enabled</label>
-                <input type="checkbox" name="stylesheets.enabled:records" tal:attributes="checked stylesheet/enabled">    
-            </div>
-
-      </fieldset>
-            
-        
-        <input type=submit i18n:attributes="value" value="Save" />
-    </form>
-
-
-
-
-
-
-    <form action="manage_addStylesheet" tal:attributes="action python:here.absolute_url()+'/manage_addStylesheet'" method="post">
-
-      
-      <fieldset>
-            
-            
-            <h3> Add a new stylesheet</h3>
-            
-            <div>
-                <label>id</label>
-                <input type="text" name="id">    
-            </div>
-
-            <div>
-                <label>expression</label>
-                <input type="text" name="expression">    
-            </div>                       
-                                         
-            <div>                        
-                <label>media</label>     
-                <input type="text" name="media">    
-            </div>                       
-                                         
-            <div>                        
-                <label>rel</label>       
-                <input type="text" name="rel" value="stylesheet">    
-            </div>                       
-                                         
-            <div>
-            <label>rendering</label>
-                <select name="rendering">
-                    <option tal:repeat="r here/getRenderingOptions" 
-                            tal:attributes="value r" 
-                            tal:content="r">import</option>                    
-                </select>  
-              
-            </div>
-                                         
-            <div>                        
-                <label>enabled</label>   
-                <input type="checkbox" name="enabled:boolean" value="1">    
-            </div>
-
-        <div>
-            <input type=submit i18n:attributes="value" value="Add" />
         </div>
 
-      </fieldset>
-    </form>
+        <div>
+            <label>enabled</label>
+            <input type="checkbox" name="stylesheets.enabled:records"
+                   tal:attributes="checked stylesheet/enabled">
+        </div>
 
+    </fieldset>
 
+    <input type=submit i18n:attributes="value" value="Save" />
 
+</form>
 
+<form action="manage_addStylesheet"
+      tal:attributes="action python:here.absolute_url()+'/manage_addStylesheet'"
+      method="post">
 
+    <fieldset>
 
+          <h3>Add a new stylesheet</h3>
 
-<div tal:replace="structure here/manage_page_footer"/>
+          <div>
+              <label>id</label>
+              <input type="text" name="id" />
+          </div>
+
+          <div>
+              <label>expression</label>
+              <input type="text" name="expression" />
+          </div>
+
+          <div>
+              <label>media</label>
+              <input type="text" name="media" />
+          </div>
+
+          <div>
+              <label>rel</label>
+              <input type="text" name="rel" value="stylesheet" />
+          </div>
+
+          <div>
+              <label>rendering</label>
+              <select name="rendering">
+                  <option tal:repeat="r here/getRenderingOptions"
+                          tal:attributes="value r"
+                          tal:content="r">import</option>
+              </select>
+          </div>
+
+          <div>
+              <label>enabled</label>
+              <input type="checkbox" name="enabled:boolean" value="1" />
+          </div>
+
+          <div>
+              <input type=submit i18n:attributes="value" value="Add" />
+          </div>
+
+    </fieldset>
+
+</form>
+
+<div tal:replace="structure here/manage_page_footer" />

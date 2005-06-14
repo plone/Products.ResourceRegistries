@@ -1,194 +1,190 @@
-<div tal:replace="structure here/manage_page_header"/>
+<div tal:replace="structure here/manage_page_header" />
 
 <script type="text/javascript">
-function moveDown(node){
-    while (node.nodeName != 'FIELDSET'){
-        node = node.parentNode    
+function moveDown(node) {
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode
     }
-    fieldset=node
+    fieldset = node
     nextBlock = fieldset.nextSibling
-    if (nextBlock){
-    shiftBlocks( nextBlock, fieldset)
+    if (nextBlock) {
+        shiftBlocks(nextBlock, fieldset)
     }
 }
 
-function moveUp(node){
-    while (node.nodeName != 'FIELDSET'){
-        node = node.parentNode    
+function moveUp(node) {
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode
     }
-    fieldset=node
+    fieldset = node
     previousBlock = fieldset.previousSibling
-    if (previousBlock){
-    shiftBlocks(fieldset, previousBlock)
+    if (previousBlock) {
+        shiftBlocks(fieldset, previousBlock)
     }
 }
 
-function shiftBlocks(fieldset, previousBlock){
-    while (previousBlock.nodeType == 3){
+function shiftBlocks(fieldset, previousBlock) {
+    while (previousBlock.nodeType == 3) {
          previousBlock = previousBlock.previousSibling
-        }
-    while (fieldset.nodeType == 3){
+    }
+    while (fieldset.nodeType == 3) {
          fieldset = fieldset.nextSibling
-        }
+    }
     x = fieldset.firstChild.value
     y = previousBlock.firstChild.value
     fieldset.firstChild.value = y
-    previousBlock.firstChild.value= x
-    fieldset.parentNode.insertBefore(fieldset, previousBlock )
-    
+    previousBlock.firstChild.value = x
+    fieldset.parentNode.insertBefore(fieldset, previousBlock)
 }
-</script>   
-    
-    
+</script>
+
 <style type="text/css">
+div.scriptform{
+    width: 50%;
+}
 
-    div.scriptform{
-        width : 50%;
-    }
-    .visualClear {
-        clear: both;
-    }
+.visualClear {
+    clear: both;
+}
 
-    label, input, select{   font-size : 80%;
-            font-family : sans-serif;}
+label, input, select{
+    font-size: 80%;
+    font-family: sans-serif;
+}
 
-    label{ width : 9em;
-            text-align : right;
-            float: left; 
-            padding : 0.2em 0.4em;
-        }
-    
-    fieldset {
-        margin : 0.2em;
-        width : 60%;
-    }
+label {
+    width: 9em;
+    text-align: right;
+    float: left;
+    padding: 0.2em 0.4em;
+}
 
+fieldset {
+    margin: 0.2em;
+    width: 60%;
+}
 
-    
-    .script-buttons{
-        text-align : left;        
-        float : right;
-        width : 30%;
-        
-    }
-    .delete-button{
-        background-color : red;
-        
-    }
+.script-buttons {
+    text-align: left;
+    float: right;
+    width: 30%;
+}
 
-</style>  
+.delete-button {
+    background-color : red;
+}
+</style>
 
-    
-    
-    
 <div tal:replace="structure here/manage_tabs"/>
 
-    <form action="manage_saveScripts" tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'" method="post">
-      <input type=submit i18n:attributes="value" value="Save" />
-      
-        <p>Debug mode (don't merge javascripts)
-            <input type="checkbox" name="debugmode:boolean" tal:attributes="checked here/getDebugMode" />
-        </p>
+<form action="manage_saveScripts"
+      tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'"
+      method="post">
 
-        <p>The order of the scripts in this form is the same as the order in the header of the resulting html code.</p>
-      
-      <fieldset tal:repeat="script here/getResources"><input type="hidden" name="scripts.sort:records:int" tal:attributes="value repeat/script/index" />     
+    <input type=submit i18n:attributes="value" value="Save" />
+
+    <p>
+        Debug mode (don't merge javascripts)
+        <input type="checkbox" name="debugmode:boolean"
+               tal:attributes="checked here/getDebugMode" />
+    </p>
+
+    <p>The order of the scripts in this form is the same as the
+    order in the header of the resulting html code.</p>
+
+    <fieldset tal:repeat="script here/getResources">
+        <input type="hidden" name="scripts.sort:records:int"
+               tal:attributes="value repeat/script/index" />
+
         <div class="script-buttons">
-        <p class="updown-buttons">
-                <a onclick="moveUp(this);return false;" href="#" tal:attributes="href string:moveResourceUp?id=${script/id}">
-                     move UP
+            <p class="updown-buttons">
+                <a onclick="moveUp(this);return false;" href="#"
+                   tal:attributes="href string:moveResourceUp?id=${script/id}">
+                     Move UP
                 </a>
-        </p>
-        <p class="delete-button">
+            </p>
+            <p class="delete-button">
                 <a href="#" tal:attributes="href string:manage_removeScript?id=${script/id}">
                      Remove script
                 </a>
-        </p>
-        <p>             
-                <a onclick="moveDown(this);return false;" href="#" tal:attributes="href string:moveResourceDown?id=${script/id}">
-                     move DOWN
+            </p>
+            <p>
+                <a onclick="moveDown(this);return false;" href="#"
+                   tal:attributes="href string:moveResourceDown?id=${script/id}">
+                     Move DOWN
                 </a>
             </p>
-            
-      
-        </div>               
-               
-               
-               
-               
-        <div class="scriptform">    
+
+        </div>
+
+        <div class="scriptform">
             <div>
                 <label>id</label>
-                <input type="text" name="scripts.id:records:string" tal:attributes="value script/id">    
+                <input type="text" name="scripts.id:records:string"
+                       tal:attributes="value script/id" />
             </div>
 
             <div>
                 <label>expression</label>
-                <input type="text" name="scripts.expression:records:string" tal:attributes="value script/expression">    
+                <input type="text" name="scripts.expression:records:string"
+                       tal:attributes="value script/expression" />
             </div>
-            
+
             <div>
                 <label>inline</label>
-                <input type="checkbox" name="scripts.inline:records:boolean" tal:attributes="checked script/inline">
-                <input type="hidden" name="scripts.inline:records:boolean:default" value="False">
+                <input type="checkbox" name="scripts.inline:records:boolean"
+                       tal:attributes="checked script/inline" />
+                <input type="hidden" name="scripts.inline:records:boolean:default" value="False" />
             </div>
 
             <div>
                 <label>enabled</label>
-                <input type="checkbox" name="scripts.enabled:records:boolean" tal:attributes="checked script/enabled">
-                <input type="hidden" name="scripts.enabled:records:boolean:default" value="False">
+                <input type="checkbox" name="scripts.enabled:records:boolean"
+                       tal:attributes="checked script/enabled" />
+                <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
             </div>
-    </div>
-      <div class="visualClear">&nbsp;</div>
-      </fieldset>
-      
-       
-        
-        <input type=submit i18n:attributes="value" value="Save" />
-    </form>
+        </div>
 
+        <div class="visualClear">&nbsp;</div>
 
+    </fieldset>
 
+    <input type=submit i18n:attributes="value" value="Save" />
 
+</form>
 
+<form action="manage_addScript"
+      tal:attributes="action python:here.absolute_url()+'/manage_addScript'"
+      method="post">
 
-    <form action="manage_addScript" tal:attributes="action python:here.absolute_url()+'/manage_addScript'" method="post">
+    <fieldset>
 
-      
-      <fieldset>
-            
-            
-            <h3> Add a new script</h3>
-            
-            <div>
-                <label>id</label>
-                <input type="text" name="id">    
-            </div>
+        <h3>Add a new script</h3>
 
-            <div>
-                <label>expression</label>
-                <input type="text" name="expression">    
-            </div>                       
-                      
-                                         
-            <div>                        
-                <label>inline</label>    
-                <input type="checkbox" name="inline:boolean" value="0">    
-            </div>                       
-                                         
-            <div>                        
-                <label>enabled</label>   
-                <input type="checkbox" name="enabled:boolean" value="1">    
-            </div>
+        <div>
+            <label>id</label>
+            <input type="text" name="id" />
+        </div>
 
-      </fieldset>
-        <input type=submit i18n:attributes="value" value="Add" />
-    </form>
+        <div>
+            <label>expression</label>
+            <input type="text" name="expression" />
+        </div>
 
+        <div>
+            <label>inline</label>
+            <input type="checkbox" name="inline:boolean" value="0" />
+        </div>
 
+        <div>
+            <label>enabled</label>
+            <input type="checkbox" name="enabled:boolean" value="1" />
+        </div>
 
+    </fieldset>
 
+    <input type=submit i18n:attributes="value" value="Add" />
 
+</form>
 
-
-<div tal:replace="structure here/manage_page_footer"/>
+<div tal:replace="structure here/manage_page_footer" />

@@ -6,29 +6,27 @@
             <tal:renderer tal:repeat="stylesheet stylesheets">
                 <tal:typedef tal:define="render python:stylesheet.get('rendering','import')">
                     <link tal:condition="python: render == 'link'"
-                    rel="stylesheet"
-                    type="text/css" 
-                        tal:attributes="href string:${portal_url}/portal_css/${stylesheet/id};
-                                        media python:path('stylesheet/media|nothing') or nothing;
-                                        rel python:path('stylesheet/rel|nothing') or nothing;
-                                        title stylesheet/title | nothing;
-                                        " />
+                          rel="stylesheet"
+                          type="text/css"
+                          tal:attributes="href string:${portal_url}/portal_css/${stylesheet/id};
+                                          media python:path('stylesheet/media|nothing') or nothing;
+                                          rel python:path('stylesheet/rel|nothing') or nothing;
+                                          title stylesheet/title | nothing" />
                     <tal:import tal:condition="python: render == 'import'">
-                        <style type="text/css" 
+                        <style type="text/css"
                             tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"
                             tal:content="structure string:<!-- @import url(${portal_url}/portal_css/${stylesheet/id}); -->">
                         </style>
-                    </tal:import> 
+                    </tal:import>
                     <tal:inline tal:condition="python: render == 'inline'">
-                        <style type="text/css" 
+                        <style type="text/css"
                             tal:attributes="media python:path('stylesheet/media|nothing') or nothing;"
                             tal:define="stylestring python:str(here.portal_css.getInlineResource(stylesheet.get('id'), here))"
                             tal:content="structure string:<!--  ${stylestring}  -->">
                         </style>
                 </tal:inline>
                 </tal:typedef>
-            </tal:renderer>    
+            </tal:renderer>
         </tal:fetcher>
     </metal:allcss>
-      
 </html>

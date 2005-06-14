@@ -1,37 +1,36 @@
 #
-# CSSRegistryTestCase
+# JSRegistry Tests
 #
 
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
-from zExceptions import NotFound
 from Testing import ZopeTestCase
-from Products.ResourceRegistries.tests import CSSRegistryTestCase
+
+from DateTime import DateTime
+from zExceptions import NotFound
+from AccessControl import Unauthorized
+from Interface.Verify import verifyObject
+
+from Products.CMFCore.utils import getToolByName
+
+from Products.PloneTestCase.PloneTestCase import PLONE21
 
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
-from Products.CMFCore.utils import getToolByName
-from Interface.Verify import verifyObject
+from Products.ResourceRegistries.tests import CSSRegistryTestCase
 
-from Products.PloneTestCase.PloneTestCase import PLONE21
-from DateTime import DateTime
 
 class TestJSImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
-
-    def afterSetUp(self):
-        pass
 
     def test_interfaces(self):
         tool = getattr(self.portal, JSTOOLNAME)
         self.failUnless(IJSRegistry.isImplementedBy(tool))
         self.failUnless(verifyObject(IJSRegistry, tool))
 
-class TestJSTool(CSSRegistryTestCase.CSSRegistryTestCase):
 
-    def afterSetUp(self):
-        pass
+class TestJSTool(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testToolExists(self):
         self.failUnless(JSTOOLNAME in self.portal.objectIds())
@@ -44,15 +43,12 @@ class TestJSTool(CSSRegistryTestCase.CSSRegistryTestCase):
 
 class TestJSSkin(CSSRegistryTestCase.CSSRegistryTestCase):
 
-    def afterSetUp(self):
-        pass
-
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
         self.failUnless('ResourceRegistries' in skins)
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'renderAllTheScripts' ))
+        self.failUnless(getattr(self.portal, 'renderAllTheScripts'))
 
 
 class testJSZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -63,7 +59,7 @@ class testJSZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testAdd(self):
         self.tool.manage_addScript(id='joe')
-        self.assertEqual(len(self.tool.getResources()),1)
+        self.assertEqual(len(self.tool.getResources()), 1)
         self.failUnless(self.tool.getResources())
 
 
@@ -73,10 +69,8 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
 
-
     def testStoringScript(self):
         self.tool.registerScript('foo')
-
         self.assertEqual(len(self.tool.getResources()), 1)
         script = self.tool.getResources()[0]
         self.assertEqual(script.get('id'), 'foo')
@@ -86,7 +80,7 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testDisallowingDuplicateIds(self):
         self.tool.registerScript('foo')
-        self.assertRaises(ValueError , self.tool.registerScript , 'foo')
+        self.assertRaises(ValueError, self.tool.registerScript, 'foo')
 
     def testUnregisterScript(self):
         self.tool.registerScript('foo')
@@ -95,6 +89,7 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.unregisterResource('foo')
         self.assertEqual(len(self.tool.getResources()), 0)
 
+
 class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -102,9 +97,10 @@ class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.clearResources()
 
     def testRegistrationSecurity(self):
-        from AccessControl import Unauthorized
-        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'registerScript')
-        self.assertRaises(Unauthorized, self.tool.restrictedTraverse , 'unregisterResource')
+        self.assertRaises(Unauthorized, self.tool.restrictedTraverse,
+                          'registerScript')
+        self.assertRaises(Unauthorized, self.tool.restrictedTraverse,
+                          'unregisterResource')
         self.setRoles(['Manager'])
         try:
             self.tool.restrictedTraverse('registerScript')
@@ -121,18 +117,21 @@ class TestJSToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testSimplestExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression('python:1', context ))
-        self.failIf(self.tool.evaluateExpression('python:0', context ))
-        self.failUnless(self.tool.evaluateExpression('python:0+1', context ))
+        self.failUnless(self.tool.evaluateExpression('python:1', context))
+        self.failIf(self.tool.evaluateExpression('python:0', context))
+        self.failUnless(self.tool.evaluateExpression('python:0+1', context))
 
     def testNormalExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression('object/absolute_url', context ))
+        self.failUnless(self.tool.evaluateExpression('object/absolute_url',
+                                                     context))
 
     def testExpressionInFolder(self):
         self.folder.invokeFactory('Document', 'eggs')
         context = self.folder
-        self.failUnless(self.tool.evaluateExpression('python:"eggs" in object.objectIds()', context ))
+        self.failUnless(self.tool.evaluateExpression(
+                        'python:"eggs" in object.objectIds()', context))
+
 
 class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -144,7 +143,6 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 1)
         self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
@@ -153,61 +151,59 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
+        self.assertEqual(self.tool.concatenatedresources[
+                         self.tool.cookedresources[0].get('id')],
+                         ['ham', 'spam', 'eggs'])
 
-        self.assertEqual(self.tool.concatenatedresources[self.tool.cookedresources[0].get('id')], ['ham', 'spam', 'eggs'] )
-
-
-    def testGetEvaluatedScriptsCollapsing(self ):
+    def testGetEvaluatedScriptsCollapsing(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)) , 1 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
-    def testMoreComplexScriptsCollapsing(self ):
+    def testMoreComplexScriptsCollapsing(self):
         self.tool.registerScript('ham')
-        self.tool.registerScript('spam',           expression='string:spam')
-        self.tool.registerScript('spam spam',      expression='string:spam')
+        self.tool.registerScript('spam', expression='string:spam')
+        self.tool.registerScript('spam spam', expression='string:spam')
         self.tool.registerScript('spam spam spam', expression='string:spam')
         self.tool.registerScript('eggs')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)) , 3 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
         ids = [item.get('id') for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in ids )
-        self.failUnless('eggs' in ids )
-        self.failIf('spam' in ids )
-        self.failIf('spam spam' in ids )
-        self.failIf('spam spam spam' in ids )
+        self.failUnless('ham' in ids)
+        self.failUnless('eggs' in ids)
+        self.failIf('spam' in ids)
+        self.failIf('spam spam' in ids)
+        self.failIf('spam spam spam' in ids)
 
-    def testGetEvaluatedScriptsWithExpression(self ):
+    def testGetEvaluatedScriptsWithExpression(self):
         self.tool.registerScript('ham')
-        self.tool.registerScript('spam',expression='python:1')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2 )
+        self.tool.registerScript('spam', expression='python:1')
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
-    def testGetEvaluatedScriptsWithFailingExpression(self ):
+    def testGetEvaluatedScriptsWithFailingExpression(self):
         self.tool.registerScript('ham')
-        self.tool.registerScript('spam',expression='python:0')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
+        self.tool.registerScript('spam', expression='python:0')
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
-    def testGetEvaluatedScriptsWithContextualExpression(self ):
+    def testGetEvaluatedScriptsWithContextualExpression(self):
         self.folder.invokeFactory('Document', 'eggs')
-        self.tool.registerScript('spam',expression='python:"eggs" in object.objectIds()')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
+        self.tool.registerScript('spam', expression='python:"eggs" in object.objectIds()')
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testCollapsingScriptsLookup(self):
         self.tool.registerScript('ham')
-        self.tool.registerScript('spam',           expression='string:spam')
-        self.tool.registerScript('spam spam',      expression='string:spam')
+        self.tool.registerScript('spam', expression='string:spam')
+        self.tool.registerScript('spam spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedResources(self.folder)
         self.assertEqual(len(evaluated), 2)
 
     def testRenderingIsInTheRightOrder(self):
-        self.tool.registerScript('ham' , expression='string:ham')
+        self.tool.registerScript('ham', expression='string:ham')
         self.tool.registerScript('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedResources(self.folder)
         evaluatedids = [item['id'] for item in evaluated]
-        self.failUnless(evaluatedids[0]=='ham')
-        self.failUnless(evaluatedids[1]=='spam')
-
-        # can you tell we had good fun writing these tests ?
+        self.failUnless(evaluatedids[0] == 'ham')
+        self.failUnless(evaluatedids[1] == 'spam')
 
     def testRenderingScriptLinks(self):
         self.tool.registerScript('ham')
@@ -227,14 +223,12 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('blue' in all)
 
     def testRenderingWorksInMainTemplate(self):
-
         renderedpage = getattr(self.portal, 'index_html')()
         self.failIf('background-color' in renderedpage)
-
         self.tool.registerScript('simple.css', inline=1)
-
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
+
 
 class TestScriptMoving(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -246,106 +240,105 @@ class TestScriptMoving(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.tool.moveResourceDown('ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'ham', 'eggs'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['spam', 'ham', 'eggs'])
 
     def testScriptMoveDownAtEnd(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.tool.moveResourceDown('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
 
     def testScriptMoveUp(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.tool.moveResourceUp('spam')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'ham', 'eggs'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['spam', 'ham', 'eggs'])
 
     def testScriptMoveUpAtStart(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.tool.moveResourceUp('ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
 
     def testScriptMoveIllegalId(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.assertRaises(NotFound, self.tool.moveResourceUp, 'foo')
 
     def testScriptMoveToBottom(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.tool.moveResourceToBottom('ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'eggs', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['spam', 'eggs', 'ham'])
 
     def testScriptMoveToTop(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs'])
         self.tool.moveResourceToTop('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['eggs', 'ham', 'spam'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['eggs', 'ham', 'spam'])
 
     def testScriptMoveBefore(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.tool.registerScript('bacon')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs', 'bacon'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs', 'bacon'])
         self.tool.moveResourceBefore('bacon', 'ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['bacon', 'ham', 'spam', 'eggs'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['bacon', 'ham', 'spam', 'eggs'])
 
     def testScriptMoveAfter(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.tool.registerScript('bacon')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs', 'bacon'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs', 'bacon'])
         self.tool.moveResourceAfter('bacon', 'ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'bacon', 'spam', 'eggs'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'bacon', 'spam', 'eggs'])
 
     def testScriptMove(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.tool.registerScript('bacon')
-
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['ham', 'spam', 'eggs', 'bacon'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['ham', 'spam', 'eggs', 'bacon'])
         self.tool.moveResource('ham', 2)
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['spam', 'eggs', 'ham', 'bacon'] )
-
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['spam', 'eggs', 'ham', 'bacon'])
         self.tool.moveResource('bacon', 0)
-        self.assertEqual([s.get('id') for s in self.tool.getResources()], ['bacon', 'spam', 'eggs', 'ham'] )
+        self.assertEqual([s.get('id') for s in self.tool.getResources()],
+                         ['bacon', 'spam', 'eggs', 'ham'])
 
 class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -358,11 +351,13 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(self.tool['plone_javascripts.js'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('registerPloneFunction' in str(self.tool['plone_javascripts.js']))
+        self.failUnless('registerPloneFunction' in str(
+                        self.tool['plone_javascripts.js']))
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('registerPloneFunction' in str(self.portal.restrictedTraverse('portal_javascripts/plone_javascripts.js')))
-
+        self.failUnless('registerPloneFunction' in str(
+                        self.portal.restrictedTraverse(
+                            'portal_javascripts/plone_javascripts.js')))
 
     def testRestrictedTraverseComposition(self):
         self.tool.registerScript('simple2.css')
@@ -370,6 +365,7 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+        # XXX: Review
         #self.failUnless('plone_javascripts.js' in content)
         #self.failUnless('registerPloneFunction' in content)
 
@@ -380,56 +376,59 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         magicId = scripts[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
 
+
 class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
-    """Integration tests. - testing http headers etc."""
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
-        self.toolpath = '/'+self.tool.absolute_url(1)
-        self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
+        self.toolpath = '/' + self.tool.absolute_url(1)
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
         self.tool.registerScript('plone_javascripts.js')
         self.setRoles(['Manager'])
-        self.portal.invokeFactory('Document','index_html')
+        self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
 
     def testPublishJSThroughTool(self):
-        response = self.publish(self.toolpath+'/plone_javascripts.js')
+        response = self.publish(self.toolpath + '/plone_javascripts.js')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript')
+        self.assertEqual(response.getHeader('Content-Type'),
+                         'application/x-javascript')
 
     def testPublishNonMagicJSThroughTool(self):
-        #this one fails because of the broken traversal hook
         self.setRoles(['Manager'])
-        body = '''<dtml-var "'joined' + 'string'">'''
+        body = """<dtml-var "'joined' + 'string'">"""
         self.portal.addDTMLMethod('testmethod', file=body)
         self.tool.registerScript('testmethod')
-        response = self.publish(self.toolpath+'/testmethod')
+        response = self.publish(self.toolpath + '/testmethod')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript;charset=utf-8')
-        
-
+        self.assertEqual(response.getHeader('Content-Type'),
+                         'application/x-javascript;charset=utf-8')
 
     def testPublishPageWithInlineJS(self):
-        # this one fails from string/utf-8 concatenation
+        # This one fails from string/utf-8 concatenation
         response = self.publish(self.portalpath)
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getHeader('Content-Type'),
+                         'text/html;charset=utf-8')
         self.tool.clearResources()
         self.tool.registerScript('plone_javascripts.js', inline=True)
-        # test that the main page retains its content-type
+        # Test that the main page retains its content-type
         response = self.publish(self.portalpath)
-        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getHeader('Content-Type'),
+                         'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
     def testPublishPageWithInlineJS2(self):
         self.tool.clearResources()
-        # test that the main page retains its content-type
+        # Test that the main page retains its content-type
         self.setRoles(['Manager'])
         body = """<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/javascript')">/*and some js comments too*/ """
         self.portal.addDTMLMethod('testmethod', file=body)
         self.tool.registerScript('testmethod', inline=True)
         response = self.publish(self.portalpath)
-        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
+        self.assertEqual(response.getHeader('Content-Type'),
+                         'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
 
@@ -438,39 +437,40 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
-        self.portalpath = '/'+ getToolByName(self.portal,'portal_url')(1)
-        self.toolpath = '/'+self.tool.absolute_url(1)
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.toolpath = '/' + self.tool.absolute_url(1)
 
-
-    def testDebugModeSplitting(self ):
+    def testDebugModeSplitting(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
         self.tool.setDebugMode(True)
         self.tool.cookResources()
-        #print self.tool.getEvaluatedResources(self.folder)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2 )
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
-    def testDebugModeSplitting(self ):
+    def testDebugModeSplitting(self):
         self.tool.registerScript('ham')
-        # publish in normal mode
+        # Publish in normal mode
         response = self.publish(self.toolpath+'/ham')
         now = DateTime()
         soon = now + 7
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
-        # set debug mode
+        self.assertEqual(response.getHeader('Expires'),
+                         soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        # Set debug mode
         self.tool.setDebugMode(True)
         self.tool.cookResources()
-        # publish in debug mode
+        # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
-        self.failIfEqual(response.getHeader('Expires'), soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
-        self.assertEqual(response.getHeader('Expires'), now.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        self.failIfEqual(response.getHeader('Expires'),
+                         soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        self.assertEqual(response.getHeader('Expires'),
+                         now.strftime('%a, %d %b %Y %H:%M:%S %Z'))
 
 
 class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
-    """ Test the defualt install for plone 2.0.x series """
-    # these do not run for plone 2.1 +
+
+    # These do not run for plone 2.1 +
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -490,8 +490,8 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         scripts = self.tool.getEvaluatedResources(self.portal)
         for s in scripts:
             try:
-                magicId = s.get('id')
-                self.portal.restrictedTraverse('portal_javascripts/%s' % magicId)
+                magic = s.get('id')
+                self.portal.restrictedTraverse('portal_javascripts/%s' % magic)
             except KeyError:
                 self.fail()
 
@@ -505,13 +505,14 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         stylesheets = self.tool.getEvaluatedResources(self.portal)
         for s in stylesheets:
             if 'ploneScripts' in s.get('id'):
-                output = self.portal.restrictedTraverse('portal_javascripts/%s' % s.get('id'))
+                output = self.portal.restrictedTraverse(
+                             'portal_javascripts/%s' % s.get('id'))
                 break
         if not output:
             self.fail()
         o = str(output)[:]
-        self.failIf("&lt;dtml-call" in o)
-        self.failIf("&amp;dtml" in o)
+        self.failIf('&lt;dtml-call' in o)
+        self.failIf('&amp;dtml' in o)
         self.failUnless('portal_url' in o)
 
 
@@ -532,8 +533,9 @@ def test_suite():
     suite.addTest(makeSuite(TestDebugMode))
 
     if not PLONE21:
-        # we must not test for the defaults in Plone 2.1 because they are all different
-        # Plone2.1 has tests in CMFPlone/tests for defaults and migrations
+        # We must not test for the defaults in Plone 2.1 because they are
+        # all different. Plone2.1 has tests in CMFPlone/tests for defaults
+        # and migrations
         suite.addTest(makeSuite(TestJSDefaults))
 
 

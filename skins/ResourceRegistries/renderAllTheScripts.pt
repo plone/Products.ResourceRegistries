@@ -5,24 +5,22 @@
                              global portal_url here/portal_url;">
             <tal:renderer tal:repeat="script scripts">
                 <script tal:condition="python:not script['inline']"
-                        type="text/javascript" 
-                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/id};" >
+                        type="text/javascript"
+                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/id}">
                 </script>
-                    
                 <tal:inline tal:condition="python:script['inline']">
-                <script 
+                <script
                     type="text/javascript"
-                    tal:define="jsstring python:str(here.portal_javascripts.getInlineResource(script.get('id'), here))"                
-                    tal:content="structure string:<!--  ${jsstring}  
+                    tal:define="jsstring python:str(here.portal_javascripts.getInlineResource(script.get('id'), here))"
+                    tal:content="structure string:<!--  ${jsstring}
                      // -->">
                 </script>
                 </tal:inline>
-            </tal:renderer>    
+            </tal:renderer>
         </tal:fetcher>
     </metal:alljs>
 </html>
 
-
-<!-- 
+<!--
 
 -->

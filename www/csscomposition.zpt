@@ -1,15 +1,10 @@
-<div tal:replace="structure here/manage_page_header"/>
-    
-    
+<div tal:replace="structure here/manage_page_header" />
+
 <style type="text/css">
+</style>
 
-</style>    
+<div tal:replace="structure here/manage_tabs" />
 
-<div tal:replace="structure here/manage_tabs"/>
-
-
-
-   
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getEvaluatedResources(here)">
         <div>
@@ -27,5 +22,5 @@
         </ul>
     </li>
 </ul>
-  
-<div tal:replace="structure here/manage_page_footer"/>
+
+<div tal:replace="structure here/manage_page_footer" />

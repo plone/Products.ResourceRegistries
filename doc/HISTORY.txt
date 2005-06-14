@@ -1,11 +1,14 @@
+After 0.8
+=========
 
+ * Cleaned up imports and whitespaces. Code standardization and small
+   improvements. Fixed ZMI templates XHTML markup.
+   [deo]
 
-0.8 +
-=====================
  * Refactored the two registries to use one common base class.
    [fschulze]
 
- * Refactored moving functions, so we have more possibilities. The api reflects
+ * Refactored moving functions, so we have more possibilities. The API reflects
    the IOrderedContainer one.
    [fschulze]
 
@@ -13,13 +16,14 @@
    to be the topmost in the resulting source.
    [fschulze]
 
- * Added debugmode where scripts are not concatenated.
-   This will let things like the javascript console point to the right line-number.
-   And makes it easier to develop, because there is no caching of the scripts.
+ * Added debugmode where scripts are not concatenated. This will let things
+   like the javascript console point to the right line-number. And makes it
+   easier to develop, because there is no caching of the scripts.
    [fschulze]
 
- * Fixed cooking of stylesheets so that composite stylesheets get correct media settings.
-   Thanks a lot to Denis Mishunoff[spliter] for discovery, investigation and suggested fix
+ * Fixed cooking of stylesheets so that composite stylesheets get correct
+   media settings. Thanks a lot to Denis Mishunoff[spliter] for discovery,
+   investigation and suggested fix
    [elvix]
 
  * Fixed some security declarations.
@@ -44,90 +48,92 @@
    available.
    [fschulze]
 
- * renamed config.TOOLNAME to config.CSSTOOLNAME 
+ * Renamed config.TOOLNAME to config.CSSTOOLNAME
    and config.TOOLTYPE to config.CSSTOOLTYPE
    [batlogg]
 
- * Added tests for attributes on stylesheets. About time. 
+ * Added tests for attributes on stylesheets. About time.
    [elvix]
 
- * Added title for alternate stylesheets
+ * Added title for alternate stylesheets.
    [fschulze]
 
- * Removing superflous skins directories
+ * Removing superflous skins directories.
    [elvix]
 
- * Added new debugmode where stylesheets are not concatenated. 
-   This will let things like the DOM inspector in Mozilla point to the right line-number. 
-   [ldr][elvix]
+ * Added new debugmode where stylesheets are not concatenated. This will let
+   things like the DOM inspector in Mozilla point to the right line-number.
+   [ldr] [elvix]
 
  * Added bugfix for handling disabled items when cooking stylesheets.
    [fschulze]
 
 
 0.8
-=====================
+===
 
  * Renamed to ResourceRegistries instead of the historical and wrong
-   CSSRegistry
-   [elvix]
-   
- * Upgraded JSRegistry to have a more proper ZMI form, now with reordering support
-   [elvix]
-   
- * Changed the order elements are added to the JSRegistry
+   CSSRegistry.
    [elvix]
 
- * Added license/copyright notice to composite files
-   (neccesary for including for third party stuff)
+ * Upgraded JSRegistry to have a more proper ZMI form, now with reordering
+   support.
    [elvix]
 
- * Bugfix fixing ZMI form for CSSRegistry
+ * Changed the order elements are added to the JSRegistry.
+   [elvix]
+
+ * Added license/copyright notice to composite files (neccesary for including
+   for third party stuff).
+   [elvix]
+
+ * Bugfix fixing ZMI form for CSSRegistry.
    [fschulze]
 
 
 0.7
-=====================
+===
 
  * Added to Plone 2.1 migrations, added installation of the default
-   Plone javascripts and stylesheets
+   Plone javascripts and stylesheets.
    [elvix]
 
- * Make sure we intecept all requests for objects, even those already 
-   present in the acquisition chain. Override __bobo_traverse__
+ * Make sure we intercept all requests for objects, even those already
+   present in the acquisition chain. Override __bobo_traverse__.
    [elvix]
 
- * Handle cache settings in http headers for served files
+ * Handle cache settings in http headers for served files.
    [elvix]
 
- * Handle http headers for inline scripts and stylesheets
+ * Handle http headers for inline scripts and stylesheets.
    [elvix]
- 
+
  * Use explicit </script> tag since these pages are being served as
-   text/html. Both IE and firefox will have problems otherwise
-   [bmh] 
- 
+   text/html. Both IE and firefox will have problems otherwise.
+   [bmh]
+
+
 0.6 and earlier
-=====================
- 
- * Added a simple readme with basic documentation
+===============
+
+ * Added a simple readme with basic documentation.
    [elvix]
 
- * Started HISTORY.txt (..somewhat late perhaps, but better than never)
+ * Started HISTORY.txt (somewhat late perhaps, but better than never).
    [elvix]
-   
- 
+
  * Cleaned up forms. Better alignment.
    [elvix]
 
- * Separate JSRegistry and CSSRegistry to two tools
+ * Separate JSRegistry and CSSRegistry to two tools.
    [elvix]
-   
+
  * Lots of changes, numerous fixes.
    [elvix]
 
-Snowsprint 2005
-=====================
-  * Designed and built first version of the CSSregistry
-    [HammerToe] [elvix]
 
+Snowsprint 2005
+===============
+
+ * Designed and built first version of the CSSregistry.
+   [HammerToe] [elvix]

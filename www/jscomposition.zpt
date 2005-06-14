@@ -1,15 +1,10 @@
-<div tal:replace="structure here/manage_page_header"/>
-    
-    
+<div tal:replace="structure here/manage_page_header" />
+
 <style type="text/css">
+</style>
 
-</style>    
+<div tal:replace="structure here/manage_tabs" />
 
-<div tal:replace="structure here/manage_tabs"/>
-
-
-
-   
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getEvaluatedResources(here)">
         <div>
@@ -20,12 +15,12 @@
         <ul tal:define="scripts here/concatenatedresources">
             <li tal:repeat="subentry python:scripts.get(entry['id'])">
                 <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${subentry}"
-                            tal:content="subentry">
+                           tal:content="subentry">
                     plone.js
                 </a>
             </li>
         </ul>
     </li>
 </ul>
-  
-<div tal:replace="structure here/manage_page_footer"/>
+
+<div tal:replace="structure here/manage_page_footer" />

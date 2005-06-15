@@ -173,12 +173,12 @@ fieldset {
 
         <div>
             <label>inline</label>
-            <input type="checkbox" name="inline:boolean" value="0" />
+            <input type="checkbox" name="inline" value="0" />
         </div>
 
         <div>
             <label>enabled</label>
-            <input type="checkbox" name="enabled:boolean" value="1" />
+            <input type="checkbox" name="enabled" checked="1" />
         </div>
 
     </fieldset>

@@ -1,5 +1,10 @@
 After 0.8
 =========
+
+ * Fixed function of enabled checkbox when adding css/javascript from ZMI.
+   Added title field to the 'add stylesheet' part in the ZMI.
+   [fschulze]
+
  * Added migration script for old instances. Just create a external method with
    id 'migrate_resourceregistries', Module Name 'ResourceRegistries.migrate' and
    Function Name 'migrate' and click on the 'Test' tab.

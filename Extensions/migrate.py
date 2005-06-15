@@ -34,7 +34,7 @@ def migrate_cssreg(self, out):
     cssreg = getToolByName(self, 'portal_css')
     if cssreg is not None:
         if base_hasattr(cssreg, 'stylesheets'):
-            cssreg.resouces = stylesheets
+            cssreg.resources = stylesheets
             del cssreg.stylesheets
     
         if base_hasattr(cssreg, 'cookedstylesheets'):
@@ -44,14 +44,17 @@ def migrate_cssreg(self, out):
         if base_hasattr(cssreg, 'concatenatedstylesheets'):
             cssreg.concatenatedresources = concatenatedstylesheets
             del cssreg.concatenatedstylesheets
-    print >> out, "Done migrating CSSRegistry."
+        cssreg.cookResources()
+        print >> out, "Done migrating CSSRegistry."
+    else:
+        print >> out, "No CSSRegistry found."
 
 def migrate_jsreg(self, out):
     print >> out, "Migrating JSSRegistry."
     jsreg = getToolByName(self, 'portal_css')
     if jsreg is not None:
         if base_hasattr(jsreg, 'scripts'):
-            jsreg.resouces = scripts
+            jsreg.resources = scripts
             del jsreg.scripts
     
         if base_hasattr(jsreg, 'cookedscripts'):
@@ -61,4 +64,7 @@ def migrate_jsreg(self, out):
         if base_hasattr(jsreg, 'concatenatedscripts'):
             jsreg.concatenatedresources = concatenatedscripts
             del jsreg.concatenatedscripts
-    print >> out, "Done migrating JSSRegistry."
+        jsreg.cookResources()
+        print >> out, "Done migrating JSSRegistry."
+    else:
+        print >> out, "No JSRegistry found."

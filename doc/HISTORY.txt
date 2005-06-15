@@ -1,5 +1,9 @@
 After 0.8
 =========
+ * Added migration script for old instances. Just create a external method with
+   id 'migrate_resourceregistries', Module Name 'ResourceRegistries.migrate' and
+   Function Name 'migrate' and click on the 'Test' tab.
+   [fschulze]
 
  * Cleaned up imports and whitespaces. Code standardization and small
    improvements. Fixed ZMI templates XHTML markup.

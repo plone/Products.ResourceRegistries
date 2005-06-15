@@ -41,18 +41,11 @@ class JSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    #
-    # Private Methods
-    #
-
-    def __init__(self):
-        """Initialize Javascript Registry."""
-        BaseRegistryTool.__init__(self)
-        self.attributes_to_compare = ('expression', 'inline')
-        self.filename_base = 'ploneScripts'
-        self.filename_appendix = '.js'
-        self.cache_duration = config.JS_CACHE_DURATION
-        self.merged_output_prefix = """/* Merged Plone Javascript file
+    attributes_to_compare = ('expression', 'inline')
+    filename_base = 'ploneScripts'
+    filename_appendix = '.js'
+    cache_duration = config.JS_CACHE_DURATION
+    merged_output_prefix = """/* Merged Plone Javascript file
  * This file is dynamically assembled from separate parts.
  * Some of these parts have 3rd party licenses or copyright information attached
  * Such information is valid for that section,
@@ -60,6 +53,10 @@ class JSRegistryTool(BaseRegistryTool):
  * originating files are separated by ----- filename.js -----
  */
 """
+
+    #
+    # Private Methods
+    #
 
     security.declarePrivate('clearScripts')
     def clearScripts(self):

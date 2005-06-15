@@ -28,6 +28,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     __implements__ = (SimpleItem.__implements__, IResourceRegistry)
     manage_options = SimpleItem.manage_options
 
+    attributes_to_compare = ('expression',)
+    filename_base = 'ploneResources'
+    filename_appendix = '.res'
+    merged_output_prefix = ''
+    cache_duration = 3600
+
     #
     # Private Methods
     #
@@ -38,11 +44,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.cookedresources = ()
         self.concatenatedresources = {}
         self.debugmode = False
-        self.attributes_to_compare = ('expression',)
-        self.filename_base = 'ploneResources'
-        self.filename_appendix = '.res'
-        self.merged_output_prefix = ''
-        self.cache_duration = 3600
 
     def __getitem__(self, item):
         """Return a resource from the registry."""

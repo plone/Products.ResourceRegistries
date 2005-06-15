@@ -41,18 +41,15 @@ class CSSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
+    attributes_to_compare = ('expression', 'inline')
+    filename_base = 'ploneStyles'
+    filename_appendix = '.css'
+    merged_output_prefix = ''
+    cache_duration = config.CSS_CACHE_DURATION
+
     #
     # Private Methods
     #
-
-    def __init__(self):
-        """Initialize CSS Registry."""
-        BaseRegistryTool.__init__(self)
-        self.attributes_to_compare = ('expression', 'inline')
-        self.filename_base = 'ploneStyles'
-        self.filename_appendix = '.css'
-        self.merged_output_prefix = ''
-        self.cache_duration = config.CSS_CACHE_DURATION
 
     security.declarePrivate('storeResource')
     def storeResource(self, resource):

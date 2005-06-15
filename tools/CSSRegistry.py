@@ -67,6 +67,10 @@ class CSSRegistryTool(BaseRegistryTool):
         self.resources = tuple(resources)
         self.cookResources()
 
+    security.declarePrivate('clearStylesheets')
+    def clearStylesheets(self):
+        self.clearResources()
+
     security.declarePrivate('compareStylesheets')
     def compareStylesheets(self, sheet1, sheet2 ):
         """Check if two resources are compatible."""

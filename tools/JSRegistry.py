@@ -61,6 +61,10 @@ class JSRegistryTool(BaseRegistryTool):
  */
 """
 
+    security.declarePrivate('clearScripts')
+    def clearScripts(self):
+        self.clearResources()
+
     #
     # ZMI Methods
     #

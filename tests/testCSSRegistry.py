@@ -281,6 +281,12 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('simple2.css', media='all')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
+    def testDifferentRenderingAreNotCollapsed(self):
+        self.tool.registerStylesheet('ham', rendering='inline')
+        self.tool.registerStylesheet('spam', rendering='link')
+        self.tool.registerStylesheet('egg', rendering='inline')
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
+
     def testRenderingWorksInMainTemplate(self):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failIf('background-color' in renderedpage)

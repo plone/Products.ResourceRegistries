@@ -41,7 +41,7 @@ class CSSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    attributes_to_compare = ('expression', 'inline')
+    attributes_to_compare = ('expression', 'rel', 'rendering')
     filename_base = 'ploneStyles'
     filename_appendix = '.css'
     merged_output_prefix = ''
@@ -68,16 +68,16 @@ class CSSRegistryTool(BaseRegistryTool):
     def clearStylesheets(self):
         self.clearResources()
 
-    security.declarePrivate('compareStylesheets')
-    def compareStylesheets(self, sheet1, sheet2 ):
+    security.declarePrivate('compareResources')
+    def compareResources(self, sheet1, sheet2 ):
         """Check if two resources are compatible."""
-        for attr in ('expression', 'rel', 'rendering'):
+        for attr in self.attributes_to_compare:
             if sheet1.get(attr) != sheet2.get(attr):
-                return 0
+                return False
             if 'alternate' in sheet1.get('rel'):
-                return 0
+                return False
                 # this part needs a test
-        return 1
+        return True
 
     security.declarePrivate('finalizeResourceMerging')
     def finalizeResourceMerging(self, resource, previtem):

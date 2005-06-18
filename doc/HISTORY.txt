@@ -1,5 +1,5 @@
-After 0.8
-=========
+0.9
+===
 
  * Fixed function of enabled checkbox when adding css/javascript from ZMI.
    Added title field to the 'add stylesheet' part in the ZMI.

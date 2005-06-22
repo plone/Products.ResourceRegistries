@@ -345,19 +345,19 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
-        self.tool.registerScript('plone_javascripts.js')
+        self.tool.registerScript('jstest.js')
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['plone_javascripts.js'])
+        self.failUnless(self.tool['jstest.js'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('registerPloneFunction' in str(
-                        self.tool['plone_javascripts.js']))
+        self.failUnless('running' in str(
+                        self.tool['jstest.js']))
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('registerPloneFunction' in str(
+        self.failUnless('running' in str(
                         self.portal.restrictedTraverse(
-                            'portal_javascripts/plone_javascripts.js')))
+                            'portal_javascripts/jstest.js')))
 
     def testRestrictedTraverseComposition(self):
         self.tool.registerScript('simple2.css')
@@ -366,7 +366,7 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         magicId = scripts[0].get('id')
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
         # XXX: Review
-        #self.failUnless('plone_javascripts.js' in content)
+        #self.failUnless('jstest.js' in content)
         #self.failUnless('registerPloneFunction' in content)
 
     def testCompositesWithBrokenId(self):
@@ -384,13 +384,13 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.clearResources()
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
-        self.tool.registerScript('plone_javascripts.js')
+        self.tool.registerScript('jstest.js')
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
 
     def testPublishJSThroughTool(self):
-        response = self.publish(self.toolpath + '/plone_javascripts.js')
+        response = self.publish(self.toolpath + '/jstest.js')
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'),
                          'application/x-javascript')
@@ -412,7 +412,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'),
                          'text/html;charset=utf-8')
         self.tool.clearResources()
-        self.tool.registerScript('plone_javascripts.js', inline=True)
+        self.tool.registerScript('jstest.js', inline=True)
         # Test that the main page retains its content-type
         response = self.publish(self.portalpath)
         self.assertEqual(response.getHeader('Content-Type'),
@@ -484,7 +484,7 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         scriptids = [item['id'] for item in self.tool.getResources()]
         self.failUnless('plone_menu.js' in scriptids)
         self.failUnless('plone_javascript_variables.js' in scriptids)
-        self.failUnless('plone_javascripts.js' in scriptids)
+        self.failUnless('jstest.js' in scriptids)
 
     def testTraverseToConcatenatedDefaults(self):
         scripts = self.tool.getEvaluatedResources(self.portal)

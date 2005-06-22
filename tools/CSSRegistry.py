@@ -74,7 +74,7 @@ class CSSRegistryTool(BaseRegistryTool):
         for attr in self.attributes_to_compare:
             if sheet1.get(attr) != sheet2.get(attr):
                 return False
-            if 'alternate' in sheet1.get('rel'):
+            if 'alternate' in sheet1.get('rel', ''):
                 return False
                 # this part needs a test
         return True
@@ -100,10 +100,10 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'manage_addStylesheet')
     def manage_addStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
-                             enabled=False, REQUEST=None):
+                             enabled=False, cookable=True, REQUEST=None):
         """Register a stylesheet from a TTW request."""
         self.registerStylesheet(id, expression, media, rel, title,
-                                rendering, enabled)
+                                rendering, enabled, cookable)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -128,6 +128,7 @@ class CSSRegistryTool(BaseRegistryTool):
             stylesheet['title'] = r.get('title', '')
             stylesheet['rendering'] = r.get('rendering', 'import')
             stylesheet['enabled'] = r.get('enabled', False)
+            stylesheet['cookable'] = r.get('cookable', False)
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -147,7 +148,7 @@ class CSSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
-                           title='', rendering='import',  enabled=1):
+                           title='', rendering='import',  enabled=1, cookable=True):
         """Register a stylesheet."""
         stylesheet = {}
         stylesheet['id'] = id
@@ -157,6 +158,7 @@ class CSSRegistryTool(BaseRegistryTool):
         stylesheet['title'] = title
         stylesheet['rendering'] = rendering
         stylesheet['enabled'] = enabled
+        stylesheet['cookable'] = cookable
         self.storeResource(stylesheet)
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')

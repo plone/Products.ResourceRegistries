@@ -487,6 +487,218 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color : red' in content)
         self.failUnless('H1 { color: blue; }' in content)
 
+class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.tool.clearResources()
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testroot.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : red }')
+        self.portal.invokeFactory('Folder', 'subfolder')
+        self.portal.subfolder.invokeFactory('File',
+                                   id='testsubfolder.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : blue }')
+
+        self.tool.registerStylesheet('testroot.css')
+        self.tool.registerStylesheet('subfolder/testsubfolder.css')
+        self.setRoles(['Member'])
+
+    def testGetItemTraversal(self):
+        self.failUnless(self.tool['testroot.css'])
+        self.failUnless(self.tool['subfolder/testsubfolder.css'])
+
+    def testGetItemTraversalContent(self):
+        self.failUnless('red' in str(self.tool['testroot.css']))
+        self.failUnless('blue' in str(self.tool['subfolder/testsubfolder.css']))
+        self.failIf('blue' in str(self.tool['testroot.css']))
+        self.failIf('red' in str(self.tool['subfolder/testsubfolder.css']))
+
+
+    def testRestrictedTraverseContent(self):
+        self.failUnless('red' in str(
+                        self.portal.restrictedTraverse('portal_css/testroot.css')))
+        self.failUnless('blue' in str(
+                        self.portal.restrictedTraverse('portal_css/subfolder/testsubfolder.css')))
+        self.failIf('blue' in str(
+                        self.portal.restrictedTraverse('portal_css/testroot.css')))
+        self.failIf('red' in str(
+                        self.portal.restrictedTraverse('portal_css/subfolder/testsubfolder.css')))
+
+    def testRestrictedTraverseComposition(self):
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), 1)
+        magicId = styles[0].get('id')
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        self.failUnless('background-color' in content)
+        self.failUnless('red' in content)
+        self.failUnless('blue' in content)
+
+    def testContextDependantInlineCSS(self):
+        self.tool.clearResources()
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('Folder', 'folder1')
+        self.portal.invokeFactory('Folder', 'folder2')
+        self.portal.folder1.invokeFactory('File',
+                                   id='context.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : pink }')
+        self.portal.folder2.invokeFactory('File',
+                                   id='context.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : purple }')
+        self.tool.registerStylesheet('context.css', rendering='inline')
+        self.setRoles(['Member'])
+        content = getattr(self.portal.folder1, 'renderAllTheStylesheets')()
+        self.failUnless('pink' in content)
+        self.failIf('purple' in content)
+        content = getattr(self.portal.folder2, 'renderAllTheStylesheets')()
+        self.failUnless('purple' in content)
+        self.failIf('pink' in content)
+
+class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.tool.clearResources()
+        self.tool.registerStylesheet('testroot.css')
+        self.tool.registerStylesheet('simple.css')
+        self.tool.registerStylesheet('simple2.css', cookable=False)
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testroot.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : green }')
+        self.setRoles(['Member'])
+
+    def testDefaultStylesheetCookableAttribute(self):
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('simple.css')].get('cookable'))
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.css')].get('cookable'))
+
+    def testStylesheetCookableAttribute(self):
+        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.css')].get('cookable'))
+
+    def testNumberOfResources(self):
+        req_resources = 3
+        req_cooked = 2
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), req_cooked)
+
+    def testCompositionWithLastUncooked(self):
+        req_resources = 3
+        req_cooked = 2
+        self.tool.moveResourceToBottom('simple2.css')
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), req_cooked)
+        magicId = None
+        for style in styles:
+            id = style.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicId = id
+        self.failUnless(magicId)
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        self.failUnless('red' in content)
+        self.failUnless('green' in content)
+        self.failIf('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        self.failUnless('blue' in content)
+
+    def testCompositionWithFirstUncooked(self):
+        req_resources = 3
+        req_cooked = 2
+        self.tool.moveResourceToTop('simple2.css')
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), req_cooked)
+        magicId = None
+        for style in styles:
+            id = style.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicId = id
+        self.failUnless(magicId)
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        self.failUnless('red' in content)
+        self.failUnless('green' in content)
+        self.failIf('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        self.failUnless('blue' in content)
+
+    def testCompositionWithMiddleUncooked(self):
+        req_resources = 3
+        req_cooked = 3
+        self.tool.moveResourceToTop('simple2.css')
+        self.tool.moveResourceDown('simple2.css')
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), req_cooked)
+        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        self.failUnless('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/simple.css'))
+        self.failUnless('red' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
+        self.failUnless('green' in content)
+
+    def testLargerCompositionWithMiddleUncooked(self):
+        req_cooked = 3
+        req_resources = 5
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testpurple.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : purple }')
+        self.portal.invokeFactory('File',
+                                   id='testpink.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : pink }')
+        self.setRoles(['Member'])
+        self.tool.registerStylesheet('testpurple.css')
+        self.tool.registerStylesheet('testpink.css')
+        self.tool.moveResourceToTop('simple2.css')
+        self.tool.moveResourceDown('simple2.css', 2)
+        #Now have [[green,red],blue,[purple,pink]]
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), req_cooked)
+        magicIds = []
+        for style in styles:
+            id = style.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicIds.append(id)
+        self.assertEqual(len(magicIds), 2)
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[0]))
+        self.failUnless('red' in content)
+        self.failUnless('green' in content)
+        self.failIf('pink' in content)
+        self.failIf('purple' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[1]))
+        self.failUnless('pink' in content)
+        self.failUnless('purple' in content)
+        self.failIf('red' in content)
+        self.failIf('green' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        self.failUnless('blue' in content)
 
 class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -529,6 +741,69 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
+class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.toolpath = '/' + self.tool.absolute_url(1)
+        self.tool.clearResources()
+        self.tool.registerStylesheet('testroot.css', cookable=False)
+        self.tool.registerStylesheet('simple.css')
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testroot.css',
+                                   format='text/css',
+                                   content_type='text/css',
+                                   file='body { background-color : green }')
+
+        stylesheet = self.portal.restrictedTraverse('testroot.css')
+
+        stylesheet.manage_permission('View',['Manager'], acquire=0)
+        stylesheet.manage_permission('Access contents information',['Manager'], acquire=0)
+        self.setRoles(['Member'])
+
+
+    def testGetItemTraversal(self):
+        try:
+            content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
+        except Unauthorized:
+            return
+
+        self.fail()
+
+    def testTestUnauthorizedTraversal(self):
+        try:
+            content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
+        except Unauthorized:
+            return
+
+        self.fail()
+
+    def testRaiseUnauthorizedOnPublish(self):
+        response = self.publish(self.toolpath + '/testroot.css')
+        #Will be 302 if CookieCrumbler is enabled
+        self.failUnless(response.getStatus() in [302, 403])
+
+    def testRemovedFromResources(self):
+        styles = self.tool.getEvaluatedResources(self.portal)
+        ids = [item.get('id') for item in styles]
+        self.failIf('testroot.css' in ids)
+        self.failUnless('simple.css' in ids)
+
+    def testRemovedFromMergedResources(self):
+        self.tool.unregisterResource('testroot.css')
+        self.tool.registerStylesheet('testroot.css')
+        styles = self.tool.getEvaluatedResources(self.portal)
+        magicId = None
+        for style in styles:
+            id = style.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicId = id
+        self.failUnless(magicId)
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        self.failIf('green' in content)
+        self.failUnless('not authorized' in content)
+        self.failUnless('red' in content)
 
 class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -620,6 +895,9 @@ def test_suite():
     suite.addTest(makeSuite(TestPublishing))
     suite.addTest(makeSuite(TestStylesheetMoving))
     suite.addTest(makeSuite(TestTraversal))
+    suite.addTest(makeSuite(TestZODBTraversal))
+    suite.addTest(makeSuite(TestMergingDisabled))
+    suite.addTest(makeSuite(TestResourcePermissions))
     suite.addTest(makeSuite(TestDebugMode))
 
     if not PLONE21:

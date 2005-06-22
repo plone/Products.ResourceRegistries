@@ -1,6 +1,22 @@
 After 0.9
 =========
 
+ * Added test for context dependancy to inline css rendering.
+   [dom]
+
+ * Now uses restrictedTraverse() rather than getattr() for returning resources,
+   to provide support for resources held within the ZODB.
+   [dom]
+
+ * Added a "is merging allowed?" option ("cookable" property) to determine where
+   a resource can be merged (default True). This was added because objects in
+   the ZODB may have variable permissions but be merged together. Whilst the
+   objects are checked at each REQUEST, a new REQUEST won't actually be made
+   each time because of the cache headers set on merged resources. If this
+   worries you, the simplest solution is not to merge such resources, hence this
+   option.
+   [dom]
+
  * Added renameResource function with tests.
    [fschulze]
 

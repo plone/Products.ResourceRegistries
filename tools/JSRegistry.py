@@ -68,16 +68,16 @@ class JSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self, id, expression='', inline=False,
-                         enabled=False, REQUEST=None):
+                         enabled=False, cookable=True, REQUEST=None):
         """Register a script from a TTW request."""
-        self.registerScript(id, expression, inline, enabled)
+        self.registerScript(id, expression, inline, enabled, cookable)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
     security.declareProtected(permissions.ManagePortal, 'manage_saveScripts')
     def manage_saveScripts(self, REQUEST=None):
         """Save scripts from the ZMI.
-        
+
         Updates the whole sequence. For editing and reordering.
         """
         debugmode = REQUEST.get('debugmode',False)
@@ -92,6 +92,7 @@ class JSRegistryTool(BaseRegistryTool):
             script['expression'] = r.get('expression', '')
             script['inline'] = r.get('inline')
             script['enabled'] = r.get('enabled')
+            script['cookable'] = r.get('cookable')
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()
@@ -110,13 +111,14 @@ class JSRegistryTool(BaseRegistryTool):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
-    def registerScript(self, id, expression='', inline=False, enabled=True):
+    def registerScript(self, id, expression='', inline=False, enabled=True, cookable=True):
         """Register a script."""
         script = {}
         script['id'] = id
         script['expression'] = expression
         script['inline'] = inline
         script['enabled'] = enabled
+        script['cookable'] = cookable
         self.storeResource(script)
 
     security.declareProtected(permissions.View, 'getContentType')

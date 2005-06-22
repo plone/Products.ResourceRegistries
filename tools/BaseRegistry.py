@@ -3,7 +3,7 @@ import random
 from DateTime import DateTime
 from zExceptions import NotFound
 from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, Unauthorized
 
 from OFS.Image import File
 from OFS.SimpleItem import SimpleItem
@@ -146,6 +146,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             if results:
                 previtem = results[-1]
                 if not self.getDebugMode() and \
+                   resource.get('cookable', True) and \
+                   previtem.get('cookable', True) and \
                    self.compareResources(resource, previtem):
                     res_id = resource.get('id')
                     prev_id = previtem.get('id')
@@ -208,13 +210,35 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
             output = output + self.merged_output_prefix
         resources = self.getResourcesDict()
 
+        portal = None
+        u_tool = getToolByName(self, 'portal_url', None)
+        if u_tool:
+            portal = u_tool.getPortalObject()
+
+        if context == self and portal is not None:
+            context = portal
+
         for id in ids:
             try:
-                obj = getattr(context, id)
-            except AttributeError, KeyError:
+                if portal is not None:
+                    obj = context.restrictedTraverse(id)
+                else:
+                    #Can't do anything other than attempt a getattr
+                    obj = getattr(context, id)
+            except (AttributeError, KeyError):
                 output += "\n/* XXX ERROR -- could not find '%s'*/\n" % id
                 content = ''
                 obj = None
+            except Unauthorized:
+                #If we're just returning a single resource, raise an Unauthorized,
+                #otherwise we're merging resources in which case just log an error
+                if len(ids) > 1:
+                    #Object probably isn't published yet
+                    output += "\n/* XXX ERROR -- access to '%s' not authorized */\n" % id
+                    content = ''
+                    obj = None
+                else:
+                    raise
 
             if obj is not None:
                 if hasattr(aq_base(obj),'meta_type') and \
@@ -302,12 +326,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerResource')
-    def registerResource(self, id, expression='', enabled=True):
+    def registerResource(self, id, expression='', enabled=True, cookable=True):
         """Register a resource."""
         resource = {}
         resource['id'] = id
         resource['expression'] = expression
         resource['enabled'] = enabled
+        resource['cookable'] = cookable
         self.storeResource(resource)
 
     security.declareProtected(permissions.ManagePortal, 'unregisterResource')
@@ -380,9 +405,36 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def getEvaluatedResources(self, context):
         """Return the filtered evaluated resources."""
         results = self.cookedresources
+
         # filter results by expression
         results = [item for item in results
                    if self.evaluateExpression(item.get('expression'), context)]
+
+        # filter out resources to which the user does not have access
+        # this is mainly cosmetic but saves raising lots of Unauthorized
+        # requests whilst resources are in their private state. 404s should stay
+        # though since they indicate an error on the part of the designer/developer
+        # or are considered legal by the Unit Tests!
+        portal = None
+        u_tool = getToolByName(self, 'portal_url', None)
+        if u_tool:
+            portal = u_tool.getPortalObject()
+
+        if portal is not None:
+            #If we don't have a portal object, just let'em through - the stylesheets will raise
+            # an Unauthorized when requested though
+            for item in results:
+                id = item.get('id')
+                if not id.startswith(self.filename_base):
+                    try:
+                        obj = portal.restrictedTraverse(id)
+                    except Unauthorized:
+                        #Only include links to Unauthorized objects if we're debugging
+                        if not self.getDebugMode():
+                            results.remove(item)
+                    except (AttributeError, KeyError):
+                        pass
+
         return results
 
     security.declareProtected(permissions.View, 'getInlineResource')

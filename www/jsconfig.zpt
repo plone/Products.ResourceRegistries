@@ -57,6 +57,7 @@ label {
     text-align: right;
     float: left;
     padding: 0.2em 0.4em;
+    clear: left;
 }
 
 fieldset {
@@ -143,6 +144,12 @@ fieldset {
                        tal:attributes="checked script/enabled" />
                 <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
             </div>
+            <div>
+                <label>is merging allowed?</label>
+                <input type="checkbox" name="scripts.cookable:records:boolean"
+                       tal:attributes="checked python:script.get('cookable', True)" />
+                <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
+            </div>
         </div>
 
         <div class="visualClear">&nbsp;</div>
@@ -179,6 +186,12 @@ fieldset {
         <div>
             <label>enabled</label>
             <input type="checkbox" name="enabled" checked="1" />
+        </div>
+
+        <div>
+            <label>is merging allowed?</label>
+            <input type="checkbox" name="cookable:boolean" checked="1" />
+            <input type="hidden" name="cookable:boolean:default" value="False" />
         </div>
 
     </fieldset>

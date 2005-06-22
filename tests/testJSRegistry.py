@@ -547,6 +547,287 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf('&amp;dtml' in o)
         self.failUnless('portal_url' in o)
 
+class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testroot.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('red')")
+        self.portal.invokeFactory('Folder', 'subfolder')
+        self.portal.subfolder.invokeFactory('File',
+                                   id='testsubfolder.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('blue')")
+
+        self.tool.registerScript('testroot.js')
+        self.tool.registerScript('subfolder/testsubfolder.js')
+        self.setRoles(['Member'])
+
+    def testGetItemTraversal(self):
+        self.failUnless(self.tool['testroot.js'])
+        self.failUnless(self.tool['subfolder/testsubfolder.js'])
+
+    def testGetItemTraversalContent(self):
+        self.failUnless('red' in str(self.tool['testroot.js']))
+        self.failUnless('blue' in str(self.tool['subfolder/testsubfolder.js']))
+        self.failIf('blue' in str(self.tool['testroot.js']))
+        self.failIf('red' in str(self.tool['subfolder/testsubfolder.js']))
+
+
+    def testRestrictedTraverseContent(self):
+        self.failUnless('red' in str(
+                        self.portal.restrictedTraverse('portal_javascripts/testroot.js')))
+        self.failUnless('blue' in str(
+                        self.portal.restrictedTraverse('portal_javascripts/subfolder/testsubfolder.js')))
+        self.failIf('blue' in str(
+                        self.portal.restrictedTraverse('portal_javascripts/testroot.js')))
+        self.failIf('red' in str(
+                        self.portal.restrictedTraverse('portal_javascripts/subfolder/testsubfolder.js')))
+
+    def testRestrictedTraverseComposition(self):
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), 1)
+        magicId = scripts[0].get('id')
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+        self.failUnless('red' in content)
+        self.failUnless('blue' in content)
+
+    def testContextDependantInlineJS(self):
+        self.tool.clearResources()
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('Folder', 'folder1')
+        self.portal.invokeFactory('Folder', 'folder2')
+        self.portal.folder1.invokeFactory('File',
+                                   id='context.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('pink')")
+        self.portal.folder2.invokeFactory('File',
+                                   id='context.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('purple')")
+        self.tool.registerScript('context.js', inline=True)
+        self.setRoles(['Member'])
+        content = getattr(self.portal.folder1, 'renderAllTheScripts')()
+        self.failUnless('pink' in content)
+        self.failIf('purple' in content)
+        content = getattr(self.portal.folder2, 'renderAllTheScripts')()
+        self.failUnless('purple' in content)
+        self.failIf('pink' in content)
+
+class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.toolpath = '/' + self.tool.absolute_url(1)
+        self.tool.clearResources()
+        self.tool.registerScript('testroot.js', cookable=False)
+        self.tool.registerScript('jstest.js')
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testroot.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('red')")
+
+        script = self.portal.restrictedTraverse('testroot.js')
+
+        script.manage_permission('View',['Manager'], acquire=0)
+        script.manage_permission('Access contents information',['Manager'], acquire=0)
+        self.setRoles(['Member'])
+
+
+    def testGetItemTraversal(self):
+        try:
+            content = str(self.portal.restrictedTraverse('portal_javascripts/testroot.js'))
+        except Unauthorized:
+            return
+
+        self.fail()
+
+    def testTestUnauthorizedTraversal(self):
+        try:
+            content = str(self.portal.restrictedTraverse('portal_javascripts/testroot.js'))
+        except Unauthorized:
+            return
+
+        self.fail()
+
+    def testRaiseUnauthorizedOnPublish(self):
+        response = self.publish(self.toolpath + '/testroot.js')
+        #Will be 302 if CookieCrumbler is enabled
+        self.failUnless(response.getStatus() in [302, 403])
+
+    def testRemovedFromResources(self):
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        ids = [item.get('id') for item in scripts]
+        self.failIf('testroot.js' in ids)
+        self.failUnless('jstest.js' in ids)
+
+    def testRemovedFromMergedResources(self):
+        self.tool.unregisterResource('testroot.js')
+        self.tool.registerScript('testroot.js')
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        for script in scripts:
+            id = script.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicId = id
+        self.failUnless(magicId)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+        self.failIf('red' in content)
+        self.failUnless('not authorized' in content)
+        self.failUnless('running' in content)
+
+class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.req_resources = 3
+        self.req_cooked = 2
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        self.tool.registerScript('testroot.js')
+        self.tool.registerScript('jstest.js')
+        self.tool.registerScript('simple2.js', cookable=False)
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testroot.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('green')")
+        self.portal.invokeFactory('File',
+                                   id='simple2.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('blue')")
+        self.setRoles(['Member'])
+
+    def testDefaultStylesheetCookableAttribute(self):
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('jstest.js')].get('cookable'))
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.js')].get('cookable'))
+
+    def testStylesheetCookableAttribute(self):
+        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.js')].get('cookable'))
+
+    def testNumberOfResources(self):
+        req_resources = 3
+        req_cooked = 2
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), req_cooked)
+
+    def testCompositionWithLastUncooked(self):
+        req_resources = 3
+        req_cooked = 2
+        self.tool.moveResourceToBottom('simple2.js')
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), req_cooked)
+        magicId = None
+        for script in scripts:
+            id = script.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicId = id
+        self.failUnless(magicId)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+        self.failUnless('running' in content)
+        self.failUnless('green' in content)
+        self.failIf('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
+        self.failUnless('blue' in content)
+
+    def testCompositionWithFirstUncooked(self):
+        req_resources = 3
+        req_cooked = 2
+        self.tool.moveResourceToTop('simple2.js')
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), req_cooked)
+        magicId = None
+        for script in scripts:
+            id = script.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicId = id
+        self.failUnless(magicId)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+        self.failUnless('running' in content)
+        self.failUnless('green' in content)
+        self.failIf('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
+        self.failUnless('blue' in content)
+
+    def testCompositionWithMiddleUncooked(self):
+        req_resources = 3
+        req_cooked = 3
+        self.tool.moveResourceToTop('simple2.js')
+        self.tool.moveResourceDown('simple2.js')
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), req_cooked)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
+        self.failUnless('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/jstest.js'))
+        self.failUnless('running' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/testroot.js'))
+        self.failUnless('green' in content)
+
+    def testLargerCompositionWithMiddleUncooked(self):
+        req_cooked = 3
+        req_resources = 5
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('File',
+                                   id='testpurple.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('purple')")
+        self.portal.invokeFactory('File',
+                                   id='testpink.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript',
+                                   file="window.alert('pink')")
+        self.setRoles(['Member'])
+        self.tool.registerScript('testpurple.js')
+        self.tool.registerScript('testpink.js')
+        self.tool.moveResourceToTop('simple2.js')
+        self.tool.moveResourceDown('simple2.js', 2)
+        #Now have [[green,running],blue,[purple,pink]]
+        self.assertEqual(len(self.tool.getResources()), req_resources)
+        self.assertEqual(len(self.tool.cookedresources), req_cooked)
+        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), req_cooked)
+        magicIds = []
+        for script in scripts:
+            id = script.get('id')
+            if id.startswith(self.tool.filename_base):
+                magicIds.append(id)
+        self.assertEqual(len(magicIds), 2)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[0]))
+        self.failUnless('running' in content)
+        self.failUnless('green' in content)
+        self.failIf('pink' in content)
+        self.failIf('purple' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[1]))
+        self.failUnless('pink' in content)
+        self.failUnless('purple' in content)
+        self.failIf('running' in content)
+        self.failIf('green' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
+        self.failUnless('blue' in content)
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -564,6 +845,9 @@ def test_suite():
     suite.addTest(makeSuite(TestJSTraversal))
     suite.addTest(makeSuite(TestPublishing))
     suite.addTest(makeSuite(TestDebugMode))
+    suite.addTest(makeSuite(TestZODBTraversal))
+    suite.addTest(makeSuite(TestMergingDisabled))
+    suite.addTest(makeSuite(TestResourcePermissions))
 
     if not PLONE21:
         # We must not test for the defaults in Plone 2.1 because they are

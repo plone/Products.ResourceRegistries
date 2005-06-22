@@ -127,6 +127,38 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(self.tool.getResourcesDict()['ham']['id'], 'ham')
 
 
+class TestStylesheetRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.tool.clearResources()
+
+    def testRenaming(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        self.assertEqual(self.tool.concatenatedresources[
+                         self.tool.cookedresources[0].get('id')],
+                         ['ham', 'spam', 'eggs'])
+        self.tool.renameResource('spam', 'bacon')
+        self.assertEqual(self.tool.concatenatedresources[
+                         self.tool.cookedresources[0].get('id')],
+                         ['ham', 'bacon', 'eggs'])
+
+    def testRenamingIdClash(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'eggs')
+
+    def testDoubleRenaming(self):
+        self.tool.registerStylesheet('ham')
+        self.tool.registerStylesheet('spam')
+        self.tool.registerStylesheet('eggs')
+        self.tool.renameResource('spam', 'bacon')
+        self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'bacon')
+
+
 class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -581,6 +613,7 @@ def test_suite():
     suite.addTest(makeSuite(TestSkin))
     suite.addTest(makeSuite(testZMIMethods))
     suite.addTest(makeSuite(TestStylesheetRegistration))
+    suite.addTest(makeSuite(TestStylesheetRenaming))
     suite.addTest(makeSuite(TestToolSecurity))
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))

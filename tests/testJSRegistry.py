@@ -90,6 +90,38 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(self.tool.getResources()), 0)
 
 
+class TestJSScriptRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+
+    def testRenaming(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+        self.assertEqual(self.tool.concatenatedresources[
+                         self.tool.cookedresources[0].get('id')],
+                         ['ham', 'spam', 'eggs'])
+        self.tool.renameResource('spam', 'bacon')
+        self.assertEqual(self.tool.concatenatedresources[
+                         self.tool.cookedresources[0].get('id')],
+                         ['ham', 'bacon', 'eggs'])
+
+    def testRenamingIdClash(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+        self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'eggs')
+
+    def testDoubleRenaming(self):
+        self.tool.registerScript('ham')
+        self.tool.registerScript('spam')
+        self.tool.registerScript('eggs')
+        self.tool.renameResource('spam', 'bacon')
+        self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'bacon')
+
+
 class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -524,6 +556,7 @@ def test_suite():
     suite.addTest(makeSuite(TestJSSkin))
     suite.addTest(makeSuite(testJSZMIMethods))
     suite.addTest(makeSuite(TestJSScriptRegistration))
+    suite.addTest(makeSuite(TestJSScriptRenaming))
     suite.addTest(makeSuite(TestJSToolSecurity))
     suite.addTest(makeSuite(TestJSToolExpression))
     suite.addTest(makeSuite(TestJSScriptCooking))

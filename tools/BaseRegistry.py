@@ -318,6 +318,18 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.resources = tuple(resources)
         self.cookResources()
 
+    security.declareProtected(permissions.ManagePortal, 'renameResource')
+    def renameResource(self, old_id, new_id):
+        """Change the id of a registered resource."""
+        self.validateId(new_id, self.getResources())
+        resources = list(self.resources)
+        for resource in resources:
+            if resource.get('id') == old_id:
+                resource['id'] = new_id
+                break
+        self.resources = tuple(resources)
+        self.cookResources()
+
     security.declareProtected(permissions.ManagePortal, 'getResources')
     def getResources(self):
         """Get all the registered resource data, uncooked.

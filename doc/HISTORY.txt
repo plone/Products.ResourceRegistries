@@ -1,6 +1,9 @@
 After 0.9
 =========
 
+ * Added renameResource function with tests.
+   [fschulze]
+
  * In Plone 2.1 plone_javascripts.js was removed, fixed tests by using
    jstest.js from our own skin.
    [dom]

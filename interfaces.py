@@ -15,6 +15,9 @@ class IResourceRegistry(Interface):
     def unregisterResource(id):
         """Unregister a registered resource."""
 
+    def renameResource(old_id, new_id):
+        """Change the id of a registered resource."""
+
     def moveResource(id, position):
         """Move a registered resource to the given position."""
 

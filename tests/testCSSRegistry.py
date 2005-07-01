@@ -763,7 +763,15 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Member'])
 
 
-    def testGetItemTraversal(self):
+    def testUnauthorizedGetItem(self):
+        try:
+            content = str(self.tool['testroot.css'])
+        except Unauthorized:
+            return
+
+        self.fail()
+
+    def testUnauthorizedTraversal(self):
         try:
             content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
         except Unauthorized:
@@ -771,15 +779,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
 
         self.fail()
 
-    def testTestUnauthorizedTraversal(self):
-        try:
-            content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
-        except Unauthorized:
-            return
-
-        self.fail()
-
-    def testRaiseUnauthorizedOnPublish(self):
+    def testUnauthorizedOnPublish(self):
         response = self.publish(self.toolpath + '/testroot.css')
         #Will be 302 if CookieCrumbler is enabled
         self.failUnless(response.getStatus() in [302, 403])
@@ -804,6 +804,20 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf('green' in content)
         self.failUnless('not authorized' in content)
         self.failUnless('red' in content)
+
+    def testAuthorizedGetItem(self):
+        self.setRoles(['Manager'])
+        try:
+            content = str(self.tool['testroot.css'])
+        except Unauthorized:
+            self.fail()
+
+    def testAuthorizedTraversal(self):
+        self.setRoles(['Manager'])
+        try:
+            content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
+        except Unauthorized:
+            self.fail()
 
 class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 

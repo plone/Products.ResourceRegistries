@@ -42,6 +42,9 @@ class IResourceRegistry(Interface):
     def moveResourceAfter(id, dest_id, REQUEST=None):
         """Move the resource after the resource with dest_id."""
 
+    def getResourceIds():
+        """Return the ids of all resources."""
+
     def getResources():
         """Get the resource objects.
 

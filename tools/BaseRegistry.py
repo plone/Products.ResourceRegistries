@@ -355,6 +355,11 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         self.resources = tuple(resources)
         self.cookResources()
 
+    security.declareProtected(permissions.ManagePortal, 'getResourceIds')
+    def getResourceIds(self):
+        """Return the ids of all resources."""
+        return tuple([x.get('id') for x in self.resources])
+
     security.declareProtected(permissions.ManagePortal, 'getResources')
     def getResources(self):
         """Get all the registered resource data, uncooked.

@@ -1,6 +1,9 @@
 After 0.9
 =========
 
+ * Added getResourceIds function.
+   [fschulze]
+
  * Added test for context dependancy to inline css rendering.
    [dom]
 

@@ -100,18 +100,18 @@ fieldset {
         <div class="script-buttons">
             <p class="updown-buttons">
                 <a onclick="moveUp(this);return false;" href="#"
-                   tal:attributes="href string:moveResourceUp?id=${script/id}">
+                   tal:attributes="href string:moveResourceUp?id=${script/getId}">
                      Move UP
                 </a>
             </p>
             <p class="delete-button">
-                <a href="#" tal:attributes="href string:manage_removeScript?id=${script/id}">
+                <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getId}">
                      Remove script
                 </a>
             </p>
             <p>
                 <a onclick="moveDown(this);return false;" href="#"
-                   tal:attributes="href string:moveResourceDown?id=${script/id}">
+                   tal:attributes="href string:moveResourceDown?id=${script/getId}">
                      Move DOWN
                 </a>
             </p>
@@ -122,32 +122,32 @@ fieldset {
             <div>
                 <label>id</label>
                 <input type="text" name="scripts.id:records:string"
-                       tal:attributes="value script/id" />
+                       tal:attributes="value script/getId" />
             </div>
 
             <div>
                 <label>expression</label>
                 <input type="text" name="scripts.expression:records:string"
-                       tal:attributes="value script/expression" />
+                       tal:attributes="value script/getExpression" />
             </div>
 
             <div>
                 <label>inline</label>
                 <input type="checkbox" name="scripts.inline:records:boolean"
-                       tal:attributes="checked script/inline" />
+                       tal:attributes="checked script/getInline" />
                 <input type="hidden" name="scripts.inline:records:boolean:default" value="False" />
             </div>
 
             <div>
                 <label>enabled</label>
                 <input type="checkbox" name="scripts.enabled:records:boolean"
-                       tal:attributes="checked script/enabled" />
+                       tal:attributes="checked script/getEnabled" />
                 <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
             </div>
             <div>
                 <label>is merging allowed?</label>
                 <input type="checkbox" name="scripts.cookable:records:boolean"
-                       tal:attributes="checked python:script.get('cookable', True)" />
+                       tal:attributes="checked script/getCookable | default" />
                 <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
             </div>
         </div>

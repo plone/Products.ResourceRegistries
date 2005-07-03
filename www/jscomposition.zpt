@@ -8,12 +8,12 @@
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getEvaluatedResources(here)">
         <div>
-            <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${entry/id}">
-                <b tal:content="entry/id">plone_ecmascript.js</b>
+            <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${entry/getId}">
+                <b tal:content="entry/getId">plone_ecmascript.js</b>
             </a>
         </div>
         <ul tal:define="scripts here/concatenatedresources">
-            <li tal:repeat="subentry python:scripts.get(entry['id'])">
+            <li tal:repeat="subentry python:scripts.get(entry.getId())">
                 <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${subentry}"
                            tal:content="subentry">
                     plone.js

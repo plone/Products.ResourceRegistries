@@ -5,8 +5,6 @@ Things to do in the near future (not in order of priority):
 
   - Descriptions for the form elements in the ZMI. Some ZMI documentation
 
-  - Change from dicts to classes to hold the registry information?
-
   - Write install instructions
   
   - Better icons

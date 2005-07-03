@@ -39,6 +39,7 @@ class TestJSTool(CSSRegistryTestCase.CSSRegistryTestCase):
         tool = getattr(self.portal, JSTOOLNAME)
         self.setRoles(['Manager'])
         self.failUnless(tool.manage_jsForm())
+        self.failUnless(tool.manage_jsComposition())
 
 
 class TestJSSkin(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -73,10 +74,10 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('foo')
         self.assertEqual(len(self.tool.getResources()), 1)
         script = self.tool.getResources()[0]
-        self.assertEqual(script.get('id'), 'foo')
-        self.assertEqual(script.get('expression'), '')
-        self.assertEqual(script.get('inline'), False)
-        self.assertEqual(script.get('enabled'), True)
+        self.assertEqual(script.getId(), 'foo')
+        self.assertEqual(script.getExpression(), '')
+        self.assertEqual(script.getInline(), False)
+        self.assertEqual(script.getEnabled(), True)
 
     def testDisallowingDuplicateIds(self):
         self.tool.registerScript('foo')
@@ -85,7 +86,7 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
     def testUnregisterScript(self):
         self.tool.registerScript('foo')
         self.assertEqual(len(self.tool.getResources()), 1)
-        self.assertEqual(self.tool.getResources()[0].get('id'), 'foo')
+        self.assertEqual(self.tool.getResources()[0].getId(), 'foo')
         self.tool.unregisterResource('foo')
         self.assertEqual(len(self.tool.getResources()), 0)
 
@@ -101,11 +102,11 @@ class TestJSScriptRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.assertEqual(self.tool.concatenatedresources[
-                         self.tool.cookedresources[0].get('id')],
+                         self.tool.cookedresources[0].getId()],
                          ['ham', 'spam', 'eggs'])
         self.tool.renameResource('spam', 'bacon')
         self.assertEqual(self.tool.concatenatedresources[
-                         self.tool.cookedresources[0].get('id')],
+                         self.tool.cookedresources[0].getId()],
                          ['ham', 'bacon', 'eggs'])
 
     def testRenamingIdClash(self):
@@ -184,7 +185,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.assertEqual(self.tool.concatenatedresources[
-                         self.tool.cookedresources[0].get('id')],
+                         self.tool.cookedresources[0].getId()],
                          ['ham', 'spam', 'eggs'])
 
     def testGetEvaluatedScriptsCollapsing(self):
@@ -200,7 +201,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam spam spam', expression='string:spam')
         self.tool.registerScript('eggs')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
-        ids = [item.get('id') for item in self.tool.getEvaluatedResources(self.folder)]
+        ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
         self.failUnless('ham' in ids)
         self.failUnless('eggs' in ids)
         self.failIf('spam' in ids)
@@ -233,7 +234,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham', expression='string:ham')
         self.tool.registerScript('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedResources(self.folder)
-        evaluatedids = [item['id'] for item in evaluated]
+        evaluatedids = [item.getId() for item in evaluated]
         self.failUnless(evaluatedids[0] == 'ham')
         self.failUnless(evaluatedids[1] == 'spam')
 
@@ -272,105 +273,105 @@ class TestScriptMoving(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.tool.moveResourceDown('ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['spam', 'ham', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('spam', 'ham', 'eggs'))
 
     def testScriptMoveDownAtEnd(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.tool.moveResourceDown('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
 
     def testScriptMoveUp(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.tool.moveResourceUp('spam')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['spam', 'ham', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('spam', 'ham', 'eggs'))
 
     def testScriptMoveUpAtStart(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.tool.moveResourceUp('ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
 
     def testScriptMoveIllegalId(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.assertRaises(NotFound, self.tool.moveResourceUp, 'foo')
 
     def testScriptMoveToBottom(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.tool.moveResourceToBottom('ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['spam', 'eggs', 'ham'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('spam', 'eggs', 'ham'))
 
     def testScriptMoveToTop(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs'))
         self.tool.moveResourceToTop('eggs')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['eggs', 'ham', 'spam'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('eggs', 'ham', 'spam'))
 
     def testScriptMoveBefore(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.tool.registerScript('bacon')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs', 'bacon'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs', 'bacon'))
         self.tool.moveResourceBefore('bacon', 'ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['bacon', 'ham', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('bacon', 'ham', 'spam', 'eggs'))
 
     def testScriptMoveAfter(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.tool.registerScript('bacon')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs', 'bacon'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs', 'bacon'))
         self.tool.moveResourceAfter('bacon', 'ham')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'bacon', 'spam', 'eggs'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'bacon', 'spam', 'eggs'))
 
     def testScriptMove(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
         self.tool.registerScript('eggs')
         self.tool.registerScript('bacon')
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['ham', 'spam', 'eggs', 'bacon'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('ham', 'spam', 'eggs', 'bacon'))
         self.tool.moveResource('ham', 2)
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['spam', 'eggs', 'ham', 'bacon'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('spam', 'eggs', 'ham', 'bacon'))
         self.tool.moveResource('bacon', 0)
-        self.assertEqual([s.get('id') for s in self.tool.getResources()],
-                         ['bacon', 'spam', 'eggs', 'ham'])
+        self.assertEqual(self.tool.getResourceIds(),
+                         ('bacon', 'spam', 'eggs', 'ham'))
 
 class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -395,7 +396,7 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('simple2.css')
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 1)
-        magicId = scripts[0].get('id')
+        magicId = scripts[0].getId()
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
         # XXX: Review
         #self.failUnless('jstest.js' in content)
@@ -405,7 +406,7 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('nonexistant.js')
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 1)
-        magicId = scripts[0].get('id')
+        magicId = scripts[0].getId()
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
 
 
@@ -513,7 +514,7 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf(self.tool.getResources())
 
     def testDefaultsInstall(self):
-        scriptids = [item['id'] for item in self.tool.getResources()]
+        scriptids = self.tool.getResourceIds()
         self.failUnless('plone_menu.js' in scriptids)
         self.failUnless('plone_javascript_variables.js' in scriptids)
         self.failUnless('jstest.js' in scriptids)
@@ -522,7 +523,7 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         scripts = self.tool.getEvaluatedResources(self.portal)
         for s in scripts:
             try:
-                magic = s.get('id')
+                magic = s.getId()
                 self.portal.restrictedTraverse('portal_javascripts/%s' % magic)
             except KeyError:
                 self.fail()
@@ -536,9 +537,9 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
     def testCallingOfConcatenatedScripts(self):
         stylesheets = self.tool.getEvaluatedResources(self.portal)
         for s in stylesheets:
-            if 'ploneScripts' in s.get('id'):
+            if 'ploneScripts' in s.getId():
                 output = self.portal.restrictedTraverse(
-                             'portal_javascripts/%s' % s.get('id'))
+                             'portal_javascripts/%s' % s.getId())
                 break
         if not output:
             self.fail()
@@ -593,7 +594,7 @@ class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
     def testRestrictedTraverseComposition(self):
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 1)
-        magicId = scripts[0].get('id')
+        magicId = scripts[0].getId()
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
         self.failUnless('red' in content)
         self.failUnless('blue' in content)
@@ -674,7 +675,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testRemovedFromResources(self):
         scripts = self.tool.getEvaluatedResources(self.portal)
-        ids = [item.get('id') for item in scripts]
+        ids = [item.getId() for item in scripts]
         self.failIf('testroot.js' in ids)
         self.failUnless('jstest.js' in ids)
 
@@ -684,7 +685,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         scripts = self.tool.getEvaluatedResources(self.portal)
         magicId = None
         for script in scripts:
-            id = script.get('id')
+            id = script.getId()
             if id.startswith(self.tool.filename_base):
                 magicId = id
         self.failUnless(magicId)
@@ -731,11 +732,11 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Member'])
 
     def testDefaultStylesheetCookableAttribute(self):
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('jstest.js')].get('cookable'))
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.js')].get('cookable'))
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('jstest.js')].getCookable())
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.js')].getCookable())
 
     def testStylesheetCookableAttribute(self):
-        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.js')].get('cookable'))
+        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.js')].getCookable())
 
     def testNumberOfResources(self):
         req_resources = 3
@@ -757,7 +758,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(scripts), req_cooked)
         magicId = None
         for script in scripts:
-            id = script.get('id')
+            id = script.getId()
             if id.startswith(self.tool.filename_base):
                 magicId = id
         self.failUnless(magicId)
@@ -779,7 +780,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(scripts), req_cooked)
         magicId = None
         for script in scripts:
-            id = script.get('id')
+            id = script.getId()
             if id.startswith(self.tool.filename_base):
                 magicId = id
         self.failUnless(magicId)
@@ -834,7 +835,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(scripts), req_cooked)
         magicIds = []
         for script in scripts:
-            id = script.get('id')
+            id = script.getId()
             if id.startswith(self.tool.filename_base):
                 magicIds.append(id)
         self.assertEqual(len(magicIds), 2)

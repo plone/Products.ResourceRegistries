@@ -4,14 +4,14 @@
         <tal:fetcher define="scripts python:here.portal_javascripts.getEvaluatedResources(here);
                              global portal_url here/portal_url;">
             <tal:renderer tal:repeat="script scripts">
-                <script tal:condition="python:not script['inline']"
+                <script tal:condition="not:script/getInline"
                         type="text/javascript"
-                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/id}">
+                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/getId}">
                 </script>
-                <tal:inline tal:condition="python:script['inline']">
+                <tal:inline tal:condition="script/getInline">
                 <script
                     type="text/javascript"
-                    tal:define="jsstring python:str(here.portal_javascripts.getInlineResource(script.get('id'), here))"
+                    tal:define="jsstring python:str(here.portal_javascripts.getInlineResource(script.getId(), here))"
                     tal:content="structure string:<!--  ${jsstring}
                      // -->">
                 </script>

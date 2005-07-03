@@ -1,6 +1,10 @@
 After 0.9
 =========
 
+ * Added getResource function. This allows to change properties of each
+   resource. After that, a call to cookResources is needed.
+   [fschulze]
+
  * Added getResourceIds function.
    [fschulze]
 

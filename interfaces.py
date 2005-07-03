@@ -15,6 +15,12 @@ class IResourceRegistry(Interface):
     def unregisterResource(id):
         """Unregister a registered resource."""
 
+    def getResource(id):
+        """Get resource object by id.
+        
+        If any property of the resource is changed, then cookResources of the
+        registry must be called."""
+
     def renameResource(old_id, new_id):
         """Change the id of a registered resource."""
 

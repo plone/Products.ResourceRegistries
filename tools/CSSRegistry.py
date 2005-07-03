@@ -10,6 +10,48 @@ from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
+from Products.ResourceRegistries.tools.BaseRegistry import Resource
+
+
+class Stylesheet(Resource):
+    security = ClassSecurityInfo()
+
+    def __init__(self, id, **kwargs):
+        Resource.__init__(self, id, **kwargs)
+        self._data['media'] = kwargs.get('media', '')
+        self._data['rel'] = kwargs.get('rel', 'stylesheet')
+        self._data['title'] = kwargs.get('title', '')
+        self._data['rendering'] = kwargs.get('rendering', 'import')
+
+    security.declarePublic('getMedia')
+    def getMedia(self):
+        return self._data['media']
+
+    def setMedia(self, media):
+        self._data['media'] = media
+
+    security.declarePublic('getRel')
+    def getRel(self):
+        return self._data['rel']
+
+    def setRel(self, rel):
+        self._data['rel'] = rel
+
+    security.declarePublic('getTitle')
+    def getTitle(self):
+        return self._data['title']
+
+    def setTitle(self, title):
+        self._data['title'] = title
+
+    security.declarePublic('getRendering')
+    def getRendering(self):
+        return self._data['rendering']
+
+    def setRendering(self, rendering):
+        self._data['rendering'] = rendering
+
+InitializeClass(Stylesheet)
 
 
 class CSSRegistryTool(BaseRegistryTool):
@@ -41,11 +83,12 @@ class CSSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    attributes_to_compare = ('expression', 'rel', 'rendering')
+    attributes_to_compare = ('getExpression', 'getCookable', 'getRel', 'getRendering')
     filename_base = 'ploneStyles'
     filename_appendix = '.css'
     merged_output_prefix = ''
     cache_duration = config.CSS_CACHE_DURATION
+    resource_class = Stylesheet
 
     #
     # Private Methods
@@ -54,9 +97,9 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('storeResource')
     def storeResource(self, resource):
         """Store a resource."""
-        self.validateId(resource.get('id'), self.getResources())
-        resources = list(self.resources)
-        if len(resources) and resources[-1].get('id') == 'ploneCustom.css':
+        self.validateId(resource.getId(), self.getResources())
+        resources = list(self.getResources())
+        if len(resources) and resources[-1].getId() == 'ploneCustom.css':
             # ploneCustom.css should be the last item
             resources.insert(-1, resource)
         else:
@@ -72,9 +115,9 @@ class CSSRegistryTool(BaseRegistryTool):
     def compareResources(self, sheet1, sheet2 ):
         """Check if two resources are compatible."""
         for attr in self.attributes_to_compare:
-            if sheet1.get(attr) != sheet2.get(attr):
+            if getattr(sheet1, attr)() != getattr(sheet2, attr)():
                 return False
-            if 'alternate' in sheet1.get('rel', ''):
+            if 'alternate' in sheet1.getRel():
                 return False
                 # this part needs a test
         return True
@@ -82,13 +125,13 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('finalizeResourceMerging')
     def finalizeResourceMerging(self, resource, previtem):
         """Finalize the resource merging with the previous item."""
-        if previtem.get('media') != resource.get('media'):
-            previtem['media'] = None
+        if previtem.getMedia() != resource.getMedia():
+            previtem.setMedia(None)
 
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):
         """Finalize the resource content."""
-        m = resource.get('media')
+        m = resource.getMedia()
         if m:
             return '@media %s {\n%s\n}\n' % (m, content)
         return content
@@ -120,15 +163,14 @@ class CSSRegistryTool(BaseRegistryTool):
         self.resources = ()
         stylesheets = []
         for r in records:
-            stylesheet = {}
-            stylesheet['id'] = r.get('id')
-            stylesheet['expression'] = r.get('expression', '')
-            stylesheet['media'] = r.get('media', '')
-            stylesheet['rel'] = r.get('rel', 'stylesheet')
-            stylesheet['title'] = r.get('title', '')
-            stylesheet['rendering'] = r.get('rendering', 'import')
-            stylesheet['enabled'] = r.get('enabled', False)
-            stylesheet['cookable'] = r.get('cookable', False)
+            stylesheet = Stylesheet(r.get('id'),
+                                    expression=r.get('expression', ''),
+                                    media=r.get('media', ''),
+                                    rel=r.get('rel', 'stylesheet'),
+                                    title=r.get('title', ''),
+                                    rendering=r.get('rendering', 'import'),
+                                    enabled=r.get('enabled', False),
+                                    cookable=r.get('cookable', False))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -150,15 +192,14 @@ class CSSRegistryTool(BaseRegistryTool):
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1, cookable=True):
         """Register a stylesheet."""
-        stylesheet = {}
-        stylesheet['id'] = id
-        stylesheet['expression'] = expression
-        stylesheet['media'] = media
-        stylesheet['rel'] = rel
-        stylesheet['title'] = title
-        stylesheet['rendering'] = rendering
-        stylesheet['enabled'] = enabled
-        stylesheet['cookable'] = cookable
+        stylesheet = Stylesheet(id,
+                                expression=expression,
+                                media=media,
+                                rel=rel,
+                                title=title,
+                                rendering=rendering,
+                                enabled=enabled,
+                                cookable=cookable)
         self.storeResource(stylesheet)
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')

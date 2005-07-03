@@ -5,7 +5,7 @@ from zExceptions import NotFound
 from Globals import InitializeClass, Persistent, PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized
 
-from Acquisition import aq_base, aq_parent, aq_inner
+from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 
 from OFS.Image import File
 from OFS.SimpleItem import SimpleItem
@@ -49,6 +49,7 @@ class Resource(Persistent):
     def getExpression(self):
         return self._data['expression']
 
+    security.declareProtected(permissions.ManagePortal, 'setExpression')
     def setExpression(self, expression):
         self._data['expression'] = expression
 
@@ -56,6 +57,7 @@ class Resource(Persistent):
     def getEnabled(self):
         return self._data['enabled']
 
+    security.declareProtected(permissions.ManagePortal, 'setEnabled')
     def setEnabled(self, enabled):
         self._data['enabled'] = enabled
 
@@ -63,6 +65,7 @@ class Resource(Persistent):
     def getCookable(self):
         return self._data['cookable']
 
+    security.declareProtected(permissions.ManagePortal, 'setCookable')
     def setCookable(self, cookable):
         self._data['cookable'] = cookable
 
@@ -184,7 +187,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         """
         return content
 
-    security.declarePrivate('cookResources')
+    security.declareProtected(permissions.ManagePortal, 'cookResources')
     def cookResources(self):
         """Cook the stored resources."""
         resources = [r.copy() for r in self.getResources() if r.getEnabled()]
@@ -246,14 +249,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         except AttributeError:
             return 1
 
-    security.declarePrivate('getResource')
+    security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def getResource(self, id):
         """Get resource object by id.
         
         If any property of the resource is changed, then cookResources of the
         registry must be called."""
         resources = self.getResourcesDict()
-        return resources.get(id, None)
+        return ExplicitAcquisitionWrapper(resources.get(id, None), self)
 
     security.declarePrivate('getResourceContent')
     def getResourceContent(self, item, context):

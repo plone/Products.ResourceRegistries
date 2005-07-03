@@ -24,6 +24,7 @@ class JavaScript(Resource):
     def getInline(self):
         return self._data['inline']
 
+    security.declareProtected(permissions.ManagePortal, 'setInline')
     def setInline(self, inline):
         self._data['inline'] = inline
 

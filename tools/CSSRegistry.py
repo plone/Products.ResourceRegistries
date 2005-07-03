@@ -27,6 +27,7 @@ class Stylesheet(Resource):
     def getMedia(self):
         return self._data['media']
 
+    security.declareProtected(permissions.ManagePortal, 'setMedia')
     def setMedia(self, media):
         self._data['media'] = media
 
@@ -34,6 +35,7 @@ class Stylesheet(Resource):
     def getRel(self):
         return self._data['rel']
 
+    security.declareProtected(permissions.ManagePortal, 'setRel')
     def setRel(self, rel):
         self._data['rel'] = rel
 
@@ -41,6 +43,7 @@ class Stylesheet(Resource):
     def getTitle(self):
         return self._data['title']
 
+    security.declareProtected(permissions.ManagePortal, 'setTitle')
     def setTitle(self, title):
         self._data['title'] = title
 
@@ -48,6 +51,7 @@ class Stylesheet(Resource):
     def getRendering(self):
         return self._data['rendering']
 
+    security.declareProtected(permissions.ManagePortal, 'setRendering')
     def setRendering(self, rendering):
         self._data['rendering'] = rendering
 

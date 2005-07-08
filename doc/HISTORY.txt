@@ -1,3 +1,12 @@
+After 0.95
+==========
+
+ * Fixed reordering of resources in ZMI when javascript is enabled.
+   [fschulze, jenner]
+
+ * Fixed submitting changes in ZMI for stylesheets on IE.
+   [fschulze]
+
 0.95
 ====
 

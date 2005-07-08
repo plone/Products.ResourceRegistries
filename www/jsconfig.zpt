@@ -1,40 +1,65 @@
 <div tal:replace="structure here/manage_page_header" />
 
 <script type="text/javascript">
-function moveDown(node) {
-    while (node.nodeName != 'FIELDSET') {
-        node = node.parentNode
+function getSortInput(node) {
+    var iterNode = null;
+    for (var i = 0; i<node.childNodes.length; i++) {
+        iterNode = node.childNodes[i];
+        if (iterNode.nodeType == 1 &&
+            iterNode.nodeName == 'INPUT' &&
+            iterNode.name == 'scripts.sort:records:int') {
+            return iterNode;
+        }
+        if (iterNode.hasChildNodes()) {
+            return getSortInput(iterNode);
+        }
     }
-    fieldset = node
-    nextBlock = fieldset.nextSibling
+    return null;
+}
+ 
+function exchangeSortValues(a, b) {
+    var aInput = getSortInput(a);
+    var bInput = getSortInput(b);
+    if (!(aInput && bInput)) return;
+    var tmp = aInput.value;
+    aInput.value = bInput.value;
+    bInput.value = tmp;
+}
+ 
+ 
+function moveDown(node) {
+    var node, fieldset, nextBlock = null;
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode;
+    }
+    fieldset = node;
+    nextBlock = fieldset.nextSibling;
     if (nextBlock) {
-        shiftBlocks(nextBlock, fieldset)
+        shiftBlocks(nextBlock, fieldset);
     }
 }
-
+ 
 function moveUp(node) {
+    var node, fieldset, previousBlock = null;
     while (node.nodeName != 'FIELDSET') {
-        node = node.parentNode
+        node = node.parentNode;
     }
-    fieldset = node
+    fieldset = node;
     previousBlock = fieldset.previousSibling
     if (previousBlock) {
-        shiftBlocks(fieldset, previousBlock)
+        shiftBlocks(fieldset, previousBlock);
     }
 }
-
-function shiftBlocks(fieldset, previousBlock) {
-    while (previousBlock.nodeType == 3) {
-         previousBlock = previousBlock.previousSibling
+ 
+function shiftBlocks(fieldset, block) {
+    while (block.nodeType == 3) {
+         block = block.previousSibling;
     }
     while (fieldset.nodeType == 3) {
-         fieldset = fieldset.nextSibling
+         fieldset = fieldset.nextSibling;
     }
-    x = fieldset.firstChild.value
-    y = previousBlock.firstChild.value
-    fieldset.firstChild.value = y
-    previousBlock.firstChild.value = x
-    fieldset.parentNode.insertBefore(fieldset, previousBlock)
+    exchangeSortValues(fieldset, block);
+    fieldset.parentNode.insertBefore(fieldset, block);
 }
 </script>
 
@@ -76,13 +101,13 @@ fieldset {
 }
 </style>
 
-<div tal:replace="structure here/manage_tabs"/>
+<div tal:replace="structure here/manage_tabs" />
 
 <form action="manage_saveScripts"
       tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'"
       method="post">
 
-    <input type=submit i18n:attributes="value" value="Save" />
+    <input type="submit" i18n:attributes="value" value="Save" />
 
     <p>
         Debug mode (don't merge javascripts)
@@ -156,7 +181,7 @@ fieldset {
 
     </fieldset>
 
-    <input type=submit i18n:attributes="value" value="Save" />
+    <input type="submit" i18n:attributes="value" value="Save" />
 
 </form>
 
@@ -196,7 +221,7 @@ fieldset {
 
     </fieldset>
 
-    <input type=submit i18n:attributes="value" value="Add" />
+    <input type="submit" i18n:attributes="value" value="Add" />
 
 </form>
 

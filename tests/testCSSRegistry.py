@@ -79,9 +79,9 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('foodefault')
         self.assertEqual(self.tool.getResources()[0].getId(), 'foodefault')
         self.assertEqual(self.tool.getResources()[0].getExpression(), '')
-        self.assertEqual(self.tool.getResources()[0].getMedia(), '')
+        self.assertEqual(self.tool.getResources()[0].getMedia(), None)
         self.assertEqual(self.tool.getResources()[0].getRel(), 'stylesheet')
-        self.assertEqual(self.tool.getResources()[0].getTitle(), '')
+        self.assertEqual(self.tool.getResources()[0].getTitle(), None)
         self.assertEqual(self.tool.getResources()[0].getRendering(), 'import')
         self.failUnless(self.tool.getResources()[0].getEnabled())
 

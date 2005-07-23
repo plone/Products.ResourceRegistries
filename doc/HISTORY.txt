@@ -1,6 +1,9 @@
 After 0.95
 ==========
 
+ * getTitle and getMedia will return None now if they are empty, this removes
+   empty title and media attributes from the generated HTML.
+
  * Fixed reordering of resources in ZMI when javascript is enabled.
    [fschulze, jenner]
 

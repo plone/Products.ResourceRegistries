@@ -25,7 +25,10 @@ class Stylesheet(Resource):
 
     security.declarePublic('getMedia')
     def getMedia(self):
-        return self._data['media']
+        result = self._data['media']
+        if result == "":
+            result = None
+        return result
 
     security.declareProtected(permissions.ManagePortal, 'setMedia')
     def setMedia(self, media):
@@ -41,7 +44,10 @@ class Stylesheet(Resource):
 
     security.declarePublic('getTitle')
     def getTitle(self):
-        return self._data['title']
+        result = self._data['title']
+        if result == "":
+            result = None
+        return result
 
     security.declareProtected(permissions.ManagePortal, 'setTitle')
     def setTitle(self, title):

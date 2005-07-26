@@ -9,18 +9,6 @@ def install(self):
 
     install_subskin(self, out, GLOBALS)
 
-    # check for plone >= 2.1
-    migrationtool = getToolByName(self, 'portal_migration')
-    plone_version = migrationtool.getInstanceVersion()
-    if not plone_version.startswith('2.0'):
-        print >> out, "Removing 2.0.x skin compatibility."
-        skinstool = getToolByName(self, 'portal_skins')
-        for name,layers in skinstool.getSkinPaths():
-            layers = layers.split(',')
-            layers = [x for x in layers if x != 'ResourceRegistries_20compatibility']
-            layers = ','.join(layers)
-            skinstool.addSkinSelection(name, layers)
-
     # Install the CSSRegistry
     if CSSTOOLNAME not in self.objectIds():
         factory = self.manage_addProduct['ResourceRegistries']

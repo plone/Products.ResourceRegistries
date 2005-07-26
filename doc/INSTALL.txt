@@ -1,0 +1,2 @@
+If ouy want to use this with Plone 2.0.5, then you have to use the header.pt
+template from the 20compatibility directory.

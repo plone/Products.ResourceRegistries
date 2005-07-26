@@ -1,6 +1,11 @@
 After 0.95
 ==========
 
+ * Moved directory with skin layer for Plone 2.0.5 compatibility to product
+   root, so it doesn't interfere with Plone 2.1. The version check on install
+   time didn't seem to be enough.
+   [fschulze]
+
  * getTitle and getMedia will return None now if they are empty, this removes
    empty title and media attributes from the generated HTML.
 

@@ -1,4 +1,4 @@
-After 0.95
+1.0
 ==========
 
  * Moved directory with skin layer for Plone 2.0.5 compatibility to product

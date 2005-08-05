@@ -12,5 +12,5 @@ GLOBALS = globals()
 
 CSS_RENDER_METHODS = ('import', 'link', 'inline')
 
-CSS_CACHE_DURATION = 7
-JS_CACHE_DURATION = 7
+CSS_CACHE_DURATION = 7  # css cache life in days (note: value can be a float)
+JS_CACHE_DURATION = 7   # js cache life in days (note: value can be a float)

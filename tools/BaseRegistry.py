@@ -1,5 +1,6 @@
 import random
 
+from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
 from Globals import InitializeClass, Persistent, PersistentMapping
@@ -103,9 +104,11 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         if self.getDebugMode():
             duration = 0
         else:
-            duration = self.cache_duration
-        self.REQUEST.RESPONSE.setHeader('Expires',
-            (DateTime() + duration).strftime('%a, %d %b %Y %H:%M:%S %Z'))
+            duration = self.cache_duration  # duration in seconds
+        seconds = float(duration)*24.0*3600.0
+        response = self.REQUEST.RESPONSE
+        response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
+        response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
         contenttype = self.getContentType()
         return File(item, item, output, contenttype).__of__(self)
 

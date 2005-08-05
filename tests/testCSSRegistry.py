@@ -8,6 +8,7 @@ if __name__ == '__main__':
 
 from Testing import ZopeTestCase
 
+from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
 from AccessControl import Unauthorized
@@ -838,21 +839,22 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
     def testDebugModeSplitting(self):
         self.tool.registerStylesheet('ham')
         # Publish in normal mode
-        response = self.publish(self.toolpath + '/ham')
+        response = self.publish(self.toolpath+'/ham')
         now = DateTime()
-        soon = now + 7
+        days = 7
+        soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'),
-                         soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
         # Set debug mode
         self.tool.setDebugMode(True)
         self.tool.cookResources()
         # Publish in debug mode
-        response = self.publish(self.toolpath + '/ham')
-        self.failIfEqual(response.getHeader('Expires'),
-                         soon.strftime('%a, %d %b %Y %H:%M:%S %Z'))
-        self.assertEqual(response.getHeader('Expires'),
-                         now.strftime('%a, %d %b %Y %H:%M:%S %Z'))
+        response = self.publish(self.toolpath+'/ham')
+        self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
 class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):

@@ -155,7 +155,7 @@ legend {
             </div>
 
             <div>
-                <label>Media</label>
+                <label>CSS Media</label>
                 <input type="text" name="stylesheets.media:records"
                        tal:attributes="value stylesheet/getMedia|nothing">
             </div>

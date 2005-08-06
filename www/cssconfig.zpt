@@ -182,7 +182,7 @@ legend {
             <div>
                 <input type="checkbox" name="stylesheets.enabled:records"
                        tal:attributes="checked stylesheet/getEnabled">
-                <label>Enabled</label>
+                <label>Enabled?</label>
             </div>
 
             <div>
@@ -209,26 +209,26 @@ legend {
 
     <fieldset>
 
-          <h3>Add a new stylesheet</h3>
+          <legend>Add a new stylesheet</legend>
 
           <div>
-              <label>id</label>
+              <label>ID</label>
               <input type="text" name="id" />
           </div>
 
           <div>
-              <label>expression</label>
+              <label>Title</label>
+              <input type="text" name="title" />
+          </div>
+
+          <div>
+              <label>TAL condition</label>
               <input type="text" name="expression" />
           </div>
 
           <div>
-              <label>media</label>
+              <label>CSS Media</label>
               <input type="text" name="media" />
-          </div>
-
-          <div>
-              <label>title</label>
-              <input type="text" name="title" />
           </div>
 
           <div>
@@ -237,7 +237,7 @@ legend {
           </div>
 
           <div>
-              <label>rendering</label>
+              <label>Render type</label>
               <select name="rendering">
                   <option tal:repeat="r here/getRenderingOptions"
                           tal:attributes="value r"
@@ -246,12 +246,12 @@ legend {
           </div>
 
           <div>
-              <label>enabled</label>
+              <label>Enabled?</label>
               <input type="checkbox" name="enabled" checked="1" />
           </div>
 
           <div>
-              <label>is merging allowed?</label>
+              <label>Merging allowed?</label>
               <input type="checkbox" name="cookable:boolean" checked="1" />
               <input type="hidden" name="cookable:boolean:default" value="False" />
           </div>

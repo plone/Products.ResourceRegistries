@@ -83,22 +83,18 @@ label {
     float: left;
     padding: 0.2em 0.4em;
     clear: left;
+    font-weight: bold;
 }
 
 fieldset {
+    border: 1px solid black;
     margin: 0.2em;
-    width: 60%;
+    margin-bottom: 1em;
+}
+legend {
+    font-size: 90%;
 }
 
-.script-buttons {
-    text-align: left;
-    float: right;
-    width: 30%;
-}
-
-.delete-button {
-    background-color : red;
-}
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -110,67 +106,66 @@ fieldset {
     <input type="submit" i18n:attributes="value" value="Save" />
 
     <p>
-        Debug mode (don't merge javascripts)
         <input type="checkbox" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
+        Debug mode (don't merge javascripts)
     </p>
 
     <p>The order of the scripts in this form is the same as the
-    order in the header of the resulting html code.</p>
+    order in the header of the resulting HTML code.
+    Use the up/down arrows to change the rendering order.</p>
 
     <fieldset tal:repeat="script here/getResources">
+
+        <legend>
+    
+            <input type="text" name="scripts.id:records:string"
+                   tal:attributes="value script/getId" />
+
+            <a onclick="moveUp(this);return false;" href="#"
+               title="Move up"
+               tal:attributes="href string:moveResourceUp?id=${script/getId}">
+                 &uarr;
+            </a>
+            <a onclick="moveDown(this);return false;" href="#"
+               title="Move down"
+               tal:attributes="href string:moveResourceDown?id=${script/getId}">
+                 &darr;
+            </a>
+            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getId}"
+               style="color: red;"
+               title="Remove">
+                 x
+            </a>
+        </legend>
+
         <input type="hidden" name="scripts.sort:records:int"
                tal:attributes="value repeat/script/index" />
 
-        <div class="script-buttons">
-            <p class="updown-buttons">
-                <a onclick="moveUp(this);return false;" href="#"
-                   tal:attributes="href string:moveResourceUp?id=${script/getId}">
-                     Move UP
-                </a>
-            </p>
-            <p class="delete-button">
-                <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getId}">
-                     Remove script
-                </a>
-            </p>
-            <p>
-                <a onclick="moveDown(this);return false;" href="#"
-                   tal:attributes="href string:moveResourceDown?id=${script/getId}">
-                     Move DOWN
-                </a>
-            </p>
-
-        </div>
 
         <div class="scriptform">
-            <div>
-                <label>id</label>
-                <input type="text" name="scripts.id:records:string"
-                       tal:attributes="value script/getId" />
-            </div>
 
             <div>
-                <label>expression</label>
+                <label>TAL condition</label>
                 <input type="text" name="scripts.expression:records:string"
                        tal:attributes="value script/getExpression" />
             </div>
 
             <div>
-                <label>inline</label>
+                <label>Inline rendering</label>
                 <input type="checkbox" name="scripts.inline:records:boolean"
                        tal:attributes="checked script/getInline" />
                 <input type="hidden" name="scripts.inline:records:boolean:default" value="False" />
             </div>
 
             <div>
-                <label>enabled</label>
+                <label>Enabled</label>
                 <input type="checkbox" name="scripts.enabled:records:boolean"
                        tal:attributes="checked script/getEnabled" />
                 <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
             </div>
             <div>
-                <label>is merging allowed?</label>
+                <label>Merging allowed?</label>
                 <input type="checkbox" name="scripts.cookable:records:boolean"
                        tal:attributes="checked script/getCookable | default" />
                 <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />

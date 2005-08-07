@@ -75,7 +75,7 @@ label, input, select {
 }
 
 label {
-    width: 9em;
+    width: 11em;
     text-align: right;
     float: left;
     padding: 0.2em 0.4em;
@@ -116,7 +116,7 @@ legend {
     <fieldset tal:repeat="stylesheet here/getResources">
 
         <legend>
-            <input type="text" name="stylesheets.id:records"
+            <input type="text" name="stylesheets.id:records" size="30"
                    tal:attributes="value stylesheet/getId">
 
                 <a onclick="moveUp(this);return false;" href="#"
@@ -213,7 +213,7 @@ legend {
 
           <div>
               <label>ID</label>
-              <input type="text" name="id" />
+              <input type="text" name="id" size="50" />
           </div>
 
           <div>
@@ -223,7 +223,7 @@ legend {
 
           <div>
               <label>TAL condition</label>
-              <input type="text" name="expression" />
+              <input type="text" name="expression" size="50" />
           </div>
 
           <div>

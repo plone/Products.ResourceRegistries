@@ -78,7 +78,7 @@ label, input, select{
 }
 
 label {
-    width: 9em;
+    width: 11em;
     text-align: right;
     float: left;
     padding: 0.2em 0.4em;
@@ -119,7 +119,7 @@ legend {
 
         <legend>
     
-            <input type="text" name="scripts.id:records:string"
+            <input type="text" name="scripts.id:records:string" size="30"
                    tal:attributes="value script/getId" />
 
             <a onclick="moveUp(this);return false;" href="#"
@@ -147,7 +147,7 @@ legend {
 
             <div>
                 <label>TAL condition</label>
-                <input type="text" name="scripts.expression:records:string"
+                <input type="text" name="scripts.expression:records:string" size="50"
                        tal:attributes="value script/getExpression" />
             </div>
 
@@ -190,12 +190,12 @@ legend {
 
         <div>
             <label>ID</label>
-            <input type="text" name="id" />
+            <input type="text" name="id" size="50" />
         </div>
 
         <div>
             <label>TAL condition</label>
-            <input type="text" name="expression" />
+            <input type="text" name="expression" size="50" />
         </div>
 
         <div>

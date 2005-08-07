@@ -1,8 +1,17 @@
-1.0
-==========
+1.0.1
+=====
+
+ * Don't filter resources in merged overview in ZMI.
+   [fschulze]
+
+ * Improved management UI.
+   [limi, fschulze]
 
  * Fixed reinstall bug due to improper resource id lookup.
    [alecm]
+
+1.0
+===
 
  * Moved directory with skin layer for Plone 2.0.5 compatibility to product
    root, so it doesn't interfere with Plone 2.1. The version check on install

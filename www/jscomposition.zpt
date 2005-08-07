@@ -6,11 +6,14 @@
 <div tal:replace="structure here/manage_tabs" />
 
 <ul tal:define="portal_url python:here.portal_url()">
-    <li tal:repeat="entry python:here.getEvaluatedResources(here)">
+    <li tal:repeat="entry python:here.getCookedResources()">
         <div>
             <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${entry/getId}">
                 <b tal:content="entry/getId">plone_ecmascript.js</b>
             </a>
+            <tal:block tal:condition="entry/getExpression | nothing">
+            - <span tal:replace="entry/getExpression" />
+            </tal:block>
         </div>
         <ul tal:define="scripts here/concatenatedresources">
             <li tal:repeat="subentry python:scripts.get(entry.getId())">

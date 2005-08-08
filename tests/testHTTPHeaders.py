@@ -52,12 +52,11 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
         self.assertEqual(response.getStatus(), 200)
 
-        # Test that the main page retains its content-type
         self.setRoles(['Manager'])
         self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() + 60.0/(24.0*3600.0)).timeTime())) # if modified in the last minute
-        self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
-        self.tool.registerStylesheet('testmethod')
-        response = self.publish(self.toolpath+'/testmethod')
+        self.portal.addDTMLMethod('testmethod2', file="""/* YES WE ARE RENDERED */""")
+        self.tool.registerStylesheet('testmethod2')
+        response = self.publish(self.toolpath+'/testmethod2')
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
         self.assertEqual(response.getStatus(), 200)
 
@@ -80,7 +79,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
         print str(response)
         self.assertEqual(int(response.getHeader('content-length')), len(response.getBody()))
-        self.assertEqual(response.getStatus(), 302)
+        self.assertEqual(response.getStatus(), 200)
 
 
 def test_suite():

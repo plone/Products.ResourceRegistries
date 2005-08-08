@@ -41,14 +41,26 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
 
     def testIfModifiedSinceHeaders(self):
+        # test with if-modified-since headers early and late (since client clock won't necessarily be synchronized)
+        
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
-        self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() - 60).timeTime()))
+        self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() - 60.0/(24.0*3600.0)).timeTime())) # if modified in the last minute
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath+'/testmethod')
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
         self.assertEqual(response.getStatus(), 200)
+
+        # Test that the main page retains its content-type
+        self.setRoles(['Manager'])
+        self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() + 60.0/(24.0*3600.0)).timeTime())) # if modified in the last minute
+        self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
+        self.tool.registerStylesheet('testmethod')
+        response = self.publish(self.toolpath+'/testmethod')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getStatus(), 200)
+
 
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type

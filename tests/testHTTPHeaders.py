@@ -59,6 +59,10 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
 
+        response = self.publish(self.toolpath+'/test_rr_2.css')
+        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
+
+
 
     def testIfModifiedSinceHeaders2(self):
         # Test that the main page returns the proper status code and content type for a conditional get

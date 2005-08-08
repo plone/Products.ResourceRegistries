@@ -53,7 +53,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
-        self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() - 60).timeTime()))
+        self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() - 1).timeTime()))
         print self.portal.REQUEST.get('If-Modified-Since')
         self.tool.registerStylesheet('test_rr_1.css')
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")

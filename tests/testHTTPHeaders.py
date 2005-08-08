@@ -40,49 +40,28 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
         self.assertEqual(response.getStatus(), 200)
 
-    def testIfModifiedSinceHeaders1(self):
+    def testIfModifiedSinceHeaders(self):
         # Test that the main page returns the proper status code and content type for a conditional get
         self.setRoles(['Manager'])
         request = self.portal.REQUEST
-        request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # resend if modified since one minute ago
+        request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # resend if modified since one minute ago (assumes client clock is a little slow)
         assert request.get_header('If-Modified-Since')
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')
-        response = self.publish(self.toolpath+'/testmethod')
+        response = self.publish(self.toolpath+'/testmethod', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
+        #response = self.publish(self.toolpath+'/testmethod')
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
         self.assertEqual(response.getStatus(), 200) # this should in fact send a 200
 
         # we also add an fsfile for good measure
         self.tool.registerStylesheet('test_rr_2.css')
         rs = self.tool.getEvaluatedResources(self.portal)
-        response = self.publish(self.toolpath+'/'+rs[0].getId())
-        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
+        response = self.publish(self.toolpath+'/test_rr_2.css', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
+        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
 
-        response = self.publish(self.toolpath+'/test_rr_2.css')
-        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
-
-
-
-    def testIfModifiedSinceHeaders2(self):
-        # Test that the main page returns the proper status code and content type for a conditional get
-        self.setRoles(['Manager'])
-        request = self.portal.REQUEST
-        request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() + 60.0/(24.0*3600.0))) # if modified in the last minute
-        assert request.get_header('If-Modified-Since')
-        self.portal.addDTMLMethod('testmethod2', file="""/* YES WE ARE RENDERED */""")
-        self.tool.registerStylesheet('testmethod2')
-        response = self.publish(self.toolpath+'/testmethod2')
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
-        self.assertEqual(response.getStatus(), 200)  # this should send a 200 right now
-
-        # we also add an fsfile for good measure
-        self.tool.registerStylesheet('test_rr_2.css')
-        rs = self.tool.getEvaluatedResources(self.portal)
-        response = self.publish(self.toolpath+'/testmethod2')
-        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
-        
+        #response = self.publish(self.toolpath+'/test_rr_2.css')
+        #self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
 
 
     def testContentLengthHeaders(self):

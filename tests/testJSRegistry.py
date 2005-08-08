@@ -243,15 +243,15 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham')
         self.tool.registerScript('ham2merge')
         self.tool.registerScript('spam', expression='string:spam')
-        self.tool.registerScript('simple.css', inline='1')
+        self.tool.registerScript('test_rr_1.css', inline='1')
         all = getattr(self.portal, 'renderAllTheScripts')()
         self.failUnless('background-color' in all)
         self.failUnless('<script' in all)
         self.failUnless('/spam' in all)
 
     def testReenderingConcatenatesInline(self):
-        self.tool.registerScript('simple.css', inline='1')
-        self.tool.registerScript('simple2.css', inline='1')
+        self.tool.registerScript('test_rr_1.css', inline='1')
+        self.tool.registerScript('test_rr_2.css', inline='1')
         all = getattr(self.portal, 'renderAllTheScripts')()
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)
@@ -259,7 +259,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     def testRenderingWorksInMainTemplate(self):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failIf('background-color' in renderedpage)
-        self.tool.registerScript('simple.css', inline=1)
+        self.tool.registerScript('test_rr_1.css', inline=1)
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
 
@@ -379,28 +379,28 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
-        self.tool.registerScript('jstest.js')
+        self.tool.registerScript('test_rr_1.js')
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['jstest.js'])
+        self.failUnless(self.tool['test_rr_1.js'])
 
     def testGetItemTraversalContent(self):
         self.failUnless('running' in str(
-                        self.tool['jstest.js']))
+                        self.tool['test_rr_1.js']))
 
     def testRestrictedTraverseContent(self):
         self.failUnless('running' in str(
                         self.portal.restrictedTraverse(
-                            'portal_javascripts/jstest.js')))
+                            'portal_javascripts/test_rr_1.js')))
 
     def testRestrictedTraverseComposition(self):
-        self.tool.registerScript('simple2.css')
+        self.tool.registerScript('test_rr_2.css')
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].getId()
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
         # XXX: Review
-        #self.failUnless('jstest.js' in content)
+        #self.failUnless('test_rr_1.js' in content)
         #self.failUnless('registerPloneFunction' in content)
 
     def testCompositesWithBrokenId(self):
@@ -418,13 +418,13 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.clearResources()
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
-        self.tool.registerScript('jstest.js')
+        self.tool.registerScript('test_rr_1.js')
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
 
     def testPublishJSThroughTool(self):
-        response = self.publish(self.toolpath + '/jstest.js')
+        response = self.publish(self.toolpath + '/test_rr_1.js')
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'),
                          'application/x-javascript')
@@ -446,7 +446,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'),
                          'text/html;charset=utf-8')
         self.tool.clearResources()
-        self.tool.registerScript('jstest.js', inline=True)
+        self.tool.registerScript('test_rr_1.js', inline=True)
         # Test that the main page retains its content-type
         response = self.publish(self.portalpath)
         self.assertEqual(response.getHeader('Content-Type'),
@@ -519,7 +519,7 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         scriptids = self.tool.getResourceIds()
         self.failUnless('plone_menu.js' in scriptids)
         self.failUnless('plone_javascript_variables.js' in scriptids)
-        self.failUnless('jstest.js' in scriptids)
+        self.failUnless('test_rr_1.js' in scriptids)
 
     def testTraverseToConcatenatedDefaults(self):
         scripts = self.tool.getEvaluatedResources(self.portal)
@@ -632,7 +632,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.tool.clearResources()
         self.tool.registerScript('testroot.js', cookable=False)
-        self.tool.registerScript('jstest.js')
+        self.tool.registerScript('test_rr_1.js')
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testroot.js',
@@ -679,7 +679,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         scripts = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in scripts]
         self.failIf('testroot.js' in ids)
-        self.failUnless('jstest.js' in ids)
+        self.failUnless('test_rr_1.js' in ids)
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.js')
@@ -718,7 +718,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerScript('testroot.js')
-        self.tool.registerScript('jstest.js')
+        self.tool.registerScript('test_rr_1.js')
         self.tool.registerScript('simple2.js', cookable=False)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
@@ -734,7 +734,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Member'])
 
     def testDefaultStylesheetCookableAttribute(self):
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('jstest.js')].getCookable())
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.js')].getCookable())
         self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.js')].getCookable())
 
     def testStylesheetCookableAttribute(self):
@@ -805,7 +805,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(scripts), req_cooked)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
         self.failUnless('blue' in content)
-        content = str(self.portal.restrictedTraverse('portal_javascripts/jstest.js'))
+        content = str(self.portal.restrictedTraverse('portal_javascripts/test_rr_1.js'))
         self.failUnless('running' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/testroot.js'))
         self.failUnless('green' in content)

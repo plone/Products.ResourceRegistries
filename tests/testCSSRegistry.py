@@ -295,23 +295,23 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('ham', rendering='link')
         self.tool.registerStylesheet('ham 2 b merged', rendering='link')
         self.tool.registerStylesheet('spam', expression='string:ham', rendering='link')
-        self.tool.registerStylesheet('simple.css', rendering='inline')
+        self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
         self.failUnless('<link' in all)
         self.failUnless('/spam' in all)
-        self.failIf('/simple.css' in all)
+        self.failIf('/test_rr_1.css' in all)
 
     def testReenderingConcatenatesInline(self):
-        self.tool.registerStylesheet('simple.css', rendering='inline')
-        self.tool.registerStylesheet('simple2.css', rendering='inline')
+        self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
+        self.tool.registerStylesheet('test_rr_2.css', rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)
 
     def testDifferentMediaAreCollapsed(self):
-        self.tool.registerStylesheet('simple.css', media='print')
-        self.tool.registerStylesheet('simple2.css', media='all')
+        self.tool.registerStylesheet('test_rr_1.css', media='print')
+        self.tool.registerStylesheet('test_rr_2.css', media='all')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testDifferentRenderingAreNotCollapsed(self):
@@ -323,7 +323,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
     def testRenderingWorksInMainTemplate(self):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failIf('background-color' in renderedpage)
-        self.tool.registerStylesheet('simple.css', rendering='inline')
+        self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
 
@@ -450,20 +450,20 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearResources()
-        self.tool.registerStylesheet('simple.css')
+        self.tool.registerStylesheet('test_rr_1.css')
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['simple.css'])
+        self.failUnless(self.tool['test_rr_1.css'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('background-color' in str(self.tool['simple.css']))
+        self.failUnless('background-color' in str(self.tool['test_rr_1.css']))
 
     def testRestrictedTraverseContent(self):
         self.failUnless('background-color' in str(
-                        self.portal.restrictedTraverse('portal_css/simple.css')))
+                        self.portal.restrictedTraverse('portal_css/test_rr_1.css')))
 
     def testRestrictedTraverseComposition(self):
-        self.tool.registerStylesheet('simple2.css')
+        self.tool.registerStylesheet('test_rr_2.css')
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
@@ -479,7 +479,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
 
     def testMediadescriptorsInConcatenatedStylesheets(self):
-        self.tool.registerStylesheet('simple2.css', media='print')
+        self.tool.registerStylesheet('test_rr_2.css', media='print')
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
@@ -570,8 +570,8 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerStylesheet('testroot.css')
-        self.tool.registerStylesheet('simple.css')
-        self.tool.registerStylesheet('simple2.css', cookable=False)
+        self.tool.registerStylesheet('test_rr_1.css')
+        self.tool.registerStylesheet('test_rr_2.css', cookable=False)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testroot.css',
@@ -581,11 +581,11 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Member'])
 
     def testDefaultStylesheetCookableAttribute(self):
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('simple.css')].getCookable())
+        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.css')].getCookable())
         self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.css')].getCookable())
 
     def testStylesheetCookableAttribute(self):
-        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.css')].getCookable())
+        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('test_rr_2.css')].getCookable())
 
     def testNumberOfResources(self):
         req_resources = 3
@@ -599,7 +599,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
     def testCompositionWithLastUncooked(self):
         req_resources = 3
         req_cooked = 2
-        self.tool.moveResourceToBottom('simple2.css')
+        self.tool.moveResourceToBottom('test_rr_2.css')
         self.assertEqual(len(self.tool.getResources()), req_resources)
         self.assertEqual(len(self.tool.cookedresources), req_cooked)
         self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
@@ -615,13 +615,13 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('red' in content)
         self.failUnless('green' in content)
         self.failIf('blue' in content)
-        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
 
     def testCompositionWithFirstUncooked(self):
         req_resources = 3
         req_cooked = 2
-        self.tool.moveResourceToTop('simple2.css')
+        self.tool.moveResourceToTop('test_rr_2.css')
         self.assertEqual(len(self.tool.getResources()), req_resources)
         self.assertEqual(len(self.tool.cookedresources), req_cooked)
         self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
@@ -637,22 +637,22 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('red' in content)
         self.failUnless('green' in content)
         self.failIf('blue' in content)
-        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
 
     def testCompositionWithMiddleUncooked(self):
         req_resources = 3
         req_cooked = 3
-        self.tool.moveResourceToTop('simple2.css')
-        self.tool.moveResourceDown('simple2.css')
+        self.tool.moveResourceToTop('test_rr_2.css')
+        self.tool.moveResourceDown('test_rr_2.css')
         self.assertEqual(len(self.tool.getResources()), req_resources)
         self.assertEqual(len(self.tool.cookedresources), req_cooked)
         self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), req_cooked)
-        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
-        content = str(self.portal.restrictedTraverse('portal_css/simple.css'))
+        content = str(self.portal.restrictedTraverse('portal_css/test_rr_1.css'))
         self.failUnless('red' in content)
         content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
         self.failUnless('green' in content)
@@ -674,8 +674,8 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.setRoles(['Member'])
         self.tool.registerStylesheet('testpurple.css')
         self.tool.registerStylesheet('testpink.css')
-        self.tool.moveResourceToTop('simple2.css')
-        self.tool.moveResourceDown('simple2.css', 2)
+        self.tool.moveResourceToTop('test_rr_2.css')
+        self.tool.moveResourceDown('test_rr_2.css', 2)
         #Now have [[green,red],blue,[purple,pink]]
         self.assertEqual(len(self.tool.getResources()), req_resources)
         self.assertEqual(len(self.tool.cookedresources), req_cooked)
@@ -698,7 +698,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('purple' in content)
         self.failIf('red' in content)
         self.failIf('green' in content)
-        content = str(self.portal.restrictedTraverse('portal_css/simple2.css'))
+        content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
 
 class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -749,7 +749,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.tool.clearResources()
         self.tool.registerStylesheet('testroot.css', cookable=False)
-        self.tool.registerStylesheet('simple.css')
+        self.tool.registerStylesheet('test_rr_1.css')
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testroot.css',
@@ -789,7 +789,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         styles = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in styles]
         self.failIf('testroot.css' in ids)
-        self.failUnless('simple.css' in ids)
+        self.failUnless('test_rr_1.css' in ids)
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.css')

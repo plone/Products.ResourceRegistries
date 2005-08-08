@@ -303,13 +303,17 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
                     raise
 
             if obj is not None:
-                if hasattr(aq_base(obj),'meta_type') and \
-                   obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
+                if hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)
+                
+                elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'Filesystem File':
+                   obj._updateFromFS()
+                   content = obj._readFile(0)
+                elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'ATFile':
+                    content = str(obj)
                 # We should add more explicit type-matching checks
-                elif hasattr(aq_base(obj), 'index_html') and \
-                     callable(obj.index_html):
+                elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                     content = obj.index_html(self.REQUEST,
                                              self.REQUEST.RESPONSE)
                 elif callable(obj):

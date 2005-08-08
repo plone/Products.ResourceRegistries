@@ -41,47 +41,52 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
 
     def testIfModifiedSinceHeaders1(self):
-        # test with if-modified-since headers early and late (since client clock won't necessarily be synchronized)
-        
-        # Test that the main page retains its content-type
+        # Test that the main page returns the proper status code and content type for a conditional get
         self.setRoles(['Manager'])
-        #self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() - 60.0/(24.0*3600.0)).timeTime())) # if modified in the last minute
         request = self.portal.REQUEST
-        request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # if modified in the last minute
-        print '###################################'
-        print 'if-modified-since: ', request.get_header('If-Modified-Since', None)
+        request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # resend if modified since one minute ago
         assert request.get_header('If-Modified-Since')
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath+'/testmethod')
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
-        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getStatus(), 200) # this should in fact send a 200
+
+        # we also add an fsfile for good measure
+        self.tool.registerStylesheet('test_rr_2.css')
+        rs = self.tool.getEvaluatedResources(self.portal)
+        response = self.publish(self.toolpath+'/testmethod2')
+        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+
 
     def testIfModifiedSinceHeaders2(self):
-        # test with if-modified-since headers early and late (since client clock won't necessarily be synchronized)
-
-        # Test that the main page retains its content-type
+        # Test that the main page returns the proper status code and content type for a conditional get
         self.setRoles(['Manager'])
-        #self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() + 60.0/(24.0*3600.0)).timeTime())) # if modified in the last minute
         request = self.portal.REQUEST
-        #print request.environ
-        #request.get_header('IF_MODIFIED_SINCE', None)
         request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() + 60.0/(24.0*3600.0))) # if modified in the last minute
-        print '###################################'
-        print 'if-modified-since: ', request.get_header('If-Modified-Since', None)
         assert request.get_header('If-Modified-Since')
         self.portal.addDTMLMethod('testmethod2', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod2')
         response = self.publish(self.toolpath+'/testmethod2')
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
-        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getStatus(), 200)  # this should send a 200 right now
+
+        # we also add an fsfile for good measure
+        self.tool.registerStylesheet('test_rr_2.css')
+        rs = self.tool.getEvaluatedResources(self.portal)
+        response = self.publish(self.toolpath+'/testmethod2')
+        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        
 
 
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
-        self.portal.REQUEST.set('If-Modified-Since', rfc1123_date((DateTime() - 1).timeTime()))
-        print self.portal.REQUEST.get('If-Modified-Since')
+        request = self.portal.REQUEST
+        request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # if modified in the last minute
+        print self.portal.REQUEST.get_header('If-Modified-Since')
         self.tool.registerStylesheet('test_rr_1.css')
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')

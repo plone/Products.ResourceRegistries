@@ -55,7 +55,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         # we also add an fsfile for good measure
         self.tool.registerStylesheet('test_rr_2.css')
         rs = self.tool.getEvaluatedResources(self.portal)
-        response = self.publish(self.toolpath+'/testmethod2')
+        response = self.publish(self.toolpath+'/'+rs[0].getId())
         self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 302
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
 
@@ -84,6 +84,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
+
         request = self.portal.REQUEST
         request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # if modified in the last minute
         print self.portal.REQUEST.get_header('If-Modified-Since')

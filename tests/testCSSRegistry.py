@@ -706,9 +706,9 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearResources()
+        self.tool.registerStylesheet('plone_styles.css')
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
-        self.tool.registerStylesheet('plone_styles.css')
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
@@ -941,6 +941,8 @@ class TestResourceObjects(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(self.tool.concatenatedresources[
                          self.tool.cookedresources[2].getId()],
                          ['eggs'])
+
+
 
 
 def test_suite():

@@ -70,7 +70,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
 
         request = self.portal.REQUEST
         request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # if modified in the last minute
-        print self.portal.REQUEST.get_header('If-Modified-Since')
+        #print self.portal.REQUEST.get_header('If-Modified-Since')
         self.tool.registerStylesheet('test_rr_1.css')
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')
@@ -82,7 +82,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(rs),1)
         response = self.publish(self.toolpath+'/'+rs[0].getId())
         self.assertEqual(response.getHeader('Content-Type'), 'text/css')
-        print str(response)
+        #print str(response)
         self.assertEqual(int(response.getHeader('content-length')), len(response.getBody()))
         self.assertEqual(response.getStatus(), 200)
 

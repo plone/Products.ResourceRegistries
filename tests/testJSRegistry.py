@@ -482,7 +482,7 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.cookResources()
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
-    def testDebugModeSplitting(self):
+    def testDebugModeSplitting2(self):
         self.tool.registerScript('ham')
         # Publish in normal mode
         response = self.publish(self.toolpath+'/ham')

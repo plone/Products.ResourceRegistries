@@ -1,3 +1,10 @@
+1.0.2
+=====
+
+ * Fix for bug #4392, where merging FSfiles could mess up http-status headers
+   and cause weird hanging in browsers.
+   [plonista][fschulze][elvix] 
+
 1.0.1
 =====
 

@@ -65,32 +65,41 @@ function shiftBlocks(fieldset, block) {
 
 <style type="text/css">
 div.scriptform{
-    width: 50%;
+    width: 45%;
+    float: left;
 }
 
 .visualClear {
     clear: both;
 }
 
-label, input, select{
+label, input, select {
     font-size: 80%;
     font-family: sans-serif;
+    float: left;
+}
+
+legend input {
+    float: none;
 }
 
 label {
     width: 11em;
     text-align: right;
-    float: left;
     padding: 0.2em 0.4em;
-    clear: left;
     font-weight: bold;
+    clear: left;
 }
 
+
 fieldset {
-    border: 1px solid black;
     margin: 0.2em;
-    margin-bottom: 1em;
+    border: 1px solid black;
+    margin-bottom: 0.5em;
+    padding-bottom: 0;
+    clear: both;
 }
+
 legend {
     font-size: 90%;
 }
@@ -103,13 +112,13 @@ legend {
       tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'"
       method="post">
 
-    <input type="submit" i18n:attributes="value" value="Save" />
-
     <p>
         <input type="checkbox" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
-        Debug mode (don't merge javascripts)
+        Debug mode (Don't merge scripts)
     </p>
+
+    <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
 
     <p>The order of the scripts in this form is the same as the
     order in the header of the resulting HTML code.
@@ -144,32 +153,26 @@ legend {
 
 
         <div class="scriptform">
+            <label>Enabled?</label>
+            <input type="checkbox" name="scripts.enabled:records:boolean"
+                   tal:attributes="checked script/getEnabled" />
+            <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
+            
+            <label>TAL condition</label>
+            <input type="text" name="scripts.expression:records:string" size="25"
+                   tal:attributes="value script/getExpression" />
+        </div>
 
-            <div>
-                <label>TAL condition</label>
-                <input type="text" name="scripts.expression:records:string" size="50"
-                       tal:attributes="value script/getExpression" />
-            </div>
+        <div class="scriptform">
+            <label>Inline rendering</label>
+            <input type="checkbox" name="scripts.inline:records:boolean"
+                   tal:attributes="checked script/getInline" />
+            <input type="hidden" name="scripts.inline:records:boolean:default" value="False" />
 
-            <div>
-                <label>Inline rendering</label>
-                <input type="checkbox" name="scripts.inline:records:boolean"
-                       tal:attributes="checked script/getInline" />
-                <input type="hidden" name="scripts.inline:records:boolean:default" value="False" />
-            </div>
-
-            <div>
-                <label>Enabled</label>
-                <input type="checkbox" name="scripts.enabled:records:boolean"
-                       tal:attributes="checked script/getEnabled" />
-                <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
-            </div>
-            <div>
-                <label>Merging allowed?</label>
-                <input type="checkbox" name="scripts.cookable:records:boolean"
-                       tal:attributes="checked script/getCookable | default" />
-                <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
-            </div>
+            <label>Merging allowed?</label>
+            <input type="checkbox" name="scripts.cookable:records:boolean"
+                   tal:attributes="checked script/getCookable | default" />
+            <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
         </div>
 
         <div class="visualClear">&nbsp;</div>

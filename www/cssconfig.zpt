@@ -69,24 +69,35 @@ div.stylesheetform{
     float: left;
 }
 
+form {
+    margin-bottom: 3em;
+}
+
 label, input, select {
     font-size: 80%;
     font-family: sans-serif;
+    float: left;
+}
+
+legend input {
+    float: none;
 }
 
 label {
     width: 11em;
     text-align: right;
-    float: left;
     padding: 0.2em 0.4em;
-    clear: left;
     font-weight: bold;
+    clear: left;
 }
+
 
 fieldset {
     margin: 0.2em;
     border: 1px solid black;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
+    padding-bottom: 0;
+    clear: both;
 }
 
 legend {
@@ -101,18 +112,19 @@ legend {
       tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'"
       method="post">
 
-    <input type="submit" i18n:attributes="value" value="Save" />
-
     <p>
         <input type="checkbox" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
         Debug mode (don't merge stylesheets)
     </p>
 
+    <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
+
     <p>The order of the stylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
 
+    
     <fieldset tal:repeat="stylesheet here/getResources">
 
         <legend>
@@ -141,57 +153,40 @@ legend {
                tal:attributes="value repeat/stylesheet/index" />
 
         <div class="stylesheetform">
+            <label>Enabled?</label>
+            <input type="checkbox" name="stylesheets.enabled:records"
+                   tal:attributes="checked stylesheet/getEnabled">
 
-            <div>
-                <label>Title</label>
-                <input type="text" name="stylesheets.title:records"
-                       tal:attributes="value stylesheet/getTitle|nothing">
-            </div>
+            <label>Title</label>
+            <input type="text" name="stylesheets.title:records"
+                   tal:attributes="value stylesheet/getTitle|nothing">
 
-            <div>
-                <label>TAL condition</label>
-                <input type="text" name="stylesheets.expression:records"
-                       tal:attributes="value stylesheet/getExpression">
-            </div>
+            <label>TAL condition</label>
+            <input type="text" name="stylesheets.expression:records"
+                   tal:attributes="value stylesheet/getExpression">
 
-            <div>
-                <label>CSS Media</label>
-                <input type="text" name="stylesheets.media:records"
-                       tal:attributes="value stylesheet/getMedia|nothing">
-            </div>
+            <label>Merging allowed?</label>
+            <input type="checkbox" name="stylesheets.cookable:records:boolean"
+                   tal:attributes="checked stylesheet/getCookable | default" />
+            <input type="hidden" name="stylesheets.cookable:records:boolean:default" value="False" />
         </div>
 
         <div class="stylesheetform">
-            <div>
-                <label>rel</label>
-                <input type="text" name="stylesheets.rel:records"
-                       tal:attributes="value stylesheet/getRel|nothing">
-            </div>
+            <label>CSS Media</label>
+            <input type="text" name="stylesheets.media:records"
+                   tal:attributes="value stylesheet/getMedia|nothing">
 
+            <label>rel</label>
+            <input type="text" name="stylesheets.rel:records"
+                   tal:attributes="value stylesheet/getRel|nothing">
 
-            <div>
-                <label>Render type</label>
-                <select name="stylesheets.rendering:records">
-                    <option tal:repeat="r here/getRenderingOptions"
-                            tal:attributes="value r;
-                                            selected python:r == stylesheet.getRendering()"
-                            tal:content="r">import</option>
-                </select>
-            </div>
-
-            <div>
-                <input type="checkbox" name="stylesheets.enabled:records"
-                       tal:attributes="checked stylesheet/getEnabled">
-                <label>Enabled?</label>
-            </div>
-
-            <div>
-                <label>Merging allowed?</label>
-                <input type="checkbox" name="stylesheets.cookable:records:boolean"
-                       tal:attributes="checked stylesheet/getCookable | default" />
-                <input type="hidden" name="stylesheets.cookable:records:boolean:default" value="False" />
-            </div>
-
+            <label>Render type</label>
+            <select name="stylesheets.rendering:records">
+                <option tal:repeat="r here/getRenderingOptions"
+                        tal:attributes="value r;
+                                        selected python:r == stylesheet.getRendering()"
+                        tal:content="r">import</option>
+            </select>
         </div>
 
         <div style="clear: both;">&nbsp;</div>

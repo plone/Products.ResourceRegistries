@@ -1,9 +1,12 @@
-After 1.0.2
-===========
+1.0.3
+=====
 
  * Fixed typo in the migration external method which lead to portal_javascripts
    not being migrated.
    [fschulze]
+
+ * Small fixes to UI.
+   [limi]
 
 1.0.2
 =====

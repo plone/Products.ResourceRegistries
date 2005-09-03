@@ -20,7 +20,7 @@ function getSortInput(node) {
 function exchangeSortValues(a, b) {
     var aInput = getSortInput(a);
     var bInput = getSortInput(b);
-    if (!(aInput && bInput)) return;
+    if (!(aInput && bInput)) return false;
     var tmp = aInput.value;
     aInput.value = bInput.value;
     bInput.value = tmp;
@@ -47,7 +47,12 @@ function moveUp(node) {
     fieldset = node;
     previousBlock = fieldset.previousSibling
     if (previousBlock) {
-        shiftBlocks(fieldset, previousBlock);
+        var shifted = shiftBlocks(fieldset, previousBlock);
+        if (!shifted) {
+            return true; // follow the link normally
+        } else {
+            return false; // don't follow the link normally
+        }
     }
 }
  
@@ -58,8 +63,12 @@ function shiftBlocks(fieldset, block) {
     while (fieldset.nodeType == 3) {
          fieldset = fieldset.nextSibling;
     }
-    exchangeSortValues(fieldset, block);
+    var exchanged = exchangeSortValues(fieldset, block);
+    if (!exchanged) {
+        return false;
+    }
     fieldset.parentNode.insertBefore(fieldset, block);
+    return true;
 }
 </script>
 
@@ -131,12 +140,12 @@ legend {
             <input type="text" name="stylesheets.id:records" size="30"
                    tal:attributes="value stylesheet/getId">
 
-                <a onclick="moveUp(this);return false;" href="#"
+                <a onclick="return moveUp(this);" href="#"
                    title="Move up"
                    tal:attributes="href string:moveResourceUp?id=${stylesheet/getId}">
                      &uarr;
                 </a>
-                <a onclick="moveDown(this);return false;" href="#"
+                <a onclick="return moveDown(this);" href="#"
                    title="Move down"
                    tal:attributes="href string:moveResourceDown?id=${stylesheet/getId}">
                      &darr;

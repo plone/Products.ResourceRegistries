@@ -11,7 +11,10 @@ function getSortInput(node) {
             return iterNode;
         }
         if (iterNode.hasChildNodes()) {
-            return getSortInput(iterNode);
+            var result = getSortInput(iterNode);
+            if (result) {
+                return result;
+            }
         }
     }
     return null;
@@ -24,6 +27,7 @@ function exchangeSortValues(a, b) {
     var tmp = aInput.value;
     aInput.value = bInput.value;
     bInput.value = tmp;
+    return true;
 }
  
  
@@ -35,7 +39,12 @@ function moveDown(node) {
     fieldset = node;
     nextBlock = fieldset.nextSibling;
     if (nextBlock) {
-        shiftBlocks(nextBlock, fieldset);
+        var shifted = shiftBlocks(nextBlock, fieldset);
+        if (!shifted) {
+            return true; // follow the link normally
+        } else {
+            return false; // don't follow the link normally
+        }
     }
 }
  

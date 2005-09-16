@@ -1,5 +1,9 @@
 import random
 
+# we *have* to use StringIO here, because we can't add attributes to cStringIO
+# instances (needed in BaseRegistryTool.__getitem__).
+from StringIO import StringIO
+
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
@@ -110,7 +114,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
         response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
         contenttype = self.getContentType()
-        return File(item, item, output, contenttype).__of__(self)
+        # make output file like and add an headers dict, so the contenttype
+        # is properly set in the headers
+        output = StringIO(output)
+        output.headers = {}
+        output.headers['content-type'] = contenttype
+        return File(item, item, output).__of__(self)
 
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""

@@ -1,5 +1,12 @@
+1.0.5
+=====
+
+ * Fixed encoding of javascripts.
+   [fschulze]
+
 1.0.4
 =====
+
  * Fixed reordering of resources with javascript.
    [fschulze]
 

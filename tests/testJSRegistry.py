@@ -426,8 +426,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
     def testPublishJSThroughTool(self):
         response = self.publish(self.toolpath + '/test_rr_1.js')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'),
-                         'application/x-javascript')
+        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript;charset=utf-8')
 
     def testPublishNonMagicJSThroughTool(self):
         self.setRoles(['Manager'])
@@ -436,8 +435,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('testmethod')
         response = self.publish(self.toolpath + '/testmethod')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'),
-                         'application/x-javascript;charset=utf-8')
+        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript;charset=utf-8')
 
     def testPublishPageWithInlineJS(self):
         # This one fails from string/utf-8 concatenation

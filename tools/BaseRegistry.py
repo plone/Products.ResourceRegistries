@@ -25,6 +25,10 @@ from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
 
+import Acquisition
+from thread import get_ident
+from Products.CMFCore.Skinnable import SKINDATA
+
 
 class Resource(Persistent):
     security = ClassSecurityInfo()
@@ -77,6 +81,30 @@ class Resource(Persistent):
 InitializeClass(Resource)
 
 
+class Skin(Acquisition.Implicit):
+    security = ClassSecurityInfo()
+
+    def __init__(self, skin):
+        self._skin = skin
+
+    def __before_publishing_traverse__(self, object, REQUEST):
+        """ Pre-traversal hook. Specify the skin. 
+        """
+        self.changeSkin(self._skin)
+
+    def __bobo_traverse__(self, REQUEST, name):
+        """Traversal hook."""
+        if REQUEST is not None and \
+           self.concatenatedresources.get(name, None) is not None:
+            return aq_parent(self).__getitem__(name)
+        obj = getattr(self, name, None)
+        if obj is not None:
+            return obj
+        raise AttributeError('%s' % (name,))    
+
+InitializeClass(Skin)
+
+
 class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     """Base class for a Plone registry managing resource files."""
 
@@ -123,6 +151,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
 
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
+        # First see if it is a skin
+        skintool = getToolByName(self, 'portal_skins')
+        skins = skintool.getSkinSelections()
+        if name in skins:
+            return Skin(name).__of__(self)
+        
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
             return self.__getitem__(name)
@@ -564,3 +598,32 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         Should be overwritten by subclasses.
         """
         return 'text/plain'
+
+    security.declareProtected(permissions.View, 'getCurrentSkinName')
+    def getCurrentSkinName(self):
+        """Returns the id of the current skin.
+        
+        Ugh, there really should be a better way of doing this. This is
+        depending on internals in CMFCore and should be added there.
+        """
+        skintool = getToolByName(self, 'portal_skins')
+        default_skin_name = skintool.getDefaultSkin()
+        tid = get_ident()
+        if SKINDATA.has_key(tid):
+            skinobj, ignore, resolve = SKINDATA.get(tid)
+            current_skin_path = skinobj.getPhysicalPath()
+
+            #
+            # Perhaps test against default skin first?
+            #
+
+            skinnames = skintool.getSkinSelections()
+
+            # loop through skin names looking for a match
+            for name in skinnames:
+                skin = skintool.getSkinByName(name)
+                path = skin.getPhysicalPath()
+                if current_skin_path == path:
+                    return name
+        
+        return default_skin_name

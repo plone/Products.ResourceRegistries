@@ -2,20 +2,23 @@
       xml:lang="en">
     <metal:allcss define-macro="cssrenderer" >
         <tal:fetcher define="stylesheets python:here.portal_css.getEvaluatedResources(here);
-                             global portal_url here/portal_url;">
+                             global portal_url here/portal_url;
+                             pss modules/Products/PythonScripts/standard;
+                             current_skin here/portal_css/getCurrentSkinName;
+                             skinname python:pss.url_quote(current_skin);">
             <tal:renderer tal:repeat="stylesheet stylesheets">
                 <tal:typedef tal:define="render stylesheet/getRendering | string:import">
                     <link tal:condition="python: render == 'link'"
                           rel="stylesheet"
                           type="text/css"
-                          tal:attributes="href string:${portal_url}/portal_css/${stylesheet/getId};
+                          tal:attributes="href string:${portal_url}/portal_css/${skinname}/${stylesheet/getId};
                                           media stylesheet/getMedia | nothing;
                                           rel stylesheet/getRel | nothing;
                                           title stylesheet/getTitle | nothing" />
                     <tal:import tal:condition="python: render == 'import'">
                         <style type="text/css"
                             tal:attributes="media stylesheet/getMedia | nothing;"
-                            tal:content="structure string:<!-- @import url(${portal_url}/portal_css/${stylesheet/getId}); -->">
+                            tal:content="structure string:<!-- @import url(${portal_url}/portal_css/${skinname}/${stylesheet/getId}); -->">
                         </style>
                     </tal:import>
                     <tal:inline tal:condition="python: render == 'inline'">

@@ -2,11 +2,14 @@
       xml:lang="en">
     <metal:alljs define-macro="jsrenderer" >
         <tal:fetcher define="scripts python:here.portal_javascripts.getEvaluatedResources(here);
-                             global portal_url here/portal_url;">
+                             global portal_url here/portal_url;
+                             pss modules/Products/PythonScripts/standard;
+                             current_skin here/portal_css/getCurrentSkinName;
+                             skinname python:pss.url_quote(current_skin);">
             <tal:renderer tal:repeat="script scripts">
                 <script tal:condition="not:script/getInline"
                         type="text/javascript"
-                        tal:attributes="src string:${portal_url}/portal_javascripts/${script/getId}">
+                        tal:attributes="src string:${portal_url}/portal_javascripts/${skinname}/${script/getId}">
                 </script>
                 <tal:inline tal:condition="script/getInline">
                 <script

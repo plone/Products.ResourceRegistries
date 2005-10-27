@@ -239,26 +239,36 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         resources = [r.copy() for r in self.getResources() if r.getEnabled()]
         self.concatenatedresources = {}
         self.cookedresources = ()
-        results = []
-        for resource in resources:
-            if results:
-                previtem = results[-1]
-                if not self.getDebugMode() and \
-                   self.compareResources(resource, previtem):
-                    res_id = resource.getId()
-                    prev_id = previtem.getId()
-                    self.finalizeResourceMerging(resource, previtem)
-                    if self.concatenatedresources.has_key(prev_id):
-                        self.concatenatedresources[prev_id].append(res_id)
+        if self.getDebugMode():
+            results = [x for x in resources]
+        else:
+            results = []
+            for resource in resources:
+                if results:
+                    previtem = results[-1]
+                    if self.compareResources(resource, previtem):
+                        res_id = resource.getId()
+                        prev_id = previtem.getId()
+                        self.finalizeResourceMerging(resource, previtem)
+                        if self.concatenatedresources.has_key(prev_id):
+                            self.concatenatedresources[prev_id].append(res_id)
+                        else:
+                            magic_id = self.generateId()
+                            self.concatenatedresources[magic_id] = [prev_id, res_id]
+                            previtem._setId(magic_id)
                     else:
-                        magic_id = self.generateId()
-                        self.concatenatedresources[magic_id] = [prev_id, res_id]
-                        previtem._setId(magic_id)
+                        if resource.getCookable():
+                            magic_id = self.generateId()
+                            self.concatenatedresources[magic_id] = [resource.getId()]
+                            resource._setId(magic_id)
+                        results.append(resource)
                 else:
+                    if resource.getCookable():
+                        magic_id = self.generateId()
+                        self.concatenatedresources[magic_id] = [resource.getId()]
+                        resource._setId(magic_id)
                     results.append(resource)
-            else:
-                results.append(resource)
-
+    
         resources = self.getResources()
         for resource in resources:
             self.concatenatedresources[resource.getId()] = [resource.getId()]

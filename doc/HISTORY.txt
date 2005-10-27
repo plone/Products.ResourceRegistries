@@ -1,6 +1,10 @@
 1.1
 ===
 
+ * Apply magic id to all resources when not in debug mode, so invalidation
+   works.
+   [fschulze]
+
  * Made skin aware.
    [ldr]
 

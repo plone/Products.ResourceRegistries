@@ -15,6 +15,7 @@ from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 from OFS.Image import File
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
+from OFS.Cache import Cacheable
 
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
@@ -29,6 +30,14 @@ import Acquisition
 from thread import get_ident
 from Products.CMFCore.Skinnable import SKINDATA
 
+
+def getFileForContent(name, content, contenttype):
+    # make output file like and add an headers dict, so the contenttype
+    # is properly set in the headers
+    output = StringIO(content)
+    output.headers = {}
+    output.headers['content-type'] = contenttype
+    return File(name, name, output)
 
 class Resource(Persistent):
     security = ClassSecurityInfo()
@@ -96,7 +105,16 @@ class Skin(Acquisition.Implicit):
         """Traversal hook."""
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
-            return aq_parent(self).__getitem__(name)
+            parent = aq_parent(self)
+            kw = {'skin':self._skin,'name':name}
+            data = None
+            if parent.ZCacheable_isCachingEnabled():
+                data = parent.ZCacheable_get(keywords=kw)
+            if data is None:
+                data = parent.__getitem__(name)
+                parent.ZCacheable_set(data, keywords=kw)
+            output, contenttype = data
+            return getFileForContent(name, output, contenttype).__of__(parent)
         obj = getattr(self, name, None)
         if obj is not None:
             return obj
@@ -105,7 +123,7 @@ class Skin(Acquisition.Implicit):
 InitializeClass(Skin)
 
 
-class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
+class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     """Base class for a Plone registry managing resource files."""
 
     security = ClassSecurityInfo()
@@ -142,12 +160,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
         response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
         contenttype = self.getContentType()
-        # make output file like and add an headers dict, so the contenttype
-        # is properly set in the headers
-        output = StringIO(output)
-        output.headers = {}
-        output.headers['content-type'] = contenttype
-        return File(item, item, output).__of__(self)
+        return (output, contenttype)
 
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
@@ -159,7 +172,15 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
-            return self.__getitem__(name)
+            kw = {'skin':None,'name':name}
+            data = None
+            if self.ZCacheable_isCachingEnabled():
+                data = self.ZCacheable_get(keywords=kw)
+            if data is None:
+                data = self.__getitem__(name)
+                self.ZCacheable_set(data, keywords=kw)
+            output, contenttype = data
+            return getFileForContent(name, output, contenttype).__of__(self)
         obj = getattr(self, name, None)
         if obj is not None:
             return obj

@@ -64,6 +64,8 @@ Usage
 
 Credits
 
+    Florian Schulze -- Independent
+
     Geir Bækholt -- "Plone Solutions":http://www.plonesolutions.com
 
     Matt Hamilton -- "Netsight Internet Solutions":http://www.netsight.co.uk

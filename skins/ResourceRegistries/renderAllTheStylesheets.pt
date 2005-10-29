@@ -27,7 +27,7 @@
                             tal:define="stylestring python:str(here.portal_css.getInlineResource(stylesheet.getId(), here))"
                             tal:content="structure string:<!--  ${stylestring}  -->">
                         </style>
-                </tal:inline>
+                    </tal:inline>
                 </tal:typedef>
             </tal:renderer>
         </tal:fetcher>

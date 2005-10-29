@@ -1,6 +1,9 @@
 1.1
 ===
 
+ * Added checkbox to configure cacheability of resources.
+   [fschulze]
+
  * Made registries cacheable. This is most useful with the RAMCacheManager.
    Just associate portal_css and portal_javascripts with the RAMCache.
    [fschulze]

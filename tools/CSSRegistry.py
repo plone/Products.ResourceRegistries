@@ -93,7 +93,8 @@ class CSSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable', 'getRel', 'getRendering')
+    attributes_to_compare = ('getExpression', 'getCookable',
+                             'getCacheable', 'getRel', 'getRendering')
     filename_base = 'ploneStyles'
     filename_appendix = '.css'
     merged_output_prefix = ''
@@ -180,7 +181,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                     title=r.get('title', ''),
                                     rendering=r.get('rendering', 'import'),
                                     enabled=r.get('enabled', False),
-                                    cookable=r.get('cookable', False))
+                                    cookable=r.get('cookable', False),
+                                    cacheable=r.get('cacheable', False))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()

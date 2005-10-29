@@ -191,6 +191,11 @@ legend {
             <input type="checkbox" name="scripts.cookable:records:boolean"
                    tal:attributes="checked script/getCookable | default" />
             <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
+
+            <label>Caching allowed?</label>
+            <input type="checkbox" name="scripts.cacheable:records:boolean"
+                   tal:attributes="checked script/getCacheable | default" />
+            <input type="hidden" name="scripts.cacheable:records:boolean:default" value="False" />
         </div>
 
         <div class="visualClear">&nbsp;</div>
@@ -233,6 +238,12 @@ legend {
             <label>Merging allowed?</label>
             <input type="checkbox" name="cookable:boolean" checked="1" />
             <input type="hidden" name="cookable:boolean:default" value="False" />
+        </div>
+
+        <div>
+            <label>Caching allowed?</label>
+            <input type="checkbox" name="cacheable:boolean" checked="1" />
+            <input type="hidden" name="cacheable:boolean:default" value="False" />
         </div>
 
     </fieldset>

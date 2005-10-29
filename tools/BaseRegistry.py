@@ -48,6 +48,7 @@ class Resource(Persistent):
         self._data['expression'] = kwargs.get('expression', '')
         self._data['enabled'] = kwargs.get('enabled', True)
         self._data['cookable'] = kwargs.get('cookable', True)
+        self._data['cacheable'] = kwargs.get('cacheable', True)
 
     def copy(self):
         result = self.__class__(self.getId())
@@ -87,6 +88,16 @@ class Resource(Persistent):
     def setCookable(self, cookable):
         self._data['cookable'] = cookable
 
+    security.declarePublic('getCacheable')
+    def getCacheable(self):
+        # as this is a new property, old instance might not have that value, so
+        # return True as default
+        return self._data.get('cacheable', True)
+
+    security.declareProtected(permissions.ManagePortal, 'setCacheable')
+    def setCacheable(self, cacheable):
+        self._data['cacheable'] = cacheable
+
 InitializeClass(Resource)
 
 
@@ -108,11 +119,14 @@ class Skin(Acquisition.Implicit):
             parent = aq_parent(self)
             kw = {'skin':self._skin,'name':name}
             data = None
-            if parent.ZCacheable_isCachingEnabled():
-                data = parent.ZCacheable_get(keywords=kw)
-            if data is None:
+            if not parent.getDebugMode() and parent.isCacheable(name):
+                if parent.ZCacheable_isCachingEnabled():
+                    data = parent.ZCacheable_get(keywords=kw)
+                if data is None:
+                    data = parent.__getitem__(name)
+                    parent.ZCacheable_set(data, keywords=kw)
+            else:
                 data = parent.__getitem__(name)
-                parent.ZCacheable_set(data, keywords=kw)
             output, contenttype = data
             return getFileForContent(name, output, contenttype).__of__(parent)
         obj = getattr(self, name, None)
@@ -130,7 +144,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     __implements__ = (SimpleItem.__implements__, IResourceRegistry)
     manage_options = SimpleItem.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable')
+    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable')
     filename_base = 'ploneResources'
     filename_appendix = '.res'
     merged_output_prefix = ''
@@ -151,7 +165,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def __getitem__(self, item):
         """Return a resource from the registry."""
         output = self.getResourceContent(item, self)
-        if self.getDebugMode():
+        if self.getDebugMode() or not self.isCacheable(item):
             duration = 0
         else:
             duration = self.cache_duration  # duration in seconds
@@ -174,17 +188,30 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
            self.concatenatedresources.get(name, None) is not None:
             kw = {'skin':None,'name':name}
             data = None
-            if self.ZCacheable_isCachingEnabled():
-                data = self.ZCacheable_get(keywords=kw)
-            if data is None:
+            if not self.getDebugMode() and self.isCacheable(name):
+                if self.ZCacheable_isCachingEnabled():
+                    data = self.ZCacheable_get(keywords=kw)
+                if data is None:
+                    data = self.__getitem__(name)
+                    self.ZCacheable_set(data, keywords=kw)
+            else:
                 data = self.__getitem__(name)
-                self.ZCacheable_set(data, keywords=kw)
             output, contenttype = data
             return getFileForContent(name, output, contenttype).__of__(self)
         obj = getattr(self, name, None)
         if obj is not None:
             return obj
         raise AttributeError('%s' % (name,))
+
+    security.declarePrivate('isCacheable')
+    def isCacheable(self, name):
+        resource_id = self.concatenatedresources.get(name, [None])[0]
+        if resource_id is None:
+            return False
+        resources = self.getResourcesDict()
+        resource = resources.get(resource_id, None)
+        result = resource.getCacheable()
+        return result
 
     security.declarePrivate('validateId')
     def validateId(self, id, existing):
@@ -326,7 +353,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         except AttributeError:
             return 1
 
-    security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
+    security.declareProtected(permissions.ManagePortal, 'getResource')
     def getResource(self, id):
         """Get resource object by id.
         
@@ -466,12 +493,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerResource')
-    def registerResource(self, id, expression='', enabled=True, cookable=True):
+    def registerResource(self, id, expression='', enabled=True,
+                         cookable=True, cacheable=True):
         """Register a resource."""
         resource = Resource(id,
                             expression=expression,
                             enabled=enabled,
-                            cookable=cookable)
+                            cookable=cookable,
+                            cacheable=cacheable)
         self.storeResource(resource)
 
     security.declareProtected(permissions.ManagePortal, 'unregisterResource')

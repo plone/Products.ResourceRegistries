@@ -12,7 +12,7 @@
    works.
    [fschulze]
 
- * Made skin aware.
+ * Made skin aware. This now depends on getCurrentSkinName added in  CMF 1.5.5.
    [ldr]
 
 1.0.5

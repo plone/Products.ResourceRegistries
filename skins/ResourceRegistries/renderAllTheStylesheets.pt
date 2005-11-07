@@ -4,7 +4,7 @@
         <tal:fetcher define="stylesheets python:here.portal_css.getEvaluatedResources(here);
                              global portal_url here/portal_url;
                              pss modules/Products/PythonScripts/standard;
-                             current_skin here/portal_css/getCurrentSkinName;
+                             current_skin here/getCurrentSkinName;
                              skinname python:pss.url_quote(current_skin);">
             <tal:renderer tal:repeat="stylesheet stylesheets">
                 <tal:typedef tal:define="render stylesheet/getRendering | string:import">

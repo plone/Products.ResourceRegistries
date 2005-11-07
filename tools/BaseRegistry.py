@@ -659,31 +659,3 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """
         return 'text/plain'
 
-    security.declareProtected(permissions.View, 'getCurrentSkinName')
-    def getCurrentSkinName(self):
-        """Returns the id of the current skin.
-        
-        Ugh, there really should be a better way of doing this. This is
-        depending on internals in CMFCore and should be added there.
-        """
-        skintool = getToolByName(self, 'portal_skins')
-        default_skin_name = skintool.getDefaultSkin()
-        tid = get_ident()
-        if SKINDATA.has_key(tid):
-            skinobj, ignore, resolve = SKINDATA.get(tid)
-            current_skin_path = skinobj.getPhysicalPath()
-
-            #
-            # Perhaps test against default skin first?
-            #
-
-            skinnames = skintool.getSkinSelections()
-
-            # loop through skin names looking for a match
-            for name in skinnames:
-                skin = skintool.getSkinByName(name)
-                path = skin.getPhysicalPath()
-                if current_skin_path == path:
-                    return name
-        
-        return default_skin_name

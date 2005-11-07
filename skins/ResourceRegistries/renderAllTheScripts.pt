@@ -4,7 +4,7 @@
         <tal:fetcher define="scripts python:here.portal_javascripts.getEvaluatedResources(here);
                              global portal_url here/portal_url;
                              pss modules/Products/PythonScripts/standard;
-                             current_skin here/portal_css/getCurrentSkinName;
+                             current_skin here/getCurrentSkinName;
                              skinname python:pss.url_quote(current_skin);">
             <tal:renderer tal:repeat="script scripts">
                 <script tal:condition="not:script/getInline"

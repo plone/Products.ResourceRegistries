@@ -10,6 +10,8 @@ from zExceptions import NotFound
 from Globals import InitializeClass, Persistent, PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized
 
+from zope.interface import implements
+
 from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 
 from OFS.Image import File
@@ -23,8 +25,8 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
+from Products.ResourceRegistries.interfaces.ResourceRegistries import IResourceRegistry as z2IResourceRegistry
 from Products.ResourceRegistries.interfaces import IResourceRegistry
-
 
 class Resource(Persistent):
     security = ClassSecurityInfo()
@@ -81,7 +83,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     """Base class for a Plone registry managing resource files."""
 
     security = ClassSecurityInfo()
-    __implements__ = (SimpleItem.__implements__, IResourceRegistry)
+    implements(IResourceRegistry)
+    __implements__ = (SimpleItem.__implements__, z2IResourceRegistry)
     manage_options = SimpleItem.manage_options
 
     attributes_to_compare = ('getExpression', 'getCookable')

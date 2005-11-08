@@ -12,16 +12,18 @@ ZopeTestCase.installProduct('CMFFormController', quiet=1)
 ZopeTestCase.installProduct('GroupUserFolder', quiet=1)
 ZopeTestCase.installProduct('ZCTextIndex', quiet=1)
 ZopeTestCase.installProduct('ExtendedPathIndex')
+ZopeTestCase.installProduct('ExternalEditor')
+ZopeTestCase.installProduct('kupu')
 
 ZopeTestCase.installProduct('CMFPlone')
 ZopeTestCase.installProduct('ResourceRegistries')
+ZopeTestCase.installProduct('Five')
 
 from Products.PloneTestCase import PloneTestCase
 
 PRODUCTS = ['ResourceRegistries']
 
 PloneTestCase.setupPloneSite(products=PRODUCTS)
-
 
 class CSSRegistryTestCase(ZopeTestCase.Functional, PloneTestCase.PloneTestCase):
 

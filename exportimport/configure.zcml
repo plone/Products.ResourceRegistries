@@ -16,4 +16,16 @@
       for="Products.ResourceRegistries.interfaces.IJSRegistry"
       />
 
+  <adapter
+      factory=".cssregistry.CSSRegistryNodeAdapter"
+      provides="Products.GenericSetup.interfaces.INodeExporter"
+      for="Products.ResourceRegistries.interfaces.ICSSRegistry"
+      />
+
+  <adapter
+      factory=".cssregistry.CSSRegistryNodeAdapter"
+      provides="Products.GenericSetup.interfaces.INodeImporter"
+      for="Products.ResourceRegistries.interfaces.ICSSRegistry"
+      />
+
 </configure>

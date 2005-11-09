@@ -66,8 +66,8 @@ class ResourceRegistryNodeAdapter(NodeAdapterBase):
         Import the object from the DOM node.
         """
         if mode == PURGE:
-            # XXX purge the registry
-            pass
+            registry = getToolByName(self.context, self.registry_id)
+            registry.clearResources()
 
         self._initResources(node, mode)
 

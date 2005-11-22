@@ -67,6 +67,8 @@ Usage
 Credits
 
     Florian Schulze -- Independent
+    
+    Laurence Rowe -- Independent
 
     Geir Bækholt -- "Plone Solutions":http://www.plonesolutions.com
 

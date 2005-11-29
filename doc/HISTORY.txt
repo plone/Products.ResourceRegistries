@@ -1,6 +1,9 @@
 1.0.5
 =====
 
+ * Correct some wrong security settings.
+   [hannosch]
+
  * Fixed encoding of javascripts.
    [fschulze]
 

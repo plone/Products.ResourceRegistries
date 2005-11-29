@@ -261,7 +261,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         except AttributeError:
             return 1
 
-    security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
+    security.declareProtected(permissions.ManagePortal, 'getResource')
     def getResource(self, id):
         """Get resource object by id.
         

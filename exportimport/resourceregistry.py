@@ -1,13 +1,14 @@
 from xml.dom.minidom import parseString
 
+from zope.app import zapi
+
 from Products.CMFCore.utils import getToolByName
 
-from Products.GenericSetup.interfaces import INodeExporter
-from Products.GenericSetup.interfaces import INodeImporter
-from Products.GenericSetup.interfaces import PURGE, UPDATE
+from Products.GenericSetup.interfaces import INode
+from Products.GenericSetup.interfaces import IBody
 from Products.GenericSetup.utils import PrettyDocument
 from Products.GenericSetup.utils import I18NURI
-from Products.GenericSetup.utils import NodeAdapterBase
+from Products.GenericSetup.utils import XMLAdapterBase
 
 
 def importResRegistry(context, reg_id, reg_title, filename):
@@ -15,61 +16,63 @@ def importResRegistry(context, reg_id, reg_title, filename):
     Import resource registry.
     """
     site = context.getSite()
-    mode = context.shouldPurge() and PURGE or UPDATE
+    logger = context.getLogger('resourceregistry')
     res_reg = getToolByName(site, reg_id)
 
     body = context.readDataFile(filename)
     if body is None:
-        return "%s: Nothing to import" % reg_title
+        logger.info("%s: Nothing to import" % reg_title)
+        return
 
-    importer = INodeImporter(res_reg, None)
+    importer = zapi.queryMultiAdapter((res_reg, context), IBody)
     if importer is None:
-        return "%s: Import adapter missing." % reg_title
+        logger.warning("%s: Import adapter missing." % reg_title)
+        return
 
-    importer.importNode(parseString(body).documentElement, mode=mode)
-    return "%s imported." % reg_title
+    importer.body = body
+    logger.info("%s imported." % reg_title)
 
 def exportResRegistry(context, reg_id, reg_title, filename):
     """
     Export resource registry.
     """
     site = context.getSite()
+    logger = context.getLogger('resourceregistry')
     res_reg = getToolByName(site, reg_id, None)
     if res_reg is None:
-        return "%s: Nothing to export." % reg_title
+        logger.info("%s: Nothing to export." % reg_title)
+        return
 
-    exporter = INodeExporter(res_reg)
+    exporter = zapi.queryMultiAdapter((res_reg, context), IBody)
     if exporter is None:
-        return "%s: Export adapter missing." % reg_title
+        logger.warning("%s: Export adapter missing." % reg_title)
+        return
 
-    doc = PrettyDocument()
-    doc.appendChild(exporter.exportNode(doc))
-    context.writeDataFile(filename, doc.toprettyxml(' '), 'text/xml')
-    return "%s exported" % reg_title
+    context.writeDataFile(filename, exporter.body, exporter.mime_type)
+    logger.info("%s exported" % reg_title)
 
 
-class ResourceRegistryNodeAdapter(NodeAdapterBase):
+class ResourceRegistryNodeAdapter(XMLAdapterBase):
 
-    def exportNode(self, doc):
+    def _exportNode(self):
         """
         Export the object as a DOM node.
         """
-        self._doc = doc
         node = self._getObjectNode('object')
-        node.setAttribute('xmlns:i18n', I18NURI)
+        #node.setAttribute('xmlns:i18n', I18NURI)
         child = self._extractResourceInfo()
         node.appendChild(child)
         return node
 
-    def importNode(self, node, mode=PURGE):
+    def _importNode(self, node):
         """
         Import the object from the DOM node.
         """
-        if mode == PURGE:
+        if self.environ.shouldPurge():
             registry = getToolByName(self.context, self.registry_id)
             registry.clearResources()
 
-        self._initResources(node, mode)
+        self._initResources(node)
 
     def _extractResourceInfo(self):
         """
@@ -88,7 +91,7 @@ class ResourceRegistryNodeAdapter(NodeAdapterBase):
             fragment.appendChild(child)
         return fragment
 
-    def _initResources(self, node, mode):
+    def _initResources(self, node):
         """
         Initialize the registered resources based on the contents of
         the provided DOM node.

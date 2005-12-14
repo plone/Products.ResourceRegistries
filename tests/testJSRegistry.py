@@ -253,7 +253,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         magic_ids = [item.getId() for item in evaluated]
         self.failUnless('background-color' in all)
         self.failUnless('<script' in all)
-        self.failUnless('/%s' magic_ids[1] in all)
+        self.failUnless('/%s' %(magic_ids[1],) in all)
 
     def testReenderingConcatenatesInline(self):
         self.tool.registerScript('test_rr_1.css', inline='1')

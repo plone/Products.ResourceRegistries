@@ -779,7 +779,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
     def testUnauthorizedOnPublish(self):
         response = self.publish(self.toolpath + '/testroot.css')
         #Will be 302 if CookieCrumbler is enabled
-        self.failUnless(response.getStatus() in [302, 403])
+        self.failUnless(response.getStatus() in [302, 403, 401])
 
     def testRemovedFromResources(self):
         styles = self.tool.getEvaluatedResources(self.portal)

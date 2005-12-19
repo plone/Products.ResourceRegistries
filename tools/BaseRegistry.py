@@ -151,6 +151,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     cache_duration = 3600
     resource_class = Resource
 
+    debugmode = False # backward compatibility for old instances
+
     #
     # Private Methods
     #
@@ -294,7 +296,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             for resource in resources:
                 if results:
                     previtem = results[-1]
-                    if self.compareResources(resource, previtem):
+                    if resource.getCookable() and previtem.getCookable() \
+                           and self.compareResources(resource, previtem):
                         res_id = resource.getId()
                         prev_id = previtem.getId()
                         self.finalizeResourceMerging(resource, previtem)
@@ -589,16 +592,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'getDebugMode')
     def getDebugMode(self):
         """Is resource merging disabled?"""
-        try:
-            return self.debugmode
-        except AttributeError:
-            # fallback for old installs. should we even care?
-            return False
+        return self.debugmode
 
     security.declareProtected(permissions.ManagePortal, 'setDebugMode')
     def setDebugMode(self, value):
         """Set whether resource merging should be disabled."""
         self.debugmode = value
+        self.cookResources()
 
     security.declareProtected(permissions.View, 'getEvaluatedResources')
     def getEvaluatedResources(self, context):

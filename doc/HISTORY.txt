@@ -1,6 +1,18 @@
 1.1
 ===
 
+ * Fixed cooking of resources to ensure that uncookable resources are not merged.
+   [elro]
+
+ * Fixed tests for unauthorized to accept a 401 as an unauthorized error.
+   [elro]
+
+ * Fixed setDebugMode to recook resources after being changed.
+   [elro]
+
+1.1b1
+=====
+
  * Added checkbox to configure cacheability of resources.
    [fschulze]
 
@@ -13,7 +25,7 @@
    [fschulze]
 
  * Made skin aware. This now depends on getCurrentSkinName added in  CMF 1.5.5.
-   [ldr]
+   [elro]
 
 1.0.5
 =====

@@ -680,10 +680,16 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(response.getStatus() in [302, 403, 401])
 
     def testRemovedFromResources(self):
+        # This test assumes that content is not merged or cached
+        self.tool.unregisterResource('test_rr_1.js')
+        self.tool.registerResource('test_rr_1.js', cookable=False, cacheable=False)
         scripts = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in scripts]
         self.failIf('testroot.js' in ids)
         self.failUnless('test_rr_1.js' in ids)
+        # Return resources to normal (not sure if this is needed)
+        self.tool.unregisterResource('test_rr_1.js')
+        self.tool.registerScript('test_rr_1.js')
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.js')

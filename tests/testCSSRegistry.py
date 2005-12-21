@@ -939,7 +939,45 @@ class TestResourceObjects(CSSRegistryTestCase.CSSRegistryTestCase):
                          ['eggs'])
 
 
+class TestSkinAwareness(CSSRegistryTestCase.CSSRegistryTestCase):
 
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.skinstool = getattr(self.portal, 'portal_skins')
+        self.tool.clearResources()
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.toolpath = '/' + self.tool.absolute_url(1)
+        self.setRoles(['Manager'])
+        self.skinstool.manage_addFolder(id='pink')
+        self.skinstool.manage_addFolder(id='purple')
+        self.skinstool.pink.manage_addFile(id='skin.css',
+                                   content_type='text/css',
+                                   file='body { background-color : pink }')
+        self.skinstool.purple.manage_addFile(id='skin.css',
+                                    content_type='text/css',
+                                    file='body { background-color : purple }')
+        self.tool.registerStylesheet('skin.css')
+        self.skinstool.addSkinSelection('PinkSkin', 'pink,ResourceRegistries')
+        self.skinstool.addSkinSelection('PurpleSkin', 'purple,ResourceRegistries')
+        self.setRoles(['Member'])
+        
+    def testRenderIncludesSkinInPath(self):
+        self.portal.changeSkin('PinkSkin')
+        content = getattr(self.portal, 'renderAllTheStylesheets')()
+        self.failUnless('/PinkSkin/' in content)
+        self.failIf('/PurpleSkin/' in content)
+        self.portal.changeSkin('PurpleSkin')
+        content = getattr(self.portal, 'renderAllTheStylesheets')()
+        self.failUnless('/PurpleSkin/' in content)
+        self.failIf('/PinkSkin/' in content)
+
+    def testPublishWithSkin(self):
+        response = self.publish(self.toolpath + '/PinkSkin/skin.css')
+        self.assertEqual(response.getStatus(), 200)
+        self.failUnless('pink' in str(response))
+        response = self.publish(self.toolpath + '/PurpleSkin/skin.css')
+        self.assertEqual(response.getStatus(), 200)
+        self.failUnless('purple' in str(response))
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -961,6 +999,7 @@ def test_suite():
     suite.addTest(makeSuite(TestResourcePermissions))
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestResourceObjects))
+    suite.addTest(makeSuite(TestSkinAwareness))
 
     if not PLONE21:
         # We must not test for the defaults in Plone 2.1 because they are

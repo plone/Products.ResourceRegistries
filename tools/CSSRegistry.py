@@ -12,6 +12,7 @@ from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
+import re
 
 class Stylesheet(Resource):
     security = ClassSecurityInfo()
@@ -139,12 +140,33 @@ class CSSRegistryTool(BaseRegistryTool):
         if previtem.getMedia() != resource.getMedia():
             previtem.setMedia(None)
 
+    def _compressCSS(self, content):
+        # currently unused code for CSS compression
+        # strip whitespace
+        content = '\n'.join([x.strip() for x in content.split('\n')])
+        
+        # remove comment contents
+        s1 = re.compile('/\*.*?\*/', re.DOTALL)
+        content = s1.sub('/**/', content)
+        
+        # remove lines with only comments
+        s2 = re.compile('^/\*\*/$', re.MULTILINE)
+        content = s2.sub('', content)
+        
+        #remove multiple newlines
+        s3 = re.compile('\n+')
+        content = s3.sub('\n', content)
+
+        return content
+
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):
         """Finalize the resource content."""
         m = resource.getMedia()
         if m:
-            return '@media %s {\n%s\n}\n' % (m, content)
+            content = '@media %s {\n%s\n}\n' % (m, content)
+
+        #return self._compressCSS(content)
         return content
 
     #

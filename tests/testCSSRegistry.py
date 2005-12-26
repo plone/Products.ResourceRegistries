@@ -238,12 +238,12 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('spam spam spam', expression='string:spam')
         self.tool.registerStylesheet('eggs')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
-        ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in ids)
-        self.failUnless('eggs' in ids)
-        self.failIf('spam' in ids)
-        self.failIf('spam spam' in ids)
-        self.failIf('spam spam spam' in ids)
+        magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
+        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
+        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[2]])
+        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
     def testConcatenatedStylesheetsHaveNoMedia(self):
         self.tool.registerStylesheet('ham')
@@ -277,9 +277,13 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('ham', expression='string:ham')
         self.tool.registerStylesheet('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedResources(self.folder)
-        evaluatedids = [item.getId() for item in evaluated]
-        self.failUnless(evaluatedids[0] == 'ham')
-        self.failUnless(evaluatedids[1] == 'spam')
+        magic_ids = [item.getId() for item in evaluated]
+        ids = []
+        for magic_id in magic_ids:
+            self.assertEqual(len(self.tool.concatenatedresources[magic_id]), 1)
+            ids.append(self.tool.concatenatedresources[magic_id][0])
+        self.failUnless(ids[0] == 'ham')
+        self.failUnless(ids[1] == 'spam')
 
     def testConcatenatedSheetsAreInTheRightOrderToo(self):
         self.tool.registerStylesheet('ham')
@@ -297,9 +301,11 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('spam', expression='string:ham', rendering='link')
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
         all = getattr(self.portal, 'renderAllTheStylesheets')()
+        evaluated = self.tool.getEvaluatedResources(self.folder)
+        magic_ids = [item.getId() for item in evaluated]
         self.failUnless('background-color' in all)
         self.failUnless('<link' in all)
-        self.failUnless('/spam' in all)
+        self.failUnless('/%s' % magic_ids[1] in all)
         self.failIf('/test_rr_1.css' in all)
 
     def testReenderingConcatenatesInline(self):
@@ -588,23 +594,19 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf(self.tool.getResources()[self.tool.getResourcePosition('test_rr_2.css')].getCookable())
 
     def testNumberOfResources(self):
-        req_resources = 3
-        req_cooked = 2
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 2)
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         styles = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(styles), req_cooked)
+        self.assertEqual(len(styles), 2)
 
     def testCompositionWithLastUncooked(self):
-        req_resources = 3
-        req_cooked = 2
         self.tool.moveResourceToBottom('test_rr_2.css')
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 2)
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         styles = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(styles), req_cooked)
+        self.assertEqual(len(styles), 2)
         magicId = None
         for style in styles:
             id = style.getId()
@@ -619,14 +621,12 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('blue' in content)
 
     def testCompositionWithFirstUncooked(self):
-        req_resources = 3
-        req_cooked = 2
         self.tool.moveResourceToTop('test_rr_2.css')
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 2)
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         styles = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(styles), req_cooked)
+        self.assertEqual(len(styles), 2)
         magicId = None
         for style in styles:
             id = style.getId()
@@ -641,15 +641,13 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('blue' in content)
 
     def testCompositionWithMiddleUncooked(self):
-        req_resources = 3
-        req_cooked = 3
         self.tool.moveResourceToTop('test_rr_2.css')
         self.tool.moveResourceDown('test_rr_2.css')
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 3)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         styles = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(styles), req_cooked)
+        self.assertEqual(len(styles), 3)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_1.css'))
@@ -658,8 +656,6 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('green' in content)
 
     def testLargerCompositionWithMiddleUncooked(self):
-        req_cooked = 3
-        req_resources = 5
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testpurple.css',
@@ -677,11 +673,11 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.moveResourceToTop('test_rr_2.css')
         self.tool.moveResourceDown('test_rr_2.css', 2)
         #Now have [[green,red],blue,[purple,pink]]
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 5)
+        self.assertEqual(len(self.tool.cookedresources), 3)
+        self.assertEqual(len(self.tool.concatenatedresources), 7)
         styles = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(styles), req_cooked)
+        self.assertEqual(len(styles), 3)
         magicIds = []
         for style in styles:
             id = style.getId()
@@ -789,7 +785,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         styles = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in styles]
         self.failIf('testroot.css' in ids)
-        self.failUnless('test_rr_1.css' in ids)
+        self.failUnless('test_rr_1.css' in self.tool.concatenatedresources[ids[0]])
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.css')
@@ -943,7 +939,45 @@ class TestResourceObjects(CSSRegistryTestCase.CSSRegistryTestCase):
                          ['eggs'])
 
 
+class TestSkinAwareness(CSSRegistryTestCase.CSSRegistryTestCase):
 
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.skinstool = getattr(self.portal, 'portal_skins')
+        self.tool.clearResources()
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.toolpath = '/' + self.tool.absolute_url(1)
+        self.setRoles(['Manager'])
+        self.skinstool.manage_addFolder(id='pink')
+        self.skinstool.manage_addFolder(id='purple')
+        self.skinstool.pink.manage_addFile(id='skin.css',
+                                   content_type='text/css',
+                                   file='body { background-color : pink }')
+        self.skinstool.purple.manage_addFile(id='skin.css',
+                                    content_type='text/css',
+                                    file='body { background-color : purple }')
+        self.tool.registerStylesheet('skin.css')
+        self.skinstool.addSkinSelection('PinkSkin', 'pink,ResourceRegistries')
+        self.skinstool.addSkinSelection('PurpleSkin', 'purple,ResourceRegistries')
+        self.setRoles(['Member'])
+        
+    def testRenderIncludesSkinInPath(self):
+        self.portal.changeSkin('PinkSkin')
+        content = getattr(self.portal, 'renderAllTheStylesheets')()
+        self.failUnless('/PinkSkin/' in content)
+        self.failIf('/PurpleSkin/' in content)
+        self.portal.changeSkin('PurpleSkin')
+        content = getattr(self.portal, 'renderAllTheStylesheets')()
+        self.failUnless('/PurpleSkin/' in content)
+        self.failIf('/PinkSkin/' in content)
+
+    def testPublishWithSkin(self):
+        response = self.publish(self.toolpath + '/PinkSkin/skin.css')
+        self.assertEqual(response.getStatus(), 200)
+        self.failUnless('pink' in str(response))
+        response = self.publish(self.toolpath + '/PurpleSkin/skin.css')
+        self.assertEqual(response.getStatus(), 200)
+        self.failUnless('purple' in str(response))
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -965,6 +999,7 @@ def test_suite():
     suite.addTest(makeSuite(TestResourcePermissions))
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestResourceObjects))
+    suite.addTest(makeSuite(TestSkinAwareness))
 
     if not PLONE21:
         # We must not test for the defaults in Plone 2.1 because they are

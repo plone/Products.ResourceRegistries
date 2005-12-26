@@ -1,8 +1,34 @@
-1.0.5
+1.1
+===
+
+ * Fixed cooking of resources to ensure that uncookable resources are not merged.
+   [elro]
+
+ * Fixed tests for unauthorized to accept a 401 as an unauthorized error.
+   [elro]
+
+ * Fixed setDebugMode to recook resources after being changed.
+   [elro]
+
+1.1b1
 =====
 
- * Correct some wrong security settings.
-   [hannosch]
+ * Added checkbox to configure cacheability of resources.
+   [fschulze]
+
+ * Made registries cacheable. This is most useful with the RAMCacheManager.
+   Just associate portal_css and portal_javascripts with the RAMCache.
+   [fschulze]
+
+ * Apply magic id to all resources when not in debug mode, so invalidation
+   works.
+   [fschulze]
+
+ * Made skin aware. This now depends on getCurrentSkinName added in  CMF 1.5.5.
+   [elro]
+
+1.0.5
+=====
 
  * Fixed encoding of javascripts.
    [fschulze]

@@ -59,7 +59,8 @@ class JSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable', 'getInline')
+    attributes_to_compare = ('getExpression', 'getCookable',
+                             'getCacheable', 'getInline')
     filename_base = 'ploneScripts'
     filename_appendix = '.js'
     cache_duration = config.JS_CACHE_DURATION
@@ -110,7 +111,8 @@ class JSRegistryTool(BaseRegistryTool):
                                 expression=r.get('expression', ''),
                                 inline=r.get('inline'),
                                 enabled=r.get('enabled'),
-                                cookable=r.get('cookable'))
+                                cookable=r.get('cookable'),
+                                cacheable=r.get('cacheable'))
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()

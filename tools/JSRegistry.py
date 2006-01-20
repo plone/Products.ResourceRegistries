@@ -64,7 +64,8 @@ class JSRegistryTool(BaseRegistryTool):
     filename_base = 'ploneScripts'
     filename_appendix = '.js'
     cache_duration = config.JS_CACHE_DURATION
-    merged_output_prefix = """/* Merged Plone Javascript file
+    merged_output_prefix = """
+/* Merged Plone Javascript file
  * This file is dynamically assembled from separate parts.
  * Some of these parts have 3rd party licenses or copyright information attached
  * Such information is valid for that section,

@@ -17,6 +17,7 @@ from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 from OFS.Image import File
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
+from OFS.Cache import Cacheable
 
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
@@ -28,6 +29,19 @@ from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces.ResourceRegistries import IResourceRegistry as z2IResourceRegistry
 from Products.ResourceRegistries.interfaces import IResourceRegistry
 
+import Acquisition
+from thread import get_ident
+from Products.CMFCore.Skinnable import SKINDATA
+
+
+def getFileForContent(name, content, contenttype):
+    # make output file like and add an headers dict, so the contenttype
+    # is properly set in the headers
+    output = StringIO(content)
+    output.headers = {}
+    output.headers['content-type'] = contenttype
+    return File(name, name, output)
+
 class Resource(Persistent):
     security = ClassSecurityInfo()
 
@@ -37,6 +51,7 @@ class Resource(Persistent):
         self._data['expression'] = kwargs.get('expression', '')
         self._data['enabled'] = kwargs.get('enabled', True)
         self._data['cookable'] = kwargs.get('cookable', True)
+        self._data['cacheable'] = kwargs.get('cacheable', True)
 
     def copy(self):
         result = self.__class__(self.getId())
@@ -76,10 +91,56 @@ class Resource(Persistent):
     def setCookable(self, cookable):
         self._data['cookable'] = cookable
 
+    security.declarePublic('getCacheable')
+    def getCacheable(self):
+        # as this is a new property, old instance might not have that value, so
+        # return True as default
+        return self._data.get('cacheable', True)
+
+    security.declareProtected(permissions.ManagePortal, 'setCacheable')
+    def setCacheable(self, cacheable):
+        self._data['cacheable'] = cacheable
+
 InitializeClass(Resource)
 
 
-class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
+class Skin(Acquisition.Implicit):
+    security = ClassSecurityInfo()
+
+    def __init__(self, skin):
+        self._skin = skin
+
+    def __before_publishing_traverse__(self, object, REQUEST):
+        """ Pre-traversal hook. Specify the skin. 
+        """
+        self.changeSkin(self._skin)
+
+    def __bobo_traverse__(self, REQUEST, name):
+        """Traversal hook."""
+        if REQUEST is not None and \
+           self.concatenatedresources.get(name, None) is not None:
+            parent = aq_parent(self)
+            kw = {'skin':self._skin,'name':name}
+            data = None
+            if not parent.getDebugMode() and parent.isCacheable(name):
+                if parent.ZCacheable_isCachingEnabled():
+                    data = parent.ZCacheable_get(keywords=kw)
+                if data is None:
+                    data = parent.__getitem__(name)
+                    parent.ZCacheable_set(data, keywords=kw)
+            else:
+                data = parent.__getitem__(name)
+            output, contenttype = data
+            return getFileForContent(name, output, contenttype).__of__(parent)
+        obj = getattr(self, name, None)
+        if obj is not None:
+            return obj
+        raise AttributeError('%s' % (name,))    
+
+InitializeClass(Skin)
+
+
+class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     """Base class for a Plone registry managing resource files."""
 
     security = ClassSecurityInfo()
@@ -87,12 +148,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     __implements__ = (SimpleItem.__implements__, z2IResourceRegistry)
     manage_options = SimpleItem.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable')
+    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable')
     filename_base = 'ploneResources'
     filename_appendix = '.res'
     merged_output_prefix = ''
     cache_duration = 3600
     resource_class = Resource
+
+    debugmode = False # backward compatibility for old instances
 
     #
     # Private Methods
@@ -108,7 +171,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     def __getitem__(self, item):
         """Return a resource from the registry."""
         output = self.getResourceContent(item, self)
-        if self.getDebugMode():
+        if self.getDebugMode() or not self.isCacheable(item):
             duration = 0
         else:
             duration = self.cache_duration  # duration in seconds
@@ -117,22 +180,44 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
         response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
         contenttype = self.getContentType()
-        # make output file like and add an headers dict, so the contenttype
-        # is properly set in the headers
-        output = StringIO(output)
-        output.headers = {}
-        output.headers['content-type'] = contenttype
-        return File(item, item, output).__of__(self)
+        return (output, contenttype)
 
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
+        # First see if it is a skin
+        skintool = getToolByName(self, 'portal_skins')
+        skins = skintool.getSkinSelections()
+        if name in skins:
+            return Skin(name).__of__(self)
+        
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
-            return self.__getitem__(name)
+            kw = {'skin':None,'name':name}
+            data = None
+            if not self.getDebugMode() and self.isCacheable(name):
+                if self.ZCacheable_isCachingEnabled():
+                    data = self.ZCacheable_get(keywords=kw)
+                if data is None:
+                    data = self.__getitem__(name)
+                    self.ZCacheable_set(data, keywords=kw)
+            else:
+                data = self.__getitem__(name)
+            output, contenttype = data
+            return getFileForContent(name, output, contenttype).__of__(self)
         obj = getattr(self, name, None)
         if obj is not None:
             return obj
         raise AttributeError('%s' % (name,))
+
+    security.declarePrivate('isCacheable')
+    def isCacheable(self, name):
+        resource_id = self.concatenatedresources.get(name, [None])[0]
+        if resource_id is None:
+            return False
+        resources = self.getResourcesDict()
+        resource = resources.get(resource_id, None)
+        result = resource.getCacheable()
+        return result
 
     security.declarePrivate('validateId')
     def validateId(self, id, existing):
@@ -208,26 +293,37 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         resources = [r.copy() for r in self.getResources() if r.getEnabled()]
         self.concatenatedresources = {}
         self.cookedresources = ()
-        results = []
-        for resource in resources:
-            if results:
-                previtem = results[-1]
-                if not self.getDebugMode() and \
-                   self.compareResources(resource, previtem):
-                    res_id = resource.getId()
-                    prev_id = previtem.getId()
-                    self.finalizeResourceMerging(resource, previtem)
-                    if self.concatenatedresources.has_key(prev_id):
-                        self.concatenatedresources[prev_id].append(res_id)
+        if self.getDebugMode():
+            results = [x for x in resources]
+        else:
+            results = []
+            for resource in resources:
+                if results:
+                    previtem = results[-1]
+                    if resource.getCookable() and previtem.getCookable() \
+                           and self.compareResources(resource, previtem):
+                        res_id = resource.getId()
+                        prev_id = previtem.getId()
+                        self.finalizeResourceMerging(resource, previtem)
+                        if self.concatenatedresources.has_key(prev_id):
+                            self.concatenatedresources[prev_id].append(res_id)
+                        else:
+                            magic_id = self.generateId()
+                            self.concatenatedresources[magic_id] = [prev_id, res_id]
+                            previtem._setId(magic_id)
                     else:
-                        magic_id = self.generateId()
-                        self.concatenatedresources[magic_id] = [prev_id, res_id]
-                        previtem._setId(magic_id)
+                        if resource.getCookable():
+                            magic_id = self.generateId()
+                            self.concatenatedresources[magic_id] = [resource.getId()]
+                            resource._setId(magic_id)
+                        results.append(resource)
                 else:
+                    if resource.getCookable():
+                        magic_id = self.generateId()
+                        self.concatenatedresources[magic_id] = [resource.getId()]
+                        resource._setId(magic_id)
                     results.append(resource)
-            else:
-                results.append(resource)
-
+    
         resources = self.getResources()
         for resource in resources:
             self.concatenatedresources[resource.getId()] = [resource.getId()]
@@ -264,7 +360,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         except AttributeError:
             return 1
 
-    security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
+    security.declareProtected(permissions.ManagePortal, 'getResource')
     def getResource(self, id):
         """Get resource object by id.
         
@@ -404,12 +500,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerResource')
-    def registerResource(self, id, expression='', enabled=True, cookable=True):
+    def registerResource(self, id, expression='', enabled=True,
+                         cookable=True, cacheable=True):
         """Register a resource."""
         resource = Resource(id,
                             expression=expression,
                             enabled=enabled,
-                            cookable=cookable)
+                            cookable=cookable,
+                            cacheable=cacheable)
         self.storeResource(resource)
 
     security.declareProtected(permissions.ManagePortal, 'unregisterResource')
@@ -498,16 +596,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
     security.declareProtected(permissions.ManagePortal, 'getDebugMode')
     def getDebugMode(self):
         """Is resource merging disabled?"""
-        try:
-            return self.debugmode
-        except AttributeError:
-            # fallback for old installs. should we even care?
-            return False
+        return self.debugmode
 
     security.declareProtected(permissions.ManagePortal, 'setDebugMode')
     def setDebugMode(self, value):
         """Set whether resource merging should be disabled."""
         self.debugmode = value
+        self.cookResources()
 
     security.declareProtected(permissions.View, 'getEvaluatedResources')
     def getEvaluatedResources(self, context):
@@ -567,3 +662,4 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager):
         Should be overwritten by subclasses.
         """
         return 'text/plain'
+

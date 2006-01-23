@@ -202,12 +202,12 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam spam spam', expression='string:spam')
         self.tool.registerScript('eggs')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
-        ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in ids)
-        self.failUnless('eggs' in ids)
-        self.failIf('spam' in ids)
-        self.failIf('spam spam' in ids)
-        self.failIf('spam spam spam' in ids)
+        magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
+        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
+        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[2]])
+        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
     def testGetEvaluatedScriptsWithExpression(self):
         self.tool.registerScript('ham')
@@ -235,9 +235,13 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('ham', expression='string:ham')
         self.tool.registerScript('spam', expression='string:spam')
         evaluated = self.tool.getEvaluatedResources(self.folder)
-        evaluatedids = [item.getId() for item in evaluated]
-        self.failUnless(evaluatedids[0] == 'ham')
-        self.failUnless(evaluatedids[1] == 'spam')
+        magic_ids = [item.getId() for item in evaluated]
+        ids = []
+        for magic_id in magic_ids:
+            self.assertEqual(len(self.tool.concatenatedresources[magic_id]), 1)
+            ids.append(self.tool.concatenatedresources[magic_id][0])
+        self.failUnless(ids[0] == 'ham')
+        self.failUnless(ids[1] == 'spam')
 
     def testRenderingScriptLinks(self):
         self.tool.registerScript('ham')
@@ -245,9 +249,11 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerScript('spam', expression='string:spam')
         self.tool.registerScript('test_rr_1.css', inline='1')
         all = getattr(self.portal, 'renderAllTheScripts')()
+        evaluated = self.tool.getEvaluatedResources(self.folder)
+        magic_ids = [item.getId() for item in evaluated]
         self.failUnless('background-color' in all)
         self.failUnless('<script' in all)
-        self.failUnless('/spam' in all)
+        self.failUnless('/%s' %(magic_ids[1],) in all)
 
     def testReenderingConcatenatesInline(self):
         self.tool.registerScript('test_rr_1.css', inline='1')
@@ -671,13 +677,19 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
     def testRaiseUnauthorizedOnPublish(self):
         response = self.publish(self.toolpath + '/testroot.js')
         #Will be 302 if CookieCrumbler is enabled
-        self.failUnless(response.getStatus() in [302, 403])
+        self.failUnless(response.getStatus() in [302, 403, 401])
 
     def testRemovedFromResources(self):
+        # This test assumes that content is not merged or cached
+        self.tool.unregisterResource('test_rr_1.js')
+        self.tool.registerResource('test_rr_1.js', cookable=False, cacheable=False)
         scripts = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in scripts]
         self.failIf('testroot.js' in ids)
         self.failUnless('test_rr_1.js' in ids)
+        # Return resources to normal (not sure if this is needed)
+        self.tool.unregisterResource('test_rr_1.js')
+        self.tool.registerScript('test_rr_1.js')
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.js')
@@ -711,8 +723,6 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
 class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.req_resources = 3
-        self.req_cooked = 2
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerScript('testroot.js')
@@ -739,23 +749,19 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.js')].getCookable())
 
     def testNumberOfResources(self):
-        req_resources = 3
-        req_cooked = 2
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 2)
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         scripts = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(scripts), req_cooked)
+        self.assertEqual(len(scripts), 2)
 
     def testCompositionWithLastUncooked(self):
-        req_resources = 3
-        req_cooked = 2
         self.tool.moveResourceToBottom('simple2.js')
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 2)
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         scripts = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(scripts), req_cooked)
+        self.assertEqual(len(scripts), 2)
         magicId = None
         for script in scripts:
             id = script.getId()
@@ -770,14 +776,12 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('blue' in content)
 
     def testCompositionWithFirstUncooked(self):
-        req_resources = 3
-        req_cooked = 2
         self.tool.moveResourceToTop('simple2.js')
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 2)
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         scripts = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(scripts), req_cooked)
+        self.assertEqual(len(scripts), 2)
         magicId = None
         for script in scripts:
             id = script.getId()
@@ -792,15 +796,13 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('blue' in content)
 
     def testCompositionWithMiddleUncooked(self):
-        req_resources = 3
-        req_cooked = 3
         self.tool.moveResourceToTop('simple2.js')
         self.tool.moveResourceDown('simple2.js')
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 3)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         scripts = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(scripts), req_cooked)
+        self.assertEqual(len(scripts), 3)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
         self.failUnless('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/test_rr_1.js'))
@@ -809,8 +811,6 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('green' in content)
 
     def testLargerCompositionWithMiddleUncooked(self):
-        req_cooked = 3
-        req_resources = 5
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testpurple.js',
@@ -828,11 +828,11 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.moveResourceToTop('simple2.js')
         self.tool.moveResourceDown('simple2.js', 2)
         #Now have [[green,running],blue,[purple,pink]]
-        self.assertEqual(len(self.tool.getResources()), req_resources)
-        self.assertEqual(len(self.tool.cookedresources), req_cooked)
-        self.assertEqual(len(self.tool.concatenatedresources), req_resources + (req_resources - req_cooked ))
+        self.assertEqual(len(self.tool.getResources()), 5)
+        self.assertEqual(len(self.tool.cookedresources), 3)
+        self.assertEqual(len(self.tool.concatenatedresources), 7)
         scripts = self.tool.getEvaluatedResources(self.portal)
-        self.assertEqual(len(scripts), req_cooked)
+        self.assertEqual(len(scripts), 3)
         magicIds = []
         for script in scripts:
             id = script.getId()

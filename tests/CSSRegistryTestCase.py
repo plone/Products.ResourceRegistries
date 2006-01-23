@@ -23,6 +23,7 @@ from Products.PloneTestCase import PloneTestCase
 
 PRODUCTS = ['ResourceRegistries']
 
+ZopeTestCase.utils.setupCoreSessions()
 PloneTestCase.setupPloneSite(products=PRODUCTS)
 
 class CSSRegistryTestCase(ZopeTestCase.Functional, PloneTestCase.PloneTestCase):
@@ -33,4 +34,3 @@ class CSSRegistryTestCase(ZopeTestCase.Functional, PloneTestCase.PloneTestCase):
 
     def _setup(self):
         PloneTestCase.PloneTestCase._setup(self)
-        self.app.REQUEST['SESSION'] = self.Session()

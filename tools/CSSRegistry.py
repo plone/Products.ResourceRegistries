@@ -146,16 +146,20 @@ class CSSRegistryTool(BaseRegistryTool):
         content = '\n'.join([x.strip() for x in content.split('\n')])
         
         # remove comment contents
-        s1 = re.compile('/\*.*?\*/', re.DOTALL)
-        content = s1.sub('/**/', content)
+        s1 = re.compile(r'/\*.*?( ?[\\/*]*\*/)', re.DOTALL)
+        content = s1.sub(r'/*\1', content)
         
         # remove lines with only comments
-        s2 = re.compile('^/\*\*/$', re.MULTILINE)
+        s2 = re.compile(r'^/\*\*/$', re.MULTILINE)
         content = s2.sub('', content)
         
         #remove multiple newlines
-        s3 = re.compile('\n+')
+        s3 = re.compile(r'\n+')
         content = s3.sub('\n', content)
+
+        #remove first newline
+        s4 = re.compile(r'^\n')
+        content = s4.sub('', content)
 
         return content
 
@@ -166,7 +170,7 @@ class CSSRegistryTool(BaseRegistryTool):
         if m:
             content = '@media %s {\n%s\n}\n' % (m, content)
 
-        #return self._compressCSS(content)
+        return self._compressCSS(content)
         return content
 
     #

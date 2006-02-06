@@ -979,6 +979,163 @@ class TestSkinAwareness(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
         self.failUnless('purple' in str(response))
 
+
+class TestCSSCompression(CSSRegistryTestCase.CSSRegistryTestCase):
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+
+    def testCommentCompression(self):
+        input = """
+        /* this is a comment */
+        #testElement {
+            property: value; /* another comment */
+        }
+        /* this is a multi
+           line comment */
+        #testElement {
+            /* yet another comment */
+            property: value;
+        }
+        """
+        expected = """/* */
+#testElement {
+property: value; /* */
+}
+/* */
+#testElement {
+/* */
+property: value;
+}
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+    def testNewlineCompression(self):
+        input = """
+        
+        
+        /* this is a comment */
+        
+        #testElement {
+            property: value; /* another comment */
+        }
+        
+        /* this is a multi
+           line comment */
+        #testElement {
+        
+            /* yet another comment */
+            property: value;
+            
+        }
+        
+        
+        """
+        expected = """/* */
+#testElement {
+property: value; /* */
+}
+/* */
+#testElement {
+/* */
+property: value;
+}
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+    def testCommentHacks(self):
+        input = """
+        #testElement {
+            property/**/: value;
+            property/* */: value;
+            property /**/: value;
+            property: /**/value;
+        }
+        """
+        expected = """#testElement {
+property/**/: value;
+property/* */: value;
+property /**/: value;
+property: /**/value;
+}
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        selector/* */ {  }
+        """
+        expected = """selector/* */ {  }
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        selector/* foobar */ {  }
+        """
+        expected = """selector/* */ {  }
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        selector/**/ {  }
+        """
+        expected = """selector/**/ {  }
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        /* \*/
+        rules
+        /* */
+        """
+        expected = """/* \*/
+rules
+/* */
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        /* foobar \*/
+        rules
+        /* */
+        """
+        expected = """/* \*/
+rules
+/* */
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        /*/*/
+        rules
+        /* */
+        """
+        expected = """/*/*/
+rules
+/* */
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+        input = """
+        /*/*//*/
+        rules
+        /* */
+        """
+        expected = """/*/*//*/
+rules
+/* */
+"""
+        got = self.tool._compressCSS(input)
+        self.assertEqual(got, expected)
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -1000,6 +1157,7 @@ def test_suite():
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestResourceObjects))
     suite.addTest(makeSuite(TestSkinAwareness))
+    suite.addTest(makeSuite(TestCSSCompression))
 
     if not PLONE21:
         # We must not test for the defaults in Plone 2.1 because they are

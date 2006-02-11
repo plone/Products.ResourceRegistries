@@ -1,5 +1,5 @@
-from Interface import Interface
-
+from zope.interface import Interface
+from zope.interface import Attribute
 
 class IResourceRegistry(Interface):
     """A tool for registering and evaluating resource linkage."""
@@ -57,9 +57,17 @@ class IResourceRegistry(Interface):
         For use in management screens.
         """
 
-
 class ICSSRegistry(Interface):
     """A tool for registering and evaluating stylesheet linkage."""
+
+    id = Attribute('id',
+                   """ The tool's ID.
+
+                   o BBB:  for use in 'getToolByName';  in the future, prefer
+                   'zapi.getUtility(ICSSRegistry)'.
+
+                   o Must be set to 'portal_css'.
+                   """)
 
     def registerStylesheet(id, expression='', media='', rel='stylesheet',
                            rendering='import', enabled=1):
@@ -78,6 +86,15 @@ class ICSSRegistry(Interface):
 
 class IJSRegistry(Interface):
     """A tool for registering and evaluating script linkage."""
+
+    id = Attribute('id',
+                   """ The tool's ID.
+
+                   o BBB:  for use in 'getToolByName';  in the future, prefer
+                   'zapi.getUtility(IJSRegistry)'.
+
+                   o Must be set to 'portal_javascripts'.
+                   """)
 
     def registerScript(id, expression='', inline=False, enabled=True):
         """Register a script."""

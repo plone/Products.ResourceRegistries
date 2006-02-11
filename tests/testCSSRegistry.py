@@ -19,7 +19,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.PloneTestCase.PloneTestCase import PLONE21
 
 from Products.ResourceRegistries.config import CSSTOOLNAME
-from Products.ResourceRegistries.interfaces import ICSSRegistry
+from Products.ResourceRegistries.interfaces.ResourceRegistries import ICSSRegistry as z2ICSSRegistry
 from Products.ResourceRegistries.tests import CSSRegistryTestCase
 
 
@@ -27,9 +27,8 @@ class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, CSSTOOLNAME)
-        self.failUnless(ICSSRegistry.isImplementedBy(tool))
-        self.failUnless(verifyObject(ICSSRegistry, tool))
-
+        self.failUnless(z2ICSSRegistry.isImplementedBy(tool))
+        self.failUnless(verifyObject(z2ICSSRegistry, tool))
 
 class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
 

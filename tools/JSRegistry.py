@@ -2,12 +2,15 @@ from DateTime import DateTime
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
+from zope.interface import implements
+
 from Products.CMFCore.utils import getToolByName
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
+from Products.ResourceRegistries.interfaces.ResourceRegistries import IJSRegistry as z2IJSRegistry
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
@@ -39,7 +42,8 @@ class JSRegistryTool(BaseRegistryTool):
 
     security = ClassSecurityInfo()
 
-    __implements__ = (BaseRegistryTool.__implements__, IJSRegistry)
+    implements(IJSRegistry)
+    __implements__ = (BaseRegistryTool.__implements__, z2IJSRegistry)
 
     #
     # ZMI stuff

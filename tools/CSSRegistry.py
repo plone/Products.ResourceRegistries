@@ -23,6 +23,7 @@ class Stylesheet(Resource):
         self._data['rel'] = kwargs.get('rel', 'stylesheet')
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'import')
+        self._data['compression'] = kwargs.get('compression', 'safe')
 
     security.declarePublic('getMedia')
     def getMedia(self):
@@ -61,6 +62,19 @@ class Stylesheet(Resource):
     security.declareProtected(permissions.ManagePortal, 'setRendering')
     def setRendering(self, rendering):
         self._data['rendering'] = rendering
+
+    security.declarePublic('getCompression')
+    def getCompression(self):
+        # as this is a new property, old instance might not have that value, so
+        # return 'safe' as default
+        compression = self._data.get('compression', 'safe')
+        if compression in ['safe','full']:
+            return compression
+        return 'none'
+
+    security.declareProtected(permissions.ManagePortal, 'setCompression')
+    def setCompression(self, compression):
+        self._data['compression'] = compression
 
 InitializeClass(Stylesheet)
 
@@ -140,7 +154,7 @@ class CSSRegistryTool(BaseRegistryTool):
         if previtem.getMedia() != resource.getMedia():
             previtem.setMedia(None)
 
-    def _compressCSS(self, content):
+    def _compressCSS(self, content, level='safe'):
         # currently unused code for CSS compression
         # strip whitespace
         content = '\n'.join([x.strip() for x in content.split('\n')])
@@ -166,11 +180,16 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):
         """Finalize the resource content."""
+        compression = resource.getCompression()
+        if compression != 'none' and not self.getDebugMode():
+            orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
+            content = "// %s\n%s" % (orig_url,
+                                     self._compressCSS(content, compression))
+
         m = resource.getMedia()
         if m:
             content = '@media %s {\n%s\n}\n' % (m, content)
 
-        return self._compressCSS(content)
         return content
 
     #
@@ -180,10 +199,11 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'manage_addStylesheet')
     def manage_addStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
-                             enabled=False, cookable=True, REQUEST=None):
+                             enabled=False, cookable=True, compression='safe',
+                             REQUEST=None):
         """Register a stylesheet from a TTW request."""
         self.registerStylesheet(id, expression, media, rel, title,
-                                rendering, enabled, cookable)
+                                rendering, enabled, cookable, compression)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -208,7 +228,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                     rendering=r.get('rendering', 'import'),
                                     enabled=r.get('enabled', False),
                                     cookable=r.get('cookable', False),
-                                    cacheable=r.get('cacheable', False))
+                                    cacheable=r.get('cacheable', False),
+                                    compression=r.get('compression', ''))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -228,7 +249,8 @@ class CSSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
-                           title='', rendering='import',  enabled=1, cookable=True):
+                           title='', rendering='import',  enabled=1,
+                           cookable=True, compression='safe'):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,
@@ -237,7 +259,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                 title=title,
                                 rendering=rendering,
                                 enabled=enabled,
-                                cookable=cookable)
+                                cookable=cookable,
+                                compression=compression)
         self.storeResource(stylesheet)
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')

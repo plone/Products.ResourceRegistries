@@ -306,7 +306,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in all)
         self.failUnless('<link' in all)
         self.failUnless('/%s' % magic_ids[1] in all)
-        self.failIf('/test_rr_1.css' in all)
+        self.failIf('/test_rr_1.css"' in all)
 
     def testReenderingConcatenatesInline(self):
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
@@ -1045,6 +1045,7 @@ property: value;
         self.assertEqual(got, expected)
 
     def testCommentHacks(self):
+        # see http://www.dithered.com/css_filters/index.html
         input = """
         #testElement {
             property/**/: value;

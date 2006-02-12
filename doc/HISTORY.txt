@@ -1,6 +1,10 @@
 1.1
 ===
 
+ * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
+   portal creation)
+   [rafrombrc]
+
  * Fixed cooking of resources to ensure that uncookable resources are not merged.
    [elro]
 

@@ -23,7 +23,8 @@ ResourceRegistries
 
 Usage
 
-  ResourceRegistries 1.1 requires CMF 1.5.5 or later.
+  ResourceRegistries 1.1 requires CMF 1.6 or later.  (Intrepid users can
+  probably get it working w/ CMF 1.5.5 w/ GenericSetup installed.)
 
   The CSSRegistry and JSRegistry is configured through the ZMI. it can be found
   in the ZMI of your plonesite as 'portal_css' and 'portal_javascript'.

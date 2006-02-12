@@ -990,6 +990,7 @@ class TestCSSCompression(CSSRegistryTestCase.CSSRegistryTestCase):
         #testElement {
             property: value; /* another comment */
         }
+        /**********/
         /* this is a multi
            line comment */
         #testElement {

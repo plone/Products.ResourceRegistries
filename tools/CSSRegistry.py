@@ -163,8 +163,8 @@ class CSSRegistryTool(BaseRegistryTool):
         s1 = re.compile(r'/\*.*?( ?[\\/*]*\*/)', re.DOTALL)
         content = s1.sub(r'/*\1', content)
         
-        # remove lines with only comments
-        s2 = re.compile(r'^/\*\*/$', re.MULTILINE)
+        # remove lines with comments only (consisting of stars only)
+        s2 = re.compile(r'^/\*+\*/$', re.MULTILINE)
         content = s2.sub('', content)
         
         #remove multiple newlines
@@ -174,6 +174,11 @@ class CSSRegistryTool(BaseRegistryTool):
         #remove first newline
         s4 = re.compile(r'^\n')
         content = s4.sub('', content)
+
+        if level == 'full':
+            #remove more whitespace
+            s5 = re.compile(r'([{,;])\s+')
+            content = s5.sub(r'\1', content)
 
         return content
 
@@ -267,6 +272,11 @@ class CSSRegistryTool(BaseRegistryTool):
     def getRenderingOptions(self):
         """Rendering methods for use in ZMI forms."""
         return config.CSS_RENDER_METHODS
+
+    security.declareProtected(permissions.ManagePortal, 'getCompressionOptions')
+    def getCompressionOptions(self):
+        """Compression methods for use in ZMI forms."""
+        return config.CSS_COMPRESSION_METHODS
 
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):

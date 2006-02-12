@@ -210,6 +210,14 @@ legend {
                                         selected python:r == stylesheet.getRendering()"
                         tal:content="r">import</option>
             </select>
+
+            <label>Compression type</label>
+            <select name="stylesheets.compression:records">
+                <option tal:repeat="r here/getCompressionOptions"
+                        tal:attributes="value r;
+                                        selected python:r == stylesheet.getCompression()"
+                        tal:content="r">safe</option>
+            </select>
         </div>
 
         <div style="clear: both;">&nbsp;</div>

@@ -12,6 +12,8 @@ from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
+import re
+
 
 class JavaScript(Resource):
     security = ClassSecurityInfo()
@@ -19,6 +21,7 @@ class JavaScript(Resource):
     def __init__(self, id, **kwargs):
         Resource.__init__(self, id, **kwargs)
         self._data['inline'] = kwargs.get('inline', False)
+        self._data['compression'] = kwargs.get('compression', 'safe')
 
     security.declarePublic('getInline')
     def getInline(self):
@@ -27,6 +30,19 @@ class JavaScript(Resource):
     security.declareProtected(permissions.ManagePortal, 'setInline')
     def setInline(self, inline):
         self._data['inline'] = inline
+
+    security.declarePublic('getCompression')
+    def getCompression(self):
+        # as this is a new property, old instance might not have that value, so
+        # return 'safe' as default
+        compression = self._data.get('compression', 'safe')
+        if compression in ['safe','full']:
+            return compression
+        return 'none'
+
+    security.declareProtected(permissions.ManagePortal, 'setCompression')
+    def setCompression(self, compression):
+        self._data['compression'] = compression
 
 InitializeClass(JavaScript)
 
@@ -83,15 +99,49 @@ class JSRegistryTool(BaseRegistryTool):
     def clearScripts(self):
         self.clearResources()
 
+    def _compressJS(self, content, level='safe'):
+        # strip whitespace
+        content = '\n'.join([x.strip() for x in content.split('\n')])
+        
+        # remove multiline comments
+        s1 = re.compile(r'/\*.*?\*/', re.DOTALL)
+        content = s1.sub(r'', content)
+
+        # remove oneline comments
+        #s2 = re.compile(r'//.*?\n', re.DOTALL)
+        #content = s2.sub(r'\n', content)
+
+        #remove multiple newlines
+        s3 = re.compile(r'\n+')
+        content = s3.sub('\n', content)
+
+        #remove first newline
+        s4 = re.compile(r'^\n')
+        content = s4.sub('', content)
+
+        return content
+
+    security.declarePrivate('finalizeContent')
+    def finalizeContent(self, resource, content):
+        """Finalize the resource content."""
+        compression = resource.getCompression()
+        if compression != 'none' and not self.getDebugMode():
+            orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
+            content = "// %s\n%s" % (orig_url,
+                                     self._compressJS(content, compression))
+
+        return content
+
     #
     # ZMI Methods
     #
 
     security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self, id, expression='', inline=False,
-                         enabled=False, cookable=True, REQUEST=None):
+                         enabled=False, cookable=True, compression='safe',
+                         REQUEST=None):
         """Register a script from a TTW request."""
-        self.registerScript(id, expression, inline, enabled, cookable)
+        self.registerScript(id, expression, inline, enabled, cookable, compression)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -113,7 +163,8 @@ class JSRegistryTool(BaseRegistryTool):
                                 inline=r.get('inline'),
                                 enabled=r.get('enabled'),
                                 cookable=r.get('cookable'),
-                                cacheable=r.get('cacheable'))
+                                cacheable=r.get('cacheable'),
+                                compression=r.get('compression'))
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()
@@ -132,7 +183,8 @@ class JSRegistryTool(BaseRegistryTool):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
-    def registerScript(self, id, expression='', inline=False, enabled=True, cookable=True):
+    def registerScript(self, id, expression='', inline=False, enabled=True,
+                       cookable=True, compression='safe'):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,
@@ -140,6 +192,11 @@ class JSRegistryTool(BaseRegistryTool):
                             enabled=enabled,
                             cookable=cookable)
         self.storeResource(script)
+
+    security.declareProtected(permissions.ManagePortal, 'getCompressionOptions')
+    def getCompressionOptions(self):
+        """Compression methods for use in ZMI forms."""
+        return config.JS_COMPRESSION_METHODS
 
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):

@@ -14,6 +14,7 @@ from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
 import re
 
+
 class Stylesheet(Resource):
     security = ClassSecurityInfo()
 
@@ -155,7 +156,6 @@ class CSSRegistryTool(BaseRegistryTool):
             previtem.setMedia(None)
 
     def _compressCSS(self, content, level='safe'):
-        # currently unused code for CSS compression
         # strip whitespace
         content = '\n'.join([x.strip() for x in content.split('\n')])
         
@@ -188,7 +188,7 @@ class CSSRegistryTool(BaseRegistryTool):
         compression = resource.getCompression()
         if compression != 'none' and not self.getDebugMode():
             orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
-            content = "// %s\n%s" % (orig_url,
+            content = "/* %s */\n%s" % (orig_url,
                                      self._compressCSS(content, compression))
 
         m = resource.getMedia()

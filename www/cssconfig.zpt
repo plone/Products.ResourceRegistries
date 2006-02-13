@@ -301,6 +301,8 @@ legend {
               <input type="submit" i18n:attributes="value" value="Add" />
           </div>
 
+          <div style="clear: both;"></div>
+
     </fieldset>
 
 </form>

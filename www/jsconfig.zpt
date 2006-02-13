@@ -263,9 +263,16 @@ legend {
             <input type="hidden" name="cacheable:boolean:default" value="False" />
         </div>
 
+        <div style="clear: both;"></div>
+
+        <input type="submit" i18n:attributes="value" value="Add" />
+
+        <div style="clear: both;"></div>
+
     </fieldset>
 
-    <input type="submit" i18n:attributes="value" value="Add" />
+
+
 
 </form>
 

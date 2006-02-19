@@ -13,6 +13,26 @@ from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
 import re
+from packer import Packer
+
+
+csspacker = Packer()
+csspacker.protect(r"'(?:.|\\\n)*'")
+csspacker.protect(r'"(?:.|\\\n)*"')
+# strip whitespace
+csspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
+# remove comment contents
+csspacker.sub(r'/\*.*?( ?[\\/*]*\*/)', r'/*\1', re.DOTALL)
+# remove lines with comments only (consisting of stars only)
+csspacker.sub(r'^/\*+\*/$', '', re.MULTILINE)
+# excessive newlines
+csspacker.sub(r'\n+', '\n')
+# first newline
+csspacker.sub(r'^\n', '')
+
+csspacker_full = csspacker.copy()
+#remove more whitespace
+csspacker_full.sub(r'([{,;])\s+', r'\1')
 
 
 class Stylesheet(Resource):
@@ -156,31 +176,12 @@ class CSSRegistryTool(BaseRegistryTool):
             previtem.setMedia(None)
 
     def _compressCSS(self, content, level='safe'):
-        # strip whitespace
-        content = '\n'.join([x.strip() for x in content.split('\n')])
-        
-        # remove comment contents
-        s1 = re.compile(r'/\*.*?( ?[\\/*]*\*/)', re.DOTALL)
-        content = s1.sub(r'/*\1', content)
-        
-        # remove lines with comments only (consisting of stars only)
-        s2 = re.compile(r'^/\*+\*/$', re.MULTILINE)
-        content = s2.sub('', content)
-        
-        #remove multiple newlines
-        s3 = re.compile(r'\n+')
-        content = s3.sub('\n', content)
-
-        #remove first newline
-        s4 = re.compile(r'^\n')
-        content = s4.sub('', content)
-
         if level == 'full':
-            #remove more whitespace
-            s5 = re.compile(r'([{,;])\s+')
-            content = s5.sub(r'\1', content)
-
-        return content
+            return csspacker_full.pack(content)
+        elif level == 'safe':
+            return csspacker.pack(content)
+        else:
+            return content
 
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):

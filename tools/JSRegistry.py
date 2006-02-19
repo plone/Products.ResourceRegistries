@@ -13,6 +13,22 @@ from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
 import re
+from packer import Packer
+
+
+jspacker = Packer()
+jspacker.protect(r"'(?:.|\\\n)*'")
+jspacker.protect(r'"(?:.|\\\n)*"')
+# strip whitespace
+jspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
+# multiline comments
+jspacker.sub(r'/\*.*?\*/', '', re.DOTALL)
+# one line comments
+jspacker.sub(r'\s*//.*$', '', re.MULTILINE)
+# excessive newlines
+jspacker.sub(r'\n+', '\n')
+# first newline
+jspacker.sub(r'^\n', '')
 
 
 class JavaScript(Resource):
@@ -45,6 +61,7 @@ class JavaScript(Resource):
         self._data['compression'] = compression
 
 InitializeClass(JavaScript)
+
 
 class JSRegistryTool(BaseRegistryTool):
     """A Plone registry for managing the linking to Javascript files."""
@@ -100,26 +117,7 @@ class JSRegistryTool(BaseRegistryTool):
         self.clearResources()
 
     def _compressJS(self, content, level='safe'):
-        # strip whitespace
-        content = '\n'.join([x.strip() for x in content.split('\n')])
-        
-        # remove multiline comments
-        s1 = re.compile(r'/\*.*?\*/', re.DOTALL)
-        content = s1.sub(r'', content)
-
-        # remove oneline comments
-        #s2 = re.compile(r'//.*?\n', re.DOTALL)
-        #content = s2.sub(r'\n', content)
-
-        #remove multiple newlines
-        s3 = re.compile(r'\n+')
-        content = s3.sub('\n', content)
-
-        #remove first newline
-        s4 = re.compile(r'^\n')
-        content = s4.sub('', content)
-
-        return content
+        return jspacker.pack(content)
 
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):

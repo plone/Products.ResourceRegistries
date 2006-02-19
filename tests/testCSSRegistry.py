@@ -1137,6 +1137,19 @@ rules
         got = self.tool._compressCSS(input)
         self.assertEqual(got, expected)
 
+        input = """
+        /* test string protection and full compression */
+        #selector,
+        #another {
+            content: 'foo; bar';
+        }
+        """
+        expected = """/* */
+#selector,#another {content: 'foo; bar';}
+"""
+        got = self.tool._compressCSS(input, 'full')
+        self.assertEqual(got, expected)
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite

@@ -30,7 +30,9 @@ class Packer:
         replacelist = list(enumerate(self.replacelist))
         replacelist.reverse() # from back to front, so 1 doesn't break 10 etc.
         for index, replacement in replacelist:
-            output = re.sub('(?<!\x00)\x00%i' % (index+1), replacement, output)
+            # we use lambda in here, so the real string is used and no escaping
+            # is done on it
+            output = re.sub('(?<!\x00)\x00%i' % (index+1), lambda m:replacement, output)
         # unescape
         output = output.replace('\x00\x00','\x00')
         # done

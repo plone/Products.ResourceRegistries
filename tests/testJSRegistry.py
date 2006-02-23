@@ -888,6 +888,12 @@ var portal_url = 'http://127.0.0.1:9080/plone';
         got = self.tool._compressJS(input)
         self.assertEqual(got, expected)
 
+    def testNewlinesInStrings(self):
+        input = r"""var message = "foo: " + foo + "\nbar: " + bar;"""
+        expected = r"""var message = "foo: " + foo + "\nbar: " + bar;"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite

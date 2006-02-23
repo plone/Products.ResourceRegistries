@@ -17,8 +17,9 @@ from packer import Packer
 
 
 csspacker = Packer()
-csspacker.protect(r"'(?:.|\\\n)*'")
-csspacker.protect(r'"(?:.|\\\n)*"')
+# protect strings
+csspacker.protect(r"""'(?:\\'|.|\\\n)*?'""")
+csspacker.protect(r'''"(?:\\"|.|\\\n)*?"''')
 # strip whitespace
 csspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
 # remove comment contents

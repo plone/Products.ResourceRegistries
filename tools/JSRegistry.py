@@ -17,14 +17,33 @@ from packer import Packer
 
 
 jspacker = Packer()
-jspacker.protect(r"'(?:.|\\\n)*'")
-jspacker.protect(r'"(?:.|\\\n)*"')
+# protect strings
+jspacker.protect(r"""'(?:\\'|.|\\\n)*?'""")
+jspacker.protect(r'''"(?:\\"|.|\\\n)*?"''')
+# protect regular expressions
+jspacker.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
+jspacker.protect(r"""[^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?""")
 # strip whitespace
 jspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
 # multiline comments
 jspacker.sub(r'/\*.*?\*/', '', re.DOTALL)
 # one line comments
 jspacker.sub(r'\s*//.*$', '', re.MULTILINE)
+# whitespace after some special chars but not
+# before function declaration
+jspacker.sub(r'([{;\[(,=&|\?:])\s+(?!function)', r'\1')
+# whitespace before some special chars
+jspacker.sub(r'\s+([{}\],=&|\?:)])', r'\1')
+# whitespace before plus chars if no other plus char before it
+jspacker.sub(r'(?<!\+)\s+\+', '+')
+# whitespace after plus chars if no other plus char after it
+jspacker.sub(r'\+\s+(?!\+)', '+')
+# whitespace before minus chars if no other minus char before it
+jspacker.sub(r'(?<!-)\s+-', '-')
+# whitespace after minus chars if no other minus char after it
+jspacker.sub(r'-\s+(?!-)', '-')
+# remove any excessive whitespace left except newlines
+jspacker.sub(r'[ \t\r\f\v]+', ' ')
 # excessive newlines
 jspacker.sub(r'\n+', '\n')
 # first newline

@@ -45,7 +45,7 @@ class Stylesheet(Resource):
         self._data['rel'] = kwargs.get('rel', 'stylesheet')
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'import')
-        self._data['compression'] = kwargs.get('compression', 'safe')
+        self._data['compression'] = kwargs.get('compression', 'none')
 
     security.declarePublic('getMedia')
     def getMedia(self):
@@ -88,8 +88,8 @@ class Stylesheet(Resource):
     security.declarePublic('getCompression')
     def getCompression(self):
         # as this is a new property, old instance might not have that value, so
-        # return 'safe' as default
-        compression = self._data.get('compression', 'safe')
+        # return 'none' as default
+        compression = self._data.get('compression', 'none')
         if compression in ['safe','full']:
             return compression
         return 'none'
@@ -176,7 +176,7 @@ class CSSRegistryTool(BaseRegistryTool):
         if previtem.getMedia() != resource.getMedia():
             previtem.setMedia(None)
 
-    def _compressCSS(self, content, level='safe'):
+    def _compressCSS(self, content, level='none'):
         if level == 'full':
             return csspacker_full.pack(content)
         elif level == 'safe':
@@ -206,7 +206,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'manage_addStylesheet')
     def manage_addStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
-                             enabled=False, cookable=True, compression='safe',
+                             enabled=False, cookable=True, compression='none',
                              REQUEST=None):
         """Register a stylesheet from a TTW request."""
         self.registerStylesheet(id, expression, media, rel, title,
@@ -257,7 +257,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1,
-                           cookable=True, compression='safe'):
+                           cookable=True, compression='none'):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,

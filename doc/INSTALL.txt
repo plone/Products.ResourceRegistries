@@ -1,4 +1,4 @@
-ResourceRegistries 1.1 depends on changes to CMFCore/Skinnable.py in the
+ResourceRegistries 1.2 depends on changes to CMFCore/Skinnable.py in the
 CMF 1.5.5 release. So for Plone 2.1.x install CMF 1.5.5.
 
 To use with Plone 2.0.x, you have to make sure to move the header.pt

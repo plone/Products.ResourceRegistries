@@ -140,7 +140,7 @@ legend {
         <input type="checkbox" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
         <label for="debugmode" id="debugmodelabel">Debug/development mode</label>
-        In debug-/development mode, scripts are not merged to composites, and caching of scripts is disabled. The registry also sends http-headers to prevent browsers from caching the scripts. <br />Recommended during javascript-related development. Remember to  turn it off again, as the debugmode affects performance. 
+        In debug-/development mode, scripts are not merged to composites, and caching and compression of scripts is disabled. The registry also sends http-headers to prevent browsers from caching the scripts. <br />Recommended during javascript-related development. Remember to  turn it off again, as the debugmode affects performance. 
     </p>
 
     <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />

@@ -61,7 +61,7 @@ class JavaScript(Resource):
     def __init__(self, id, **kwargs):
         Resource.__init__(self, id, **kwargs)
         self._data['inline'] = kwargs.get('inline', False)
-        self._data['compression'] = kwargs.get('compression', 'safe')
+        self._data['compression'] = kwargs.get('compression', 'none')
 
     security.declarePublic('getInline')
     def getInline(self):
@@ -74,8 +74,8 @@ class JavaScript(Resource):
     security.declarePublic('getCompression')
     def getCompression(self):
         # as this is a new property, old instance might not have that value, so
-        # return 'safe' as default
-        compression = self._data.get('compression', 'safe')
+        # return 'none' as default
+        compression = self._data.get('compression', 'none')
         if compression in ['safe','full']:
             return compression
         return 'none'
@@ -140,7 +140,7 @@ class JSRegistryTool(BaseRegistryTool):
     def clearScripts(self):
         self.clearResources()
 
-    def _compressJS(self, content, level='safe'):
+    def _compressJS(self, content, level='none'):
         return jspacker.pack(content)
 
     security.declarePrivate('finalizeContent')
@@ -160,7 +160,7 @@ class JSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self, id, expression='', inline=False,
-                         enabled=False, cookable=True, compression='safe',
+                         enabled=False, cookable=True, compression='none',
                          REQUEST=None):
         """Register a script from a TTW request."""
         self.registerScript(id, expression, inline, enabled, cookable, compression)
@@ -206,7 +206,7 @@ class JSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', inline=False, enabled=True,
-                       cookable=True, compression='safe'):
+                       cookable=True, compression='none'):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,

@@ -5,6 +5,8 @@
 
 <div tal:replace="structure here/manage_tabs" />
 
+<p>Overview of which javascripts are merged to create composite javascripts.</p> 
+
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getCookedResources()">
         <div>

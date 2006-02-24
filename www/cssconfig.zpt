@@ -91,7 +91,7 @@ form {
     margin-bottom: 3em;
 }
 
-label, input, select {
+fieldset label,fieldset input,fieldset  select {
     font-size: 80%;
     font-family: sans-serif;
     float: left;
@@ -101,7 +101,7 @@ legend input {
     float: none;
 }
 
-label {
+fieldset label {
     width: 11em;
     text-align: right;
     padding: 0.2em 0.4em;
@@ -122,6 +122,10 @@ legend {
     font-size: 90%;
 }
 
+#debugmodelabel{
+    font-weight : bold;
+}
+
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -131,13 +135,14 @@ legend {
       method="post">
 
     <p>
-        <input type="checkbox" name="debugmode:boolean"
+        <input type="checkbox" id="debugmode" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
-        Debug mode (don't merge stylesheets)
+        <label for="debugmode" id="debugmodelabel">Debug/development mode</label>
+        In debug-/development mode, stylesheets are not merged to composites, and caching of css is disabled. The registry also sends http-headers to prevent browsers from caching the stylesheets. <br />Recommended during css-related development. Remember to  turn it off again, as the debugmode affects performance. 
     </p>
 
     <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
-
+    
     <p>The order of the stylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
@@ -179,7 +184,7 @@ legend {
             <input type="text" name="stylesheets.title:records"
                    tal:attributes="value stylesheet/getTitle|nothing">
 
-            <label>TAL condition</label>
+            <label>Condition</label>
             <input type="text" name="stylesheets.expression:records"
                    tal:attributes="value stylesheet/getExpression">
 
@@ -240,7 +245,7 @@ legend {
           </div>
 
           <div>
-              <label>TAL condition</label>
+              <label>Condition</label>
               <input type="text" name="expression" size="50" />
           </div>
 
@@ -283,6 +288,8 @@ legend {
           <div>
               <input type="submit" i18n:attributes="value" value="Add" />
           </div>
+          <p style="clear:both">&nbsp;</p>
+
 
     </fieldset>
 

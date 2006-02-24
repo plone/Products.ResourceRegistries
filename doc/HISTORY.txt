@@ -1,3 +1,13 @@
+1.2 (SVN/unreleased)
+====================
+
+ * Added better labels and a short explanation to the debugmode-checkbox in the forms. 
+   [elvix]
+   
+ * Renamed 'TAL condition' to 'Condition' in the forms, as it has nothing to do with 
+   TAL at all (it is a CMF/TALES expression) It should include a link to CMF Expressions help
+   [elvix]
+
 1.1
 ===
 

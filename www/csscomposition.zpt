@@ -5,6 +5,8 @@
 
 <div tal:replace="structure here/manage_tabs" />
 
+<p> Overview of which stylesheets that are merged to create composite stylesheets</p> 
+
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getCookedResources()">
         <div>

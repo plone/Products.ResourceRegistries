@@ -14,6 +14,11 @@ from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
 import re
 from packer import Packer
+try:
+    from jspacker import JavaScriptPacker
+    JSPACKER = True
+except ImportError:
+    JSPACKER = False
 
 
 jspacker = Packer()
@@ -231,5 +236,14 @@ class JSRegistryTool(BaseRegistryTool):
                 encoding = default
         return 'application/x-javascript;charset=%s' % encoding
 
+    security.declarePrivate('getResourceContent')
+    def getResourceContent(self, item, context, original=False):
+        output = BaseRegistryTool.getResourceContent(self, item, context, original)
+        if JSPACKER and not original:
+            packer = JavaScriptPacker()
+            result = packer.pack(output, compaction=False, encoding=62, fastDecode=True)
+            if len(result) < len(output):
+                return result
+        return output
 
 InitializeClass(JSRegistryTool)

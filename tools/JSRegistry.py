@@ -57,6 +57,16 @@ jspacker.sub(r'\n+', '\n')
 # first newline
 jspacker.sub(r'^\n', '')
 
+jspacker_full = jspacker.copy()
+# encode local variables. those are preceeded by dollar signs
+# the amount of dollar signs says how many characters are preserved
+# $name -> n, $$name -> na
+def _dollar_replacement(match):
+    length = len(match.group(2))
+    start = length - max(length - len(match.group(3)), 0)
+    return match.group(1)[start:start+length] + match.group(4)
+jspacker_full.sub(r"""((\$+)([a-zA-Z\$_]+))(\d*)""", _dollar_replacement)
+
 
 class JavaScript(Resource):
     security = ClassSecurityInfo()
@@ -145,7 +155,12 @@ class JSRegistryTool(BaseRegistryTool):
         self.clearResources()
 
     def _compressJS(self, content, level='safe'):
-        return jspacker.pack(content)
+        if level == 'full':
+            return jspacker_full.pack(content)
+        elif level == 'safe':
+            return jspacker.pack(content)
+        else:
+            return content
 
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):

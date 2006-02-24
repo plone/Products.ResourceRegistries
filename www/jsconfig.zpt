@@ -91,7 +91,7 @@ div.scriptform{
     clear: both;
 }
 
-label, input, select {
+fieldset label,fieldset input,fieldset  select {
     font-size: 80%;
     font-family: sans-serif;
     float: left;
@@ -101,7 +101,7 @@ legend input {
     float: none;
 }
 
-label {
+fieldset label  {
     width: 11em;
     text-align: right;
     padding: 0.2em 0.4em;
@@ -122,6 +122,12 @@ legend {
     font-size: 90%;
 }
 
+
+#debugmodelabel{
+    font-weight : bold;
+}
+
+
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -133,7 +139,8 @@ legend {
     <p>
         <input type="checkbox" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
-        Debug mode (Don't merge scripts)
+        <label for="debugmode" id="debugmodelabel">Debug/development mode</label>
+        In debug-/development mode, scripts are not merged to composites, and caching of scripts is disabled. The registry also sends http-headers to prevent browsers from caching the scripts. <br />Recommended during javascript-related development. Remember to  turn it off again, as the debugmode affects performance. 
     </p>
 
     <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
@@ -176,7 +183,7 @@ legend {
                    tal:attributes="checked script/getEnabled" />
             <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
             
-            <label>TAL condition</label>
+            <label>Condition</label>
             <input type="text" name="scripts.expression:records:string" size="25"
                    tal:attributes="value script/getExpression" />
 
@@ -228,7 +235,7 @@ legend {
         </div>
 
         <div>
-            <label>TAL condition</label>
+            <label>Condition</label>
             <input type="text" name="expression" size="50" />
         </div>
 
@@ -263,15 +270,13 @@ legend {
             <input type="hidden" name="cacheable:boolean:default" value="False" />
         </div>
 
-        <div style="clear: both;"></div>
+          <div>
+              <input type="submit" i18n:attributes="value" value="Add" />
+          </div>
 
-        <input type="submit" i18n:attributes="value" value="Add" />
 
-        <div style="clear: both;"></div>
-
+    <p style="clear:both">&nbsp;</p>
     </fieldset>
-
-
 
 
 </form>

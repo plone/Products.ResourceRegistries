@@ -1,5 +1,5 @@
-1.2 (SVN/unreleased)
-====================
+1.2
+===
 
  * Added compression for CSS and Javascript resources.
    [fschulze]

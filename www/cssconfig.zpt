@@ -138,11 +138,11 @@ legend {
         <input type="checkbox" id="debugmode" name="debugmode:boolean"
                tal:attributes="checked here/getDebugMode" />
         <label for="debugmode" id="debugmodelabel">Debug/development mode</label>
-        In debug-/development mode, stylesheets are not merged to composites, and caching of css is disabled. The registry also sends http-headers to prevent browsers from caching the stylesheets. <br />Recommended during css-related development. Remember to  turn it off again, as the debugmode affects performance. 
+        In debug-/development mode, stylesheets are not merged to composites, and caching and compression of css is disabled. The registry also sends http-headers to prevent browsers from caching the stylesheets. <br />Recommended during css-related development. Remember to  turn it off again, as the debugmode affects performance. 
     </p>
 
     <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
-    
+
     <p>The order of the stylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
@@ -215,6 +215,14 @@ legend {
                                         selected python:r == stylesheet.getRendering()"
                         tal:content="r">import</option>
             </select>
+
+            <label>Compression type</label>
+            <select name="stylesheets.compression:records">
+                <option tal:repeat="r here/getCompressionOptions"
+                        tal:attributes="value r;
+                                        selected python:r == stylesheet.getCompression()"
+                        tal:content="r">safe</option>
+            </select>
         </div>
 
         <div style="clear: both;">&nbsp;</div>
@@ -265,6 +273,15 @@ legend {
                   <option tal:repeat="r here/getRenderingOptions"
                           tal:attributes="value r"
                           tal:content="r">import</option>
+              </select>
+          </div>
+
+          <div>
+              <label>Compression type</label>
+              <select name="compression">
+                  <option tal:repeat="r here/getCompressionOptions"
+                          tal:attributes="value r"
+                          tal:content="r">safe</option>
               </select>
           </div>
 

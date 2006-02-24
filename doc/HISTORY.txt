@@ -1,16 +1,25 @@
-1.1
-===
-
- * Added better labels and a short explanation to the debugmode-checkbox in the forms. 
-   [elvix]
-   
- * Renamed 'TAL condition' to 'Condition' in the forms, as it has nothing to do with 
-   TAL at all (it is a CMF/TALES expression) It should include a link to CMF Expressions help
-   [elvix]
+1.3 (SVN/unreleased)
+====================
 
  * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
    portal creation)
    [rafrombrc]
+
+1.2
+===
+
+ * Added compression for CSS and Javascript resources.
+   [fschulze]
+
+ * Added better labels and a short explanation to the debugmode-checkbox in the forms. 
+   [elvix]
+
+ * Renamed 'TAL condition' to 'Condition' in the forms, as it has nothing to do with 
+   TAL at all (it is a CMF/TALES expression) It should include a link to CMF Expressions help
+   [elvix]
+
+1.1
+===
 
  * Fixed cooking of resources to ensure that uncookable resources are not merged.
    [elro]

@@ -170,7 +170,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
     def __getitem__(self, item):
         """Return a resource from the registry."""
-        output = self.getResourceContent(item, self)
+        original = self.REQUEST.get('original', False)
+        output = self.getResourceContent(item, self, original)
         if self.getDebugMode() or not self.isCacheable(item):
             duration = 0
         else:
@@ -370,7 +371,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         return ExplicitAcquisitionWrapper(resources.get(id, None), self)
 
     security.declarePrivate('getResourceContent')
-    def getResourceContent(self, item, context):
+    def getResourceContent(self, item, context, original=False):
         """Fetch resource content for delivery."""
         ids = self.concatenatedresources.get(item, None)
         resources = self.getResourcesDict()
@@ -433,7 +434,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             # understanding and debugging
             if content:
                 output += '\n/* ----- %s ----- */\n' % (id,)
-                output += self.finalizeContent(resources[id], content)
+                if original:
+                    output += content
+                else:
+                    output += self.finalizeContent(resources[id], content)
                 output += '\n'
         return output
 

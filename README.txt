@@ -21,9 +21,11 @@ ResourceRegistries
 
   - Enable developers to activate/deactivate their styles in a simpler way
 
+  - Enable compression to safe bandwidth and download time
+
 Usage
 
-  ResourceRegistries 1.1 requires CMF 1.6 or later.  (Intrepid users can
+  ResourceRegistries 1.3 requires CMF 1.6 or later.  (Intrepid users can
   probably get it working w/ CMF 1.5.5 w/ GenericSetup installed.)
 
   The CSSRegistry and JSRegistry is configured through the ZMI. it can be found
@@ -55,6 +57,16 @@ Usage
         externally. Use
         sparingly. Costs bandwidth, but is very useful for style that vary for
         example on a per-folder-basis, like those famous header graphics bars.
+
+  compression -- Whether and how much the resource should be compressed:
+
+      - 'none' - the original content will not be changed
+
+      - 'safe' - the content will be compressed in a way which should be safe
+                 for any workarounds for browser bugs
+
+      - 'full' - the content will be heavily compressed, this might break some
+                 workarounds, only use this if you know what you are doing
 
   If several stylesheets listed directly after each other in the registry have
   the same parameters and expression, they will be concatenated into a larger,

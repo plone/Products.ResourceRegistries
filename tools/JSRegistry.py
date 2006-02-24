@@ -15,6 +15,48 @@ from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
+import re
+from packer import Packer
+try:
+    from jspacker import JavaScriptPacker
+    JSPACKER = True
+except ImportError:
+    JSPACKER = False
+
+
+jspacker = Packer()
+# protect strings
+jspacker.protect(r"""'(?:\\'|.|\\\n)*?'""")
+jspacker.protect(r'''"(?:\\"|.|\\\n)*?"''')
+# protect regular expressions
+jspacker.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
+jspacker.protect(r"""[^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?""")
+# strip whitespace
+jspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
+# multiline comments
+jspacker.sub(r'/\*.*?\*/', '', re.DOTALL)
+# one line comments
+jspacker.sub(r'\s*//.*$', '', re.MULTILINE)
+# whitespace after some special chars but not
+# before function declaration
+jspacker.sub(r'([{;\[(,=&|\?:])\s+(?!function)', r'\1')
+# whitespace before some special chars
+jspacker.sub(r'\s+([{}\],=&|\?:)])', r'\1')
+# whitespace before plus chars if no other plus char before it
+jspacker.sub(r'(?<!\+)\s+\+', '+')
+# whitespace after plus chars if no other plus char after it
+jspacker.sub(r'\+\s+(?!\+)', '+')
+# whitespace before minus chars if no other minus char before it
+jspacker.sub(r'(?<!-)\s+-', '-')
+# whitespace after minus chars if no other minus char after it
+jspacker.sub(r'-\s+(?!-)', '-')
+# remove any excessive whitespace left except newlines
+jspacker.sub(r'[ \t\r\f\v]+', ' ')
+# excessive newlines
+jspacker.sub(r'\n+', '\n')
+# first newline
+jspacker.sub(r'^\n', '')
+
 
 class JavaScript(Resource):
     security = ClassSecurityInfo()
@@ -22,6 +64,7 @@ class JavaScript(Resource):
     def __init__(self, id, **kwargs):
         Resource.__init__(self, id, **kwargs)
         self._data['inline'] = kwargs.get('inline', False)
+        self._data['compression'] = kwargs.get('compression', 'safe')
 
     security.declarePublic('getInline')
     def getInline(self):
@@ -31,7 +74,21 @@ class JavaScript(Resource):
     def setInline(self, inline):
         self._data['inline'] = inline
 
+    security.declarePublic('getCompression')
+    def getCompression(self):
+        # as this is a new property, old instance might not have that value, so
+        # return 'safe' as default
+        compression = self._data.get('compression', 'safe')
+        if compression in ['safe','full']:
+            return compression
+        return 'none'
+
+    security.declareProtected(permissions.ManagePortal, 'setCompression')
+    def setCompression(self, compression):
+        self._data['compression'] = compression
+
 InitializeClass(JavaScript)
+
 
 class JSRegistryTool(BaseRegistryTool):
     """A Plone registry for managing the linking to Javascript files."""
@@ -87,15 +144,30 @@ class JSRegistryTool(BaseRegistryTool):
     def clearScripts(self):
         self.clearResources()
 
+    def _compressJS(self, content, level='safe'):
+        return jspacker.pack(content)
+
+    security.declarePrivate('finalizeContent')
+    def finalizeContent(self, resource, content):
+        """Finalize the resource content."""
+        compression = resource.getCompression()
+        if compression != 'none' and not self.getDebugMode():
+            orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
+            content = "// %s\n%s" % (orig_url,
+                                     self._compressJS(content, compression))
+
+        return content
+
     #
     # ZMI Methods
     #
 
     security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self, id, expression='', inline=False,
-                         enabled=False, cookable=True, REQUEST=None):
+                         enabled=False, cookable=True, compression='safe',
+                         REQUEST=None):
         """Register a script from a TTW request."""
-        self.registerScript(id, expression, inline, enabled, cookable)
+        self.registerScript(id, expression, inline, enabled, cookable, compression)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -117,7 +189,8 @@ class JSRegistryTool(BaseRegistryTool):
                                 inline=r.get('inline'),
                                 enabled=r.get('enabled'),
                                 cookable=r.get('cookable'),
-                                cacheable=r.get('cacheable'))
+                                cacheable=r.get('cacheable'),
+                                compression=r.get('compression'))
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()
@@ -136,7 +209,8 @@ class JSRegistryTool(BaseRegistryTool):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
-    def registerScript(self, id, expression='', inline=False, enabled=True, cookable=True):
+    def registerScript(self, id, expression='', inline=False, enabled=True,
+                       cookable=True, compression='safe'):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,
@@ -144,6 +218,11 @@ class JSRegistryTool(BaseRegistryTool):
                             enabled=enabled,
                             cookable=cookable)
         self.storeResource(script)
+
+    security.declareProtected(permissions.ManagePortal, 'getCompressionOptions')
+    def getCompressionOptions(self):
+        """Compression methods for use in ZMI forms."""
+        return config.JS_COMPRESSION_METHODS
 
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
@@ -161,5 +240,14 @@ class JSRegistryTool(BaseRegistryTool):
                 encoding = default
         return 'application/x-javascript;charset=%s' % encoding
 
+    security.declarePrivate('getResourceContent')
+    def getResourceContent(self, item, context, original=False):
+        output = BaseRegistryTool.getResourceContent(self, item, context, original)
+        if JSPACKER and not original:
+            packer = JavaScriptPacker()
+            result = packer.pack(output, compaction=False, encoding=62, fastDecode=True)
+            if len(result) < len(output):
+                return result
+        return output
 
 InitializeClass(JSRegistryTool)

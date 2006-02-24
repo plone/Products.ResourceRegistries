@@ -871,7 +871,7 @@ function dummy() {
         expected = """function dummy(){var localvar=10
 document.write(localvar);return 'bar'}
 """
-        got = self.tool._compressJS(input)
+        got = self.tool._compressJS(input, 'safe')
         self.assertEqual(got, expected)
 
     def testStringProtection(self):
@@ -880,19 +880,19 @@ var leafnode = this.shared.xmldata.selectSingleNode('//*[@selected]');
 var portal_url = 'http://127.0.0.1:9080/plone';
 """
         expected = """var leafnode=this.shared.xmldata.selectSingleNode('//*[@selected]');var portal_url='http://127.0.0.1:9080/plone';"""
-        got = self.tool._compressJS(input)
+        got = self.tool._compressJS(input, 'safe')
         self.assertEqual(got, expected)
 
     def testNewlinesInStrings(self):
         input = r"""var message = "foo: " + foo + "\nbar: " + bar;"""
         expected = r"""var message="foo: "+foo+"\nbar: "+bar;"""
-        got = self.tool._compressJS(input)
+        got = self.tool._compressJS(input, 'safe')
         self.assertEqual(got, expected)
 
     def testEscapedStrings(self):
         input = r"""var message = "foo: \"something in quotes\"" + foo + "\nbar: " + bar;"""
         expected = r"""var message="foo: \"something in quotes\""+foo+"\nbar: "+bar;"""
-        got = self.tool._compressJS(input)
+        got = self.tool._compressJS(input, 'safe')
         self.assertEqual(got, expected)
 
     def testWhitspaceAroundPlusMinus(self):
@@ -900,14 +900,14 @@ var portal_url = 'http://127.0.0.1:9080/plone';
 message = foo++ + bar;
 message = foo + ++bar;"""
         expected = r"""var message=foo+bar;message=foo++ +bar;message=foo+ ++bar;"""
-        got = self.tool._compressJS(input)
+        got = self.tool._compressJS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = r"""var message = foo - bar;
 message = foo-- - bar;
 message = foo - --bar;"""
         expected = r"""var message=foo-bar;message=foo-- -bar;message=foo- --bar;"""
-        got = self.tool._compressJS(input)
+        got = self.tool._compressJS(input, 'safe')
         self.assertEqual(got, expected)
 
 

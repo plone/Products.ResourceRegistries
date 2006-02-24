@@ -1008,7 +1008,7 @@ property: value; /* */
 property: value;
 }
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
     def testNewlineCompression(self):
@@ -1042,7 +1042,7 @@ property: value; /* */
 property: value;
 }
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
     def testCommentHacks(self):
@@ -1062,7 +1062,7 @@ property /**/: value;
 property: /**/value;
 }
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1070,7 +1070,7 @@ property: /**/value;
         """
         expected = """selector/* */ {  }
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1078,7 +1078,7 @@ property: /**/value;
         """
         expected = """selector/* */ {  }
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1086,7 +1086,7 @@ property: /**/value;
         """
         expected = """selector/**/ {  }
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1098,7 +1098,7 @@ property: /**/value;
 rules
 /* */
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1110,7 +1110,7 @@ rules
 rules
 /* */
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1122,7 +1122,7 @@ rules
 rules
 /* */
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """
@@ -1134,7 +1134,7 @@ rules
 rules
 /* */
 """
-        got = self.tool._compressCSS(input)
+        got = self.tool._compressCSS(input, 'safe')
         self.assertEqual(got, expected)
 
         input = """

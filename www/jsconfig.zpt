@@ -186,6 +186,14 @@ legend {
             <label>Condition</label>
             <input type="text" name="scripts.expression:records:string" size="25"
                    tal:attributes="value script/getExpression" />
+
+            <label>Compression type</label>
+            <select name="scripts.compression:records">
+                <option tal:repeat="r here/getCompressionOptions"
+                        tal:attributes="value r;
+                                        selected python:r == script.getCompression()"
+                        tal:content="r">safe</option>
+            </select>
         </div>
 
         <div class="scriptform">
@@ -234,6 +242,15 @@ legend {
         <div>
             <label>Inline rendering?</label>
             <input type="checkbox" name="inline" value="0" />
+        </div>
+
+        <div>
+            <label>Compression type</label>
+            <select name="compression">
+                <option tal:repeat="r here/getCompressionOptions"
+                        tal:attributes="value r"
+                        tal:content="r">safe</option>
+            </select>
         </div>
 
         <div>

@@ -852,6 +852,65 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
         self.failUnless('blue' in content)
 
+class TestJSCompression(CSSRegistryTestCase.CSSRegistryTestCase):
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+
+    def testCompression(self):
+        input = """
+/* a comment */
+
+function dummy() {
+
+    var localvar = 10 // one line comment
+
+    document.write(localvar);
+    return 'bar'
+}
+"""
+        expected = """function dummy(){var localvar=10
+document.write(localvar);return 'bar'}
+"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
+    def testStringProtection(self):
+        input = """
+var leafnode = this.shared.xmldata.selectSingleNode('//*[@selected]');
+var portal_url = 'http://127.0.0.1:9080/plone';
+"""
+        expected = """var leafnode=this.shared.xmldata.selectSingleNode('//*[@selected]');var portal_url='http://127.0.0.1:9080/plone';"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
+    def testNewlinesInStrings(self):
+        input = r"""var message = "foo: " + foo + "\nbar: " + bar;"""
+        expected = r"""var message="foo: "+foo+"\nbar: "+bar;"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
+    def testEscapedStrings(self):
+        input = r"""var message = "foo: \"something in quotes\"" + foo + "\nbar: " + bar;"""
+        expected = r"""var message="foo: \"something in quotes\""+foo+"\nbar: "+bar;"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
+    def testWhitspaceAroundPlusMinus(self):
+        input = r"""var message = foo + bar;
+message = foo++ + bar;
+message = foo + ++bar;"""
+        expected = r"""var message=foo+bar;message=foo++ +bar;message=foo+ ++bar;"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
+        input = r"""var message = foo - bar;
+message = foo-- - bar;
+message = foo - --bar;"""
+        expected = r"""var message=foo-bar;message=foo-- -bar;message=foo- --bar;"""
+        got = self.tool._compressJS(input)
+        self.assertEqual(got, expected)
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -871,6 +930,7 @@ def test_suite():
     suite.addTest(makeSuite(TestZODBTraversal))
     suite.addTest(makeSuite(TestMergingDisabled))
     suite.addTest(makeSuite(TestResourcePermissions))
+    suite.addTest(makeSuite(TestJSCompression))
 
     if not PLONE21:
         # We must not test for the defaults in Plone 2.1 because they are

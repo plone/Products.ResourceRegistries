@@ -4,7 +4,8 @@ from Interface import Interface
 class IResourceRegistry(Interface):
     """A tool for registering and evaluating resource linkage."""
 
-    def registerResource(id, expression='', enabled=1):
+    def registerResource(id, expression='', enabled=True,
+                         cookable=True, cacheable=True):
         """Register a resource."""
 
     def getEvaluatedResources(context):
@@ -62,11 +63,13 @@ class ICSSRegistry(Interface):
     """A tool for registering and evaluating stylesheet linkage."""
 
     def registerStylesheet(id, expression='', media='', rel='stylesheet',
-                           rendering='import', enabled=1):
+                           title='', rendering='import', enabled=1,
+                           cookable=True, compression='none'):
         """Register a stylesheet."""
 
     def manage_addStylesheet(id, expression='', media='', rel='stylesheet',
-                             rendering='import', enabled=True , REQUEST=None):
+                             title='', rendering='import', enabled=False,
+                             cookable=True, compression='none', REQUEST=None):
         """Add stylesheet from a ZMI form."""
 
     def manage_removeStylesheet(id, REQUEST=None):
@@ -79,13 +82,15 @@ class ICSSRegistry(Interface):
 class IJSRegistry(Interface):
     """A tool for registering and evaluating script linkage."""
 
-    def registerScript(id, expression='', inline=False, enabled=True):
+    def registerScript(id, expression='', inline=False, enabled=True,
+                       cookable=True, compression='none'):
         """Register a script."""
 
     def manage_saveScripts(REQUEST=None):
         """Save script data from form submission."""
 
-    def manage_addScript(id, expression='', inline=False, enabled=True , REQUEST=None):
+    def manage_addScript(id, expression='', inline=False, enabled=False,
+                         cookable=True, compression='none', REQUEST=None):
         """Add script from a ZMI form."""
 
     def manage_removeScript(id, REQUEST=None):

@@ -16,6 +16,5 @@ def initialize(context):
     ToolInit(
         config.PROJECTNAME + ' Tool',
         tools = TOOLS,
-        product_name = config.PROJECTNAME,
         icon = 'tool.gif',
     ).initialize(context)

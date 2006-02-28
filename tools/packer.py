@@ -32,15 +32,20 @@ class KeywordMapper:
             if not keyword_count[match]:
                 protected[match] = None
 
-        ## sorted_matches = []
-        ## for value, count in keyword_count.iteritems():
-            ## weight = count * len(value)
-            ## if len(value) >= weight:
-                ## keyword_count[value] = 0
-                ## sorted_matches.append((0, value))
-            ## else:
-                ## sorted_matches.append((weight, value))
-        sorted_matches = [(c,len(v),v) for v,c in keyword_count.iteritems()]
+        ## sorted_matches = [(c,len(v),v) for v,c in keyword_count.iteritems()]
+        # the above line implements the original behaviour, the code below
+        # removes keywords which have not enough weight to be encoded, in total
+        # this saves some bytes, because the total length of the generated
+        # codes is a bit smaller. This needs corresponding code in the
+        # fast_decode javascript function of the decoder, see comment there
+        sorted_matches = []
+        for value, count in keyword_count.iteritems():
+            weight = count * len(value)
+            if len(value) >= weight:
+                keyword_count[value] = 0
+                sorted_matches.append((0, value))
+            else:
+                sorted_matches.append((weight, value))
         sorted_matches.sort()
         sorted_matches.reverse()
         sorted_matches = [x[-1] for x in sorted_matches]
@@ -118,10 +123,13 @@ class JavascriptKeywordMapper(KeywordMapper):
             //  replacement value is a function?
             if (!''.replace(/^/, String)) {
                 // decode all the values we need
-                while ($count--) $decode[$encode($count)] = $keywords[$count] || $encode($count);
+                // we have to add the dollar prefix, because $encoded can be
+                // any keyword in the decode function below. For example
+                // 'constructor' is an attribute of any object and it would
+                // return a false positive match in that case.
+                while ($count--) $decode["$"+$encode($count)] = $keywords[$count] || $encode($count);
                 // global replacement function
-                $keywords = [function($encoded){return $decode[$encoded]}];
-                // $keywords = [function($encoded){return typeof($decode[$encoded])=='string'?$decode[$encoded]:$encoded}];
+                $keywords = [function($encoded){$result = $decode["$"+$encoded]; return $result!=undefined?$result:$encoded}];
                 // generic match
                 $encode = function(){return'\\w+'};
                 // reset the loop counter -  we are now doing a global replace
@@ -351,8 +359,8 @@ class CSSPacker(Packer):
             self.sub(r'([{,;])\s+', r'\1')
 
 
-jspacker = JavascriptPacker('safe')
-jspacker_full = JavascriptPacker('full')
+## jspacker = JavascriptPacker('safe')
+## jspacker_full = JavascriptPacker('full')
 
 ## def run():
     ## script = open('cssQuery.js').read()
@@ -364,8 +372,8 @@ jspacker_full = JavascriptPacker('full')
     ## script = mapper.sub(script)
     ## f = open('output1.js','w')
     ## #f.write("keywords='%s'.split('|');\n" % "|".join(keywords))
-    ## f.write(mapper.getDecodeFunction(name='__dEcOdE'))
-    ## f.write(mapper.getDecoder(script, keyword_var="''", decode_func='__dEcOdE'))
+    ## #f.write(mapper.getDecodeFunction(name='__dEcOdE'))
+    ## f.write(mapper.getDecoder(script))
     ## for index, keyword in enumerate(keywords):
         ## encoded = mapper._encode(index)
         ## if keyword == '':

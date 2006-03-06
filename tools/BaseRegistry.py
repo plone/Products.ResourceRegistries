@@ -206,8 +206,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             return obj
         raise AttributeError('%s' % (name,))
 
-    security.declarePrivate('isCacheable')
+    security.declarePublic('isCacheable')
     def isCacheable(self, name):
+        """Return a boolean whether the resource is cacheable or not."""
         resource_id = self.concatenatedresources.get(name, [None])[0]
         if resource_id is None:
             return False

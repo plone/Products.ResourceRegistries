@@ -13,27 +13,11 @@ from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
 import re
-from packer import Packer
+from packer import CSSPacker
 
 
-csspacker = Packer()
-# protect strings
-csspacker.protect(r"""'(?:\\'|.|\\\n)*?'""")
-csspacker.protect(r'''"(?:\\"|.|\\\n)*?"''')
-# strip whitespace
-csspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
-# remove comment contents
-csspacker.sub(r'/\*.*?( ?[\\/*]*\*/)', r'/*\1', re.DOTALL)
-# remove lines with comments only (consisting of stars only)
-csspacker.sub(r'^/\*+\*/$', '', re.MULTILINE)
-# excessive newlines
-csspacker.sub(r'\n+', '\n')
-# first newline
-csspacker.sub(r'^\n', '')
-
-csspacker_full = csspacker.copy()
-#remove more whitespace
-csspacker_full.sub(r'([{,;])\s+', r'\1')
+csspacker = CSSPacker('safe')
+csspacker_full = CSSPacker('full')
 
 
 class Stylesheet(Resource):
@@ -90,7 +74,7 @@ class Stylesheet(Resource):
         # as this is a new property, old instance might not have that value, so
         # return 'none' as default
         compression = self._data.get('compression', 'none')
-        if compression in ['safe','full']:
+        if compression in config.CSS_COMPRESSION_METHODS:
             return compression
         return 'none'
 

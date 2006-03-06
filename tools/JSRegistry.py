@@ -13,46 +13,11 @@ from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
 import re
-from packer import Packer
-try:
-    from jspacker import JavaScriptPacker
-    JSPACKER = True
-except ImportError:
-    JSPACKER = False
+from packer import JavascriptPacker, JavascriptKeywordMapper
 
 
-jspacker = Packer()
-# protect strings
-jspacker.protect(r"""'(?:\\'|.|\\\n)*?'""")
-jspacker.protect(r'''"(?:\\"|.|\\\n)*?"''')
-# protect regular expressions
-jspacker.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
-jspacker.protect(r"""[^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?""")
-# strip whitespace
-jspacker.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
-# multiline comments
-jspacker.sub(r'/\*.*?\*/', '', re.DOTALL)
-# one line comments
-jspacker.sub(r'\s*//.*$', '', re.MULTILINE)
-# whitespace after some special chars but not
-# before function declaration
-jspacker.sub(r'([{;\[(,=&|\?:])\s+(?!function)', r'\1')
-# whitespace before some special chars
-jspacker.sub(r'\s+([{}\],=&|\?:)])', r'\1')
-# whitespace before plus chars if no other plus char before it
-jspacker.sub(r'(?<!\+)\s+\+', '+')
-# whitespace after plus chars if no other plus char after it
-jspacker.sub(r'\+\s+(?!\+)', '+')
-# whitespace before minus chars if no other minus char before it
-jspacker.sub(r'(?<!-)\s+-', '-')
-# whitespace after minus chars if no other minus char after it
-jspacker.sub(r'-\s+(?!-)', '-')
-# remove any excessive whitespace left except newlines
-jspacker.sub(r'[ \t\r\f\v]+', ' ')
-# excessive newlines
-jspacker.sub(r'\n+', '\n')
-# first newline
-jspacker.sub(r'^\n', '')
+jspacker = JavascriptPacker('safe')
+jspacker_full = JavascriptPacker('full')
 
 
 class JavaScript(Resource):
@@ -76,7 +41,7 @@ class JavaScript(Resource):
         # as this is a new property, old instance might not have that value, so
         # return 'none' as default
         compression = self._data.get('compression', 'none')
-        if compression in ['safe','full']:
+        if compression in config.JS_COMPRESSION_METHODS:
             return compression
         return 'none'
 
@@ -140,8 +105,18 @@ class JSRegistryTool(BaseRegistryTool):
     def clearScripts(self):
         self.clearResources()
 
-    def _compressJS(self, content, level='none'):
-        return jspacker.pack(content)
+    def _compressJS(self, content, level='safe'):
+        encode_marker = "/* sTART eNCODE */\n%s\n/* eND eNCODE */"
+        if level == 'full-encode':
+            return encode_marker % jspacker_full.pack(content)
+        elif level == 'safe-encode':
+            return encode_marker % jspacker.pack(content)
+        elif level == 'full':
+            return jspacker_full.pack(content)
+        elif level == 'safe':
+            return jspacker.pack(content)
+        else:
+            return content
 
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):
@@ -239,11 +214,20 @@ class JSRegistryTool(BaseRegistryTool):
     security.declarePrivate('getResourceContent')
     def getResourceContent(self, item, context, original=False):
         output = BaseRegistryTool.getResourceContent(self, item, context, original)
-        if JSPACKER and not original:
-            packer = JavaScriptPacker()
-            result = packer.pack(output, compaction=False, encoding=62, fastDecode=True)
-            if len(result) < len(output):
-                return result
+        if not original:
+            mapper = JavascriptKeywordMapper()
+            regexp = re.compile(r"/\* sTART eNCODE \*/\s*(.*?)\s*/\* eND eNCODE \*/", re.DOTALL)
+            matches = regexp.findall(output)
+            if len(matches) > 0:
+                mapper.analyse("\n".join(matches))
+                decoder = mapper.getDecodeFunction(name='__dEcOdE')
+                def repl(m):
+                    return mapper.getDecoder(mapper.sub(m.group(1)),
+                                             keyword_var="''",
+                                             decode_func='__dEcOdE')
+                #output = "\n__sTaRtTiMe = new Date()\n%s\n%s\nalert(new Date() - __sTaRtTiMe);" % (decoder,
+                output = "\n%s\n%s\n" % (decoder,
+                                         regexp.sub(repl, output))
         return output
 
 InitializeClass(JSRegistryTool)

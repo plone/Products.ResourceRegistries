@@ -13,6 +13,7 @@ def install(self):
     if CSSTOOLNAME not in self.objectIds():
         factory = self.manage_addProduct['ResourceRegistries']
         factory.manage_addTool(CSSTOOLTYPE)
+        installPloneDefaultCSS(self, out)
         print >> out, 'Added CSSRegistry'
     else:
         print >> out, 'CSSRegistry already exists.'
@@ -21,13 +22,12 @@ def install(self):
     if JSTOOLNAME not in self.objectIds():
         factory = self.manage_addProduct['ResourceRegistries']
         factory.manage_addTool(JSTOOLTYPE)
+        installPloneDefaultJS(self, out)
         print >> out, 'Added JSRegistry'
     else:
         print >> out, 'JSRegistry already exists.'
 
-    installPloneDefaultJS(self, out)
     
-    installPloneDefaultCSS(self, out)
     
     return out.getvalue()
 

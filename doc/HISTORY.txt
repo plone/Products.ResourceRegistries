@@ -11,6 +11,10 @@
    decoding.
    [fschulze]
 
+ * Do not install default CSS and JS on upgrade, only on initial installation.
+   [wichert]
+
+
 1.3-alpha1
 ==========
 

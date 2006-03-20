@@ -2,7 +2,7 @@
 ======================
 
  * Fixed traversal of security restricted resources.
-   [fschulze]
+   [jenner, alecm, fschulze]
 
  * Added javascript "full" compression, which achieves higher compression ratios
    by doing variable name packing based on the rules from Dean Edwards packer:

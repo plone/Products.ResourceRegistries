@@ -1,6 +1,9 @@
 1.2.1 (SVN/unreleased)
 ======================
 
+ * Fixed traversal of security restricted resources.
+   [fschulze]
+
  * Added javascript "full" compression, which achieves higher compression ratios
    by doing variable name packing based on the rules from Dean Edwards packer:
    http://dean.edwards.name/packer/usage/

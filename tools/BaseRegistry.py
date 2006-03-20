@@ -30,13 +30,13 @@ import Acquisition
 from thread import get_ident
 from Products.CMFCore.Skinnable import SKINDATA
 
+from AccessControl import getSecurityManager
 
-def getFileForContent(name, content, contenttype):
+def getDummyFileForContent(name, ctype):
     # make output file like and add an headers dict, so the contenttype
     # is properly set in the headers
-    output = StringIO(content)
-    output.headers = {}
-    output.headers['content-type'] = contenttype
+    output = StringIO()
+    output.headers = {'content-type': ctype}
     return File(name, name, output)
 
 class Resource(Persistent):
@@ -117,22 +117,18 @@ class Skin(Acquisition.Implicit):
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
             parent = aq_parent(self)
-            kw = {'skin':self._skin,'name':name}
-            data = None
-            if not parent.getDebugMode() and parent.isCacheable(name):
-                if parent.ZCacheable_isCachingEnabled():
-                    data = parent.ZCacheable_get(keywords=kw)
-                if data is None:
-                    data = parent.__getitem__(name)
-                    parent.ZCacheable_set(data, keywords=kw)
+            # see BaseTool.__bobo_traverse__
+            deferred = getDummyFileForContent(name, self.getContentType())
+            post_traverse = getattr(aq_base(REQUEST), 'post_traverse', None)
+            if post_traverse is not None:
+                post_traverse(parent.deferredGetContent, (deferred, name,))
             else:
-                data = parent.__getitem__(name)
-            output, contenttype = data
-            return getFileForContent(name, output, contenttype).__of__(parent)
+                parent.deferredGetContent(deferred, name)
+            return deferred.__of__(parent)
         obj = getattr(self, name, None)
         if obj is not None:
             return obj
-        raise AttributeError('%s' % (name,))    
+        raise AttributeError('%s' % (name,))
 
 InitializeClass(Skin)
 
@@ -179,6 +175,44 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         contenttype = self.getContentType()
         return (output, contenttype)
 
+    def deferredGetContent(self, deferred, name):
+        """ uploads data of a resource to deferred """
+        # "deferred" was previosly created by a getDummyFileForContent
+        # call in the __bobo_traverse__ method. As the name suggests,
+        # the file is merely a traversable dummy with appropriate
+        # headers and name. Now as soon as REQUEST.traverse
+        # finishes and gets to the part where it calls the tuples
+        # register using post_traverse (that's actually happening
+        # right now) we can be sure, that all necessary security
+        # stuff has taken place (e.g. authentication).
+        kw = {'skin':None,'name':name}
+        data = None
+        if not self.getDebugMode() and self.isCacheable(name):
+            if self.ZCacheable_isCachingEnabled():
+                data = self.ZCacheable_get(keywords=kw)
+            if data is None:
+                # This is the part were we would fail if
+                # we would just return the ressource
+                # without using the post_traverse hook:
+                # self.__getitem__ leads (indirectly) to
+                # a restrictedTraverse call which performs
+                # security checks. So if a tool (or its ressource)
+                # is not "View"able by anonymous - we'd
+                # get an Unauthorized exception.
+                data = self.__getitem__(name)
+                self.ZCacheable_set(data, keywords=kw)
+        else:
+            data = self.__getitem__(name)
+        
+        output, contenttype = data
+        out = StringIO(output)
+        out.headers = {'content-type': contenttype}
+        # At this point we are ready to provide some content
+        # for our dummy and since it's just a File instance,
+        # we can "upload" (a quite delusive method name) the
+        # data and that's it.
+        deferred.manage_upload(out)
+    
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
         # First see if it is a skin
@@ -189,18 +223,24 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
-            kw = {'skin':None,'name':name}
-            data = None
-            if not self.getDebugMode() and self.isCacheable(name):
-                if self.ZCacheable_isCachingEnabled():
-                    data = self.ZCacheable_get(keywords=kw)
-                if data is None:
-                    data = self.__getitem__(name)
-                    self.ZCacheable_set(data, keywords=kw)
+            # __bobo_traverse__ is called before the authentication has
+            # taken place, so if some operations require an authenticated
+            # user (like restrictedTraverse in __getitem__) it will fail.
+            # Now we can circumvent that by using the post_traverse()
+            # method from BaseRequest. It temporarely stores a callable
+            # along with its arguments in a REQUEST instance and calls
+            # them at the end of BaseRequest.traverse()
+            deferred = getDummyFileForContent(name, self.getContentType())
+            # __bobo_traverse__ might be called from within
+            # OFS.Traversable.Traversable.unrestrictedTraverse()
+            # which passes a simple dict to the method, instead
+            # of a "real" REQUEST object
+            post_traverse = getattr(aq_base(REQUEST), 'post_traverse', None)
+            if post_traverse is not None:
+                post_traverse(self.deferredGetContent, (deferred, name,))
             else:
-                data = self.__getitem__(name)
-            output, contenttype = data
-            return getFileForContent(name, output, contenttype).__of__(self)
+                self.deferredGetContent(deferred, name)
+            return deferred.__of__(self)
         obj = getattr(self, name, None)
         if obj is not None:
             return obj

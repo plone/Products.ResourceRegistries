@@ -121,9 +121,9 @@ class Skin(Acquisition.Implicit):
             deferred = getDummyFileForContent(name, self.getContentType())
             post_traverse = getattr(aq_base(REQUEST), 'post_traverse', None)
             if post_traverse is not None:
-                post_traverse(parent.deferredGetContent, (deferred, name,))
+                post_traverse(parent.deferredGetContent, (deferred, name, self._skin))
             else:
-                parent.deferredGetContent(deferred, name)
+                parent.deferredGetContent(deferred, name, self._skin)
             return deferred.__of__(parent)
         obj = getattr(self, name, None)
         if obj is not None:
@@ -175,7 +175,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         contenttype = self.getContentType()
         return (output, contenttype)
 
-    def deferredGetContent(self, deferred, name):
+    def deferredGetContent(self, deferred, name, skin=None):
         """ uploads data of a resource to deferred """
         # "deferred" was previosly created by a getDummyFileForContent
         # call in the __bobo_traverse__ method. As the name suggests,
@@ -185,7 +185,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         # register using post_traverse (that's actually happening
         # right now) we can be sure, that all necessary security
         # stuff has taken place (e.g. authentication).
-        kw = {'skin':None,'name':name}
+        kw = {'skin':skin,'name':name}
         data = None
         if not self.getDebugMode() and self.isCacheable(name):
             if self.ZCacheable_isCachingEnabled():
@@ -237,9 +237,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             # of a "real" REQUEST object
             post_traverse = getattr(aq_base(REQUEST), 'post_traverse', None)
             if post_traverse is not None:
-                post_traverse(self.deferredGetContent, (deferred, name,))
+                post_traverse(self.deferredGetContent, (deferred, name, None))
             else:
-                self.deferredGetContent(deferred, name)
+                self.deferredGetContent(deferred, name, None)
             return deferred.__of__(self)
         obj = getattr(self, name, None)
         if obj is not None:

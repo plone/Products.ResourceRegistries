@@ -815,6 +815,13 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         except Unauthorized:
             self.fail()
 
+    def testAuthorizedOnPublish(self):
+        # FIXME - As a manager this should be accessible, but the test doesn't work
+        # when tested by hand in the browser, it does work as expected
+        self.setRoles(['Manager'])
+        response = self.publish(self.toolpath + '/testroot.css')
+        self.failUnlessEqual(response.getStatus(), 200)
+
 class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):

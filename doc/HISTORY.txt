@@ -1,6 +1,22 @@
 1.3 (SVN/unreleased)
 ====================
 
+ * Do not install default CSS and JS on upgrade, only on initial installation.
+   [wichert]
+
+1.3-alpha1
+==========
+
+ * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
+   portal creation)
+   [rafrombrc]
+
+1.2.1 (SVN/unreleased)
+======================
+
+ * Fixed traversal of security restricted resources.
+   [jenner, alecm, fschulze]
+
  * Added javascript "full" compression, which achieves higher compression ratios
    by doing variable name packing based on the rules from Dean Edwards packer:
    http://dean.edwards.name/packer/usage/
@@ -10,17 +26,6 @@
    javascript files, but adds a small performance hit on the client for the
    decoding.
    [fschulze]
-
- * Do not install default CSS and JS on upgrade, only on initial installation.
-   [wichert]
-
-
-1.3-alpha1
-==========
-
- * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
-   portal creation)
-   [rafrombrc]
 
 1.2
 ===

@@ -30,7 +30,6 @@ import Acquisition
 from thread import get_ident
 from Products.CMFCore.Skinnable import SKINDATA
 
-from AccessControl import getSecurityManager
 
 def getDummyFileForContent(name, ctype):
     # make output file like and add an headers dict, so the contenttype

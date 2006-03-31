@@ -1,5 +1,5 @@
-1.3 (SVN/unreleased)
-====================
+1.3-beta1
+=========
 
  * Do not install default CSS and JS on upgrade, only on initial installation.
    [wichert]
@@ -11,8 +11,8 @@
    portal creation)
    [rafrombrc]
 
-1.2.1 (SVN/unreleased)
-======================
+1.2.1
+=====
 
  * Fixed traversal of security restricted resources.
    [jenner, alecm, fschulze]

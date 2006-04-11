@@ -191,10 +191,10 @@ class CSSRegistryTool(BaseRegistryTool):
     def manage_addStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
                              enabled=False, cookable=True, compression='none',
-                             REQUEST=None):
+                             cacheable=True, REQUEST=None):
         """Register a stylesheet from a TTW request."""
         self.registerStylesheet(id, expression, media, rel, title,
-                                rendering, enabled, cookable, compression)
+                                rendering, enabled, cookable, compression, cacheable)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -241,7 +241,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1,
-                           cookable=True, compression='none'):
+                           cookable=True, compression='none', cacheable=True):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,
@@ -251,7 +251,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                 rendering=rendering,
                                 enabled=enabled,
                                 cookable=cookable,
-                                compression=compression)
+                                compression=compression,
+                                cacheable=cacheable)
         self.storeResource(stylesheet)
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')

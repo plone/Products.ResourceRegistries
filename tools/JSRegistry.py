@@ -136,9 +136,9 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self, id, expression='', inline=False,
                          enabled=False, cookable=True, compression='none',
-                         REQUEST=None):
+                         cacheable=True, REQUEST=None):
         """Register a script from a TTW request."""
-        self.registerScript(id, expression, inline, enabled, cookable, compression)
+        self.registerScript(id, expression, inline, enabled, cookable, compression, cacheable)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -181,13 +181,15 @@ class JSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', inline=False, enabled=True,
-                       cookable=True, compression='none'):
+                       cookable=True, compression='none', cacheable=True):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,
                             inline=inline,
                             enabled=enabled,
-                            cookable=cookable)
+                            cookable=cookable,
+                            compression=compression,
+                            cacheable=cacheable)
         self.storeResource(script)
 
     security.declareProtected(permissions.ManagePortal, 'getCompressionOptions')

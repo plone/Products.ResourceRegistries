@@ -298,8 +298,8 @@ legend {
 
           <div>
               <label>Caching allowed?</label>
-              <input type="checkbox" name="cachable:boolean" checked="1" />
-              <input type="hidden" name="cachable:boolean:default" value="False" />
+              <input type="checkbox" name="cacheable:boolean" checked="1" />
+              <input type="hidden" name="cacheable:boolean:default" value="False" />
           </div>
 
           <div>

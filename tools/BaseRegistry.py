@@ -33,6 +33,24 @@ import Acquisition
 from thread import get_ident
 from Products.CMFCore.Skinnable import SKINDATA
 
+# version agnostic import of z3_Resource
+try:
+    import Products.Five
+except ImportError:
+    __five__ = False
+    from zope.app.publisher.browser.resource import Resource as z3_Resource
+else:
+    __five__ = True
+    try:
+        # Zope 2.8 / Five 1.0.2
+        from Products.Five.resource import Resource as z3_Resource
+        __five_pre_1_3_ = True
+    except ImportError:
+        # Zope 2.9 / Five 1.3
+        from Products.Five.browser.resource import Resource as z3_Resource
+        __five_pre_1_3__ = False
+
+
 
 def getDummyFileForContent(name, ctype):
     # make output file like and add an headers dict, so the contenttype
@@ -452,7 +470,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     raise
 
             if obj is not None:
-                if hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
+                if isinstance(obj, z3_Resource):
+                    # z3 resources
+                    # XXX this is a temporary solution, we wrap the five resources
+                    # into our mechanism, where it should be the other way around.
+                    content = obj.GET()
+                elif hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)
                 

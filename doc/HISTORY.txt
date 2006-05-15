@@ -1,5 +1,8 @@
-1.2.2 (SVN/unreleased)
-======================
+1.2.2
+=====
+
+ * Added missing arguments in resource adding functions.
+   [jenner, fschulze]
 
 1.2.1
 =====

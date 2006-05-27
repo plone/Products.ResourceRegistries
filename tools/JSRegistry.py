@@ -196,6 +196,22 @@ class JSRegistryTool(BaseRegistryTool):
                             cacheable=cacheable)
         self.storeResource(script)
 
+    security.declareProtected(permissions.ManagePortal, 'updateScript')
+    def updateScript(self, id, **data):
+        script = self.getResourcesDict().get(id, None)
+        if script is None:
+            raise ValueError, 'Invalid resource id %s' % (id)
+        if data.get('expression', None) is not None:
+            script.setExpression(data['expression'])
+        if data.get('inline', None) is not None:
+            script.setInline(data['inline'])
+        if data.get('cookable', None) is not None:
+            script.setCookable(data['cookable'])
+        if data.get('compression', None) is not None:
+            script.setCompression(data['compression'])
+        if data.get('cacheable', None) is not None:
+            script.setCacheable(data['cacheable'])
+
     security.declareProtected(permissions.ManagePortal, 'getCompressionOptions')
     def getCompressionOptions(self):
         """Compression methods for use in ZMI forms."""

@@ -241,6 +241,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         skins = skintool.getSkinSelections()
         if name in skins:
             return Skin(name).__of__(self)
+
         
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
@@ -474,7 +475,29 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     # z3 resources
                     # XXX this is a temporary solution, we wrap the five resources
                     # into our mechanism, where it should be the other way around.
+                    #
+                    # First thing we must be aware of: resources give a complete
+                    # response so first we must save the headers.
+                    # Especially, we must delete the If-Modified-Since, because
+                    # otherwise we might get a 30x response status in some cases.
+                    response_headers = self.REQUEST.RESPONSE.headers.copy()
+                    if_modif = self.REQUEST.get_header('If-Modified-Since', None)
+                    try:
+                        del self.REQUEST.environ['IF_MODIFIED_SINCE']
+                    except KeyError:
+                        pass
+                    try:
+                        del self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE']
+                    except KeyError:
+                        pass
+                    # Now, get the content.
                     content = obj.GET()
+                    # Now restore the headers and for safety, check that we
+                    # have a 20x response. If not, we have a problem and
+                    # some browser would hang indefinitely at this point.
+                    assert int(self.REQUEST.RESPONSE.getStatus()) / 100 == 2
+                    self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE'] = if_modif
+                    self.REQUEST.RESPONSE.headers = response_headers
                 elif hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)

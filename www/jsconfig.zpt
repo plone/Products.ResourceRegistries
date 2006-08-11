@@ -127,6 +127,17 @@ legend {
     font-weight : bold;
 }
 
+.hiddenLabel {
+    display: block;
+    background: transparent;
+    background-image: none; /* */
+    border: none;
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    margin: -1px 0 0 -1px;
+    width: 1px;
+}
 
 </style>
 
@@ -152,7 +163,12 @@ legend {
     <fieldset tal:repeat="script here/getResources">
 
         <legend>
-    
+            <label class="hiddenLabel">Enabled?</label>
+            <input type="checkbox" name="scripts.enabled:records:boolean"
+                   title="Enabled?"
+                   tal:attributes="checked script/getEnabled" />
+            <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
+
             <input type="text" name="scripts.id:records:string" size="30"
                    tal:attributes="value script/getId" />
 
@@ -178,11 +194,6 @@ legend {
 
 
         <div class="scriptform">
-            <label>Enabled?</label>
-            <input type="checkbox" name="scripts.enabled:records:boolean"
-                   tal:attributes="checked script/getEnabled" />
-            <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
-            
             <label>Condition</label>
             <input type="text" name="scripts.expression:records:string" size="25"
                    tal:attributes="value script/getExpression" />

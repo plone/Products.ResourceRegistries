@@ -126,6 +126,17 @@ legend {
     font-weight : bold;
 }
 
+.hiddenLabel {
+    display: block;
+    background: transparent;
+    background-image: none; /* */
+    border: none;
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    margin: -1px 0 0 -1px;
+    width: 1px;
+}
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -151,6 +162,12 @@ legend {
     <fieldset tal:repeat="stylesheet here/getResources">
 
         <legend>
+            <label class="hiddenLabel">Enabled?</label>
+            <input type="checkbox" name="stylesheets.enabled:records"
+                   title="Enabled?"
+                   tal:attributes="checked stylesheet/getEnabled">
+            <input type="hidden" name="stylesheets.enabled:records:boolean:default" value="False" />
+
             <input type="text" name="stylesheets.id:records" size="30"
                    tal:attributes="value stylesheet/getId">
 
@@ -176,10 +193,6 @@ legend {
                tal:attributes="value repeat/stylesheet/index" />
 
         <div class="stylesheetform">
-            <label>Enabled?</label>
-            <input type="checkbox" name="stylesheets.enabled:records"
-                   tal:attributes="checked stylesheet/getEnabled">
-
             <label>Title</label>
             <input type="text" name="stylesheets.title:records"
                    tal:attributes="value stylesheet/getTitle|nothing">

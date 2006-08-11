@@ -1,6 +1,10 @@
 <div tal:replace="structure here/manage_page_header" />
 
 <style type="text/css">
+.notFound,
+.notFound a {
+    color: red;
+}
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -18,12 +22,17 @@
             </tal:block>
         </div>
         <ul tal:define="scripts here/concatenatedresources">
-            <li tal:repeat="subentry python:scripts.get(entry.getId())">
+          <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
+                       tal:repeat="subentry python:scripts.get(entry.getId())">
+            <li tal:define="resourceExists python:path('exists:portal/%s' % subentry);"
+                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
                 <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${subentry}"
                            tal:content="subentry">
                     plone.js
                 </a>
+                <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
             </li>
+          </tal:scripts>
         </ul>
     </li>
 </ul>

@@ -137,6 +137,12 @@ legend {
     margin: -1px 0 0 -1px;
     width: 1px;
 }
+
+.notFound {
+    background-color: #ffce7b;
+    border: 1px solid #ffa500;
+}
+
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -159,7 +165,10 @@ legend {
     to change the rendering order.</p>
 
     
-    <fieldset tal:repeat="stylesheet here/getResources">
+    <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
+                     tal:repeat="stylesheet here/getResources">
+      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % stylesheet.getId());"
+                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <legend>
             <label class="hiddenLabel">Enabled?</label>
@@ -187,6 +196,7 @@ legend {
                    tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/getId}">
                     x
                 </a>
+                <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
         </legend>
         
         <input type="hidden" name="stylesheets.sort:records:int"
@@ -241,7 +251,8 @@ legend {
         <div style="clear: both;">&nbsp;</div>
         
 
-    </fieldset>
+      </fieldset>
+    </tal:stylesheets>
 
     <input type="submit" i18n:attributes="value" value="Save" />
 

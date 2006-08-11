@@ -54,6 +54,8 @@ def exportResRegistry(context, reg_id, reg_title, filename):
 
 class ResourceRegistryNodeAdapter(XMLAdapterBase):
 
+    unregister_method = 'unregisterResource'
+
     def _exportNode(self):
         """
         Export the object as a DOM node.
@@ -98,13 +100,22 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         """
         registry = getToolByName(self.context, self.registry_id)
         reg_method = getattr(registry, self.register_method)
+        unreg_method = getattr(registry, self.unregister_method)
+        update_method = getattr(registry, self.update_method)
         for child in node.childNodes:
             if child.nodeName != self.resource_type:
                 continue
 
             data = {}
+            method = reg_method
             for key, value in child.attributes.items():
                 key = str(key)
+                if key == 'update':
+                    method = update_method
+                    continue
+                if key == 'remove':
+                    method = unreg_method
+                    break
                 if key == 'id':
                     res_id = str(value)
                 elif value.lower() == 'false':
@@ -117,4 +128,9 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                     except ValueError:
                         data[key] = str(value)
 
-            reg_method(res_id, **data)
+            # unreg_method doesn't expect any keyword arguments
+            # and has to be called separately (this feels dirty..)
+            if method == unreg_method:
+                method(res_id)
+            else:
+                method(res_id, **data)

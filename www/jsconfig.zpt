@@ -127,6 +127,22 @@ legend {
     font-weight : bold;
 }
 
+.hiddenLabel {
+    display: block;
+    background: transparent;
+    background-image: none; /* */
+    border: none;
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    margin: -1px 0 0 -1px;
+    width: 1px;
+}
+
+.notFound {
+    background-color: #ffce7b;
+    border: 1px solid #ffa500;
+}
 
 </style>
 
@@ -149,10 +165,18 @@ legend {
     order in the header of the resulting HTML code.
     Use the up/down arrows to change the rendering order.</p>
 
-    <fieldset tal:repeat="script here/getResources">
+    <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
+                 tal:repeat="script here/getResources">
+      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % script.getId());"
+                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <legend>
-    
+            <label class="hiddenLabel">Enabled?</label>
+            <input type="checkbox" name="scripts.enabled:records:boolean"
+                   title="Enabled?"
+                   tal:attributes="checked script/getEnabled" />
+            <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
+
             <input type="text" name="scripts.id:records:string" size="30"
                    tal:attributes="value script/getId" />
 
@@ -171,6 +195,7 @@ legend {
                title="Remove">
                  x
             </a>
+            <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
         </legend>
 
         <input type="hidden" name="scripts.sort:records:int"
@@ -178,11 +203,6 @@ legend {
 
 
         <div class="scriptform">
-            <label>Enabled?</label>
-            <input type="checkbox" name="scripts.enabled:records:boolean"
-                   tal:attributes="checked script/getEnabled" />
-            <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
-            
             <label>Condition</label>
             <input type="text" name="scripts.expression:records:string" size="25"
                    tal:attributes="value script/getExpression" />
@@ -215,7 +235,8 @@ legend {
 
         <div class="visualClear">&nbsp;</div>
 
-    </fieldset>
+      </fieldset>
+    </tal:scripts>
 
     <input type="submit" i18n:attributes="value" value="Save" />
 
@@ -248,7 +269,8 @@ legend {
             <label>Compression type</label>
             <select name="compression">
                 <option tal:repeat="r here/getCompressionOptions"
-                        tal:attributes="value r"
+                        tal:attributes="value r;
+                                        selected python:r=='safe'"
                         tal:content="r">safe</option>
             </select>
         </div>

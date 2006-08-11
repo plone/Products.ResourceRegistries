@@ -29,3 +29,4 @@ class JSRegistryNodeAdapter(ResourceRegistryNodeAdapter):
     registry_id = _REG_ID
     resource_type = 'javascript'
     register_method = 'registerScript'
+    update_method = 'updateScript'

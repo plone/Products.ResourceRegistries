@@ -1,5 +1,35 @@
-1.3 (SVN/unreleased)
-====================
+1.3.1 (SVN/unreleased)
+======================
+
+ * Mark missing or unaccessible ressources in management screens.
+   [fschulze]
+
+ * Moved 'enabled' checkbox into legend before 'id' textbox.
+   [fschulze]
+
+ * Don't remove conditional compile instructions for IE from javascripts.
+   [fschulze]
+
+ * Fixed error when content is unicode.
+   [rocky]
+
+1.3
+===
+
+ * No changes since rc1.
+
+1.3-rc1
+=======
+
+ * Add patch from jenner to handle updating and removal of resources
+   from GenericSetup profiles.
+   [wichert]
+
+1.3-beta2
+=========
+
+ * Included fixes from the 1.2 line.
+   [fschulze]
 
 1.3-beta1
 =========
@@ -13,6 +43,12 @@
  * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
    portal creation)
    [rafrombrc]
+
+1.2.2
+=====
+
+ * Added missing arguments in resource adding functions.
+   [jenner, fschulze]
 
 1.2.1
 =====

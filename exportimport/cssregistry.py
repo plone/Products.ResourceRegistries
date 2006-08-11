@@ -29,3 +29,4 @@ class CSSRegistryNodeAdapter(ResourceRegistryNodeAdapter):
     registry_id = _REG_ID
     resource_type = 'stylesheet'
     register_method = 'registerStylesheet'
+    update_method = 'updateStylesheet'

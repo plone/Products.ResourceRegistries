@@ -226,6 +226,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             data = self.__getitem__(name)
         
         output, contenttype = data
+        
+        if isinstance(output, unicode):
+            portal_props = getToolByName(self, 'portal_properties')
+            site_props = portal_props.site_properties
+            charset = site_props.getProperty('default_charset', 'utf-8')
+            output = output.encode(charset)
+            contenttype += ';charset=' + charset
+        
         out = StringIO(output)
         out.headers = {'content-type': contenttype}
         # At this point we are ready to provide some content

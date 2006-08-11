@@ -224,7 +224,7 @@ class CSSRegistryTool(BaseRegistryTool):
                                     enabled=r.get('enabled', False),
                                     cookable=r.get('cookable', False),
                                     cacheable=r.get('cacheable', False),
-                                    compression=r.get('compression', ''))
+                                    compression=r.get('compression', 'safe'))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -258,6 +258,31 @@ class CSSRegistryTool(BaseRegistryTool):
                                 compression=compression,
                                 cacheable=cacheable)
         self.storeResource(stylesheet)
+
+    security.declareProtected(permissions.ManagePortal, 'updateStylesheet')
+    def updateStylesheet(self, id, **data):
+        stylesheet = self.getResourcesDict().get(id, None)
+        if stylesheet is None:
+            raise ValueError, 'Invalid resource id %s' % (id)
+        
+        if data.get('expression', None) is not None:
+            stylesheet.setExpression(data['expression'])
+        if data.get('media', None) is not None:
+            stylesheet.setMedia(data['media'])
+        if data.get('rel', None) is not None:
+            stylesheet.setRel(data['rel'])
+        if data.get('title', None) is not None:
+            stylesheet.setTitle(data['title'])
+        if data.get('rendering', None) is not None:
+            stylesheet.setRendering(data['rendering'])
+        if data.get('enabled', None) is not None:
+            stylesheet.setEnabled(data['enabled'])
+        if data.get('cookable', None) is not None:
+            stylesheet.setCookable(data['cookable'])
+        if data.get('compression', None) is not None:
+            stylesheet.setCompression(data['compression'])
+        if data.get('cacheable', None) is not None:
+            stylesheet.setCacheable(data['cacheable'])
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):

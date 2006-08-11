@@ -165,7 +165,7 @@ class JSRegistryTool(BaseRegistryTool):
                                 enabled=r.get('enabled'),
                                 cookable=r.get('cookable'),
                                 cacheable=r.get('cacheable'),
-                                compression=r.get('compression'))
+                                compression=r.get('compression', 'safe'))
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()

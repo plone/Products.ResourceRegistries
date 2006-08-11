@@ -269,7 +269,8 @@ legend {
             <label>Compression type</label>
             <select name="compression">
                 <option tal:repeat="r here/getCompressionOptions"
-                        tal:attributes="value r"
+                        tal:attributes="value r;
+                                        selected python:r=='safe'"
                         tal:content="r">safe</option>
             </select>
         </div>

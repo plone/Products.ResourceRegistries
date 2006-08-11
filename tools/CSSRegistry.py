@@ -224,7 +224,7 @@ class CSSRegistryTool(BaseRegistryTool):
                                     enabled=r.get('enabled', False),
                                     cookable=r.get('cookable', False),
                                     cacheable=r.get('cacheable', False),
-                                    compression=r.get('compression', ''))
+                                    compression=r.get('compression', 'safe'))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()

@@ -3,22 +3,31 @@ Set up tests with Five.
 '''
 
 import Products.ResourceRegistries.tests
-from textwrap import dedent
+import Products.Five
+from Products.Five.zcml import load_string, load_config
+
+try:
+    from zope.app.testing import placelesssetup
+    run_setUp = True
+except ImportError:
+    # Zope 2.8 / Five < 1.3
+    from zope.app.tests import placelesssetup
+    run_setUp = False
 
 class FiveTestsBase:
     'Publishing with Five'
 
     def afterSetUp(self):
-        from zope.app.testing.placelesssetup import setUp
-        setUp()
+        if run_setUp:
+            placelesssetup.setUp()
+            # XXX I have absolutely no idea, why this fails on
+            # Zope 2.8, however it seems to work fine without... ???
         # Allow traversing
-        import Products.Five
-        from Products.Five.zcml import load_string, load_config
         load_config('meta.zcml', package=Products.Five)
         load_config('configure.zcml', package=Products.Five)
         # Change to the context of this package
         Products.Five.zcml._context.package = Products.ResourceRegistries.tests
-        load_string(dedent('''\
+        load_string('''\
                     <configure xmlns="http://namespaces.zope.org/zope"
                            xmlns:five="http://namespaces.zope.org/five">
                     <include package="zope.app.traversing" />
@@ -32,10 +41,9 @@ class FiveTestsBase:
                           factory="zope.app.traversing.adapters.Traverser"
                           provides="zope.app.traversing.interfaces.ITraverser"
                           />
-                    </configure>'''))
+                    </configure>''')
         # Enable Plone traversing
-        # XXX this is needed in 2.1 but if defined it breaks 2.5. Why?
-        load_string(dedent('''\
+        load_string('''\
                     <configure xmlns="http://namespaces.zope.org/zope"
                            xmlns:five="http://namespaces.zope.org/five">
                       <!-- IPortal binds to the portal root -->
@@ -76,10 +84,9 @@ class FiveTestsBase:
                       <five:traversable class="Products.CMFCore.PortalObject.PortalObjectBase" />
                       <five:traversable class="Products.Archetypes.public.BaseObject" />
 
-                    </configure>'''))
+                    </configure>''')
 
     def beforeTearDown(self):
-        from zope.app.testing.placelesssetup import tearDown
-        tearDown()
+        placelesssetup.tearDown()
         import Products.Five.zcml
         Products.Five.zcml._context = None

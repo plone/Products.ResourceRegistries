@@ -5,6 +5,7 @@
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
+from textwrap import dedent
 
 from Testing import ZopeTestCase
 
@@ -21,6 +22,7 @@ from Products.PloneTestCase.PloneTestCase import PLONE21
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
 
 
 class TestJSImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -469,6 +471,37 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
                          'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
+class TestFivePublishing(CSSRegistryTestCase.CSSRegistryTestCase, FiveTestsBase):
+    'Publishing with Five'
+
+    def afterSetUp(self):
+        FiveTestsBase.afterSetUp(self)
+        # Define some resource
+        from Products.Five.zcml import load_string, load_config
+        load_string(dedent('''\
+                    <configure xmlns="http://namespaces.zope.org/zope"
+                           xmlns:browser="http://namespaces.zope.org/browser"
+                           xmlns:five="http://namespaces.zope.org/five">
+                        <browser:resource
+                                   name="test_rr_1.js"
+                                   file="test_rr_1.js"
+                          />
+                    </configure>'''))
+        #
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        self.tool.registerScript('++resource++test_rr_1.js')
+        self.toolpath = '/' + self.tool.absolute_url(1)
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.setRoles(['Manager'])
+        self.portal.invokeFactory('Document', 'index_html')
+        self.setRoles(['Member'])
+
+    def testPublishFiveResource(self):
+        response = self.publish(self.toolpath + '/++resource++test_rr_1.js')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Content-Type')[:24], 'application/x-javascript')
+        self.assertEqual("window.alert('running')" in response.getBody(), True)
 
 class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
 
@@ -933,6 +966,7 @@ def test_suite():
     suite.addTest(makeSuite(TestScriptMoving))
     suite.addTest(makeSuite(TestJSTraversal))
     suite.addTest(makeSuite(TestPublishing))
+    suite.addTest(makeSuite(TestFivePublishing))
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestZODBTraversal))
     suite.addTest(makeSuite(TestMergingDisabled))

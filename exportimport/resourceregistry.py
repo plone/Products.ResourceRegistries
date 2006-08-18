@@ -132,5 +132,13 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
             # and has to be called separately (this feels dirty..)
             if method == unreg_method:
                 method(res_id)
-            else:
+            elif method == reg_method:
+                try:
+                    method(res_id, **data)
+                except ValueError, e:
+                    # this feels a bit dirty too, but we always want to update
+                    # if the resource already exists (in which case 'ValueError:
+                    # Duplicate id ...' is raised.
+                    method=update_method
+            if method == update_method:
                 method(res_id, **data)

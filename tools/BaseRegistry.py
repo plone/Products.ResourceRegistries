@@ -33,6 +33,24 @@ import Acquisition
 from thread import get_ident
 from Products.CMFCore.Skinnable import SKINDATA
 
+# version agnostic import of z3_Resource
+try:
+    import Products.Five
+except ImportError:
+    __five__ = False
+    from zope.app.publisher.browser.resource import Resource as z3_Resource
+else:
+    __five__ = True
+    try:
+        # Zope 2.8 / Five 1.0.2
+        from Products.Five.resource import Resource as z3_Resource
+        __five_pre_1_3_ = True
+    except ImportError:
+        # Zope 2.9 / Five 1.3
+        from Products.Five.browser.resource import Resource as z3_Resource
+        __five_pre_1_3__ = False
+
+
 
 def getDummyFileForContent(name, ctype):
     # make output file like and add an headers dict, so the contenttype
@@ -208,6 +226,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             data = self.__getitem__(name)
         
         output, contenttype = data
+        
+        if isinstance(output, unicode):
+            portal_props = getToolByName(self, 'portal_properties')
+            site_props = portal_props.site_properties
+            charset = site_props.getProperty('default_charset', 'utf-8')
+            output = output.encode(charset)
+            contenttype += ';charset=' + charset
+        
         out = StringIO(output)
         out.headers = {'content-type': contenttype}
         # At this point we are ready to provide some content
@@ -223,6 +249,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         skins = skintool.getSkinSelections()
         if name in skins:
             return Skin(name).__of__(self)
+
         
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
@@ -452,7 +479,34 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     raise
 
             if obj is not None:
-                if hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
+                if isinstance(obj, z3_Resource):
+                    # z3 resources
+                    # XXX this is a temporary solution, we wrap the five resources
+                    # into our mechanism, where it should be the other way around.
+                    #
+                    # First thing we must be aware of: resources give a complete
+                    # response so first we must save the headers.
+                    # Especially, we must delete the If-Modified-Since, because
+                    # otherwise we might get a 30x response status in some cases.
+                    response_headers = self.REQUEST.RESPONSE.headers.copy()
+                    if_modif = self.REQUEST.get_header('If-Modified-Since', None)
+                    try:
+                        del self.REQUEST.environ['IF_MODIFIED_SINCE']
+                    except KeyError:
+                        pass
+                    try:
+                        del self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE']
+                    except KeyError:
+                        pass
+                    # Now, get the content.
+                    content = obj.GET()
+                    # Now restore the headers and for safety, check that we
+                    # have a 20x response. If not, we have a problem and
+                    # some browser would hang indefinitely at this point.
+                    assert int(self.REQUEST.RESPONSE.getStatus()) / 100 == 2
+                    self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE'] = if_modif
+                    self.REQUEST.RESPONSE.headers = response_headers
+                elif hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)
                 

@@ -1,6 +1,9 @@
 1.3.2 (SVN/unreleased)
 ======================
 
+ * Made GenericSetup importer not fail on repeated imports.
+   [alecm]
+
 1.3.1
 =====
 
@@ -18,9 +21,6 @@
 
  * Fixed error when content is unicode.
    [rocky]
-
- * Made GenericSetup importer not fail on repeated imports.
-   [alecm]
 
 1.3
 ===

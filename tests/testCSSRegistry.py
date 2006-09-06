@@ -5,6 +5,7 @@
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
+from textwrap import dedent
 
 from Testing import ZopeTestCase
 
@@ -21,6 +22,10 @@ from Products.PloneTestCase.PloneTestCase import PLONE21
 from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tests import CSSRegistryTestCase
+try:
+    from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
+except ImportError:
+    FiveTestsBase = None
 
 
 class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
@@ -738,6 +743,41 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
+
+if FiveTestsBase is not None:
+    class TestFivePublishing(CSSRegistryTestCase.CSSRegistryTestCase, FiveTestsBase):
+        'Publishing with Five'
+
+        def afterSetUp(self):
+            FiveTestsBase.afterSetUp(self)
+            # Define some resource
+            from Products.Five.zcml import load_string, load_config
+            load_string(dedent('''\
+                        <configure xmlns="http://namespaces.zope.org/zope"
+                               xmlns:browser="http://namespaces.zope.org/browser"
+                               xmlns:five="http://namespaces.zope.org/five">
+                            <browser:resource
+                                       name="test_rr_1.css"
+                                       file="test_rr_1.css"
+                              />
+                        </configure>'''))
+            #
+            self.tool = getattr(self.portal, CSSTOOLNAME)
+            self.tool.clearResources()
+            self.tool.registerStylesheet('++resource++test_rr_1.css')
+            self.toolpath = '/' + self.tool.absolute_url(1)
+            self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+            self.setRoles(['Manager'])
+            self.portal.invokeFactory('Document', 'index_html')
+            self.setRoles(['Member'])
+
+        def testPublishFiveResource(self):
+            response = self.publish(self.toolpath + '/++resource++test_rr_1.css')
+            self.assertEqual(response.getStatus(), 200)
+            self.assertEqual(response.getHeader('Content-Type')[:8], 'text/css')
+            self.assertEqual('body { background-color : red }' in response.getBody(), True)
+
+
 class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def afterSetUp(self):
@@ -1171,6 +1211,8 @@ def test_suite():
     suite.addTest(makeSuite(TestToolExpression))
     suite.addTest(makeSuite(TestStylesheetCooking))
     suite.addTest(makeSuite(TestPublishing))
+    if FiveTestsBase is not None:
+        suite.addTest(makeSuite(TestFivePublishing))
     suite.addTest(makeSuite(TestStylesheetMoving))
     suite.addTest(makeSuite(TestTraversal))
     suite.addTest(makeSuite(TestZODBTraversal))

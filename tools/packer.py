@@ -303,7 +303,7 @@ class JavascriptPacker(Packer):
         self.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
         self.protect(r"""([^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
         # multiline comments
-        self.sub(r'/\*.*?\*/', '', re.DOTALL)
+        self.sub(r'/\*(?!@).*?\*/', '', re.DOTALL)
         # one line comments
         self.sub(r'\s*//.*$', '', re.MULTILINE)
         # strip whitespace at the beginning and end of each line

@@ -1,6 +1,9 @@
 1.2.4 (SVN/unreleased)
 ======================
 
+ * Made enabled checkbox work again.
+   [fschulze]
+
 1.2.3
 =====
 

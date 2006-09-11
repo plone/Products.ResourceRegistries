@@ -1,5 +1,5 @@
-1.3.2 (SVN/unreleased)
-======================
+1.3.2
+=====
 
  * Made GenericSetup importer not fail on repeated imports.
    [alecm]

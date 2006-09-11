@@ -170,6 +170,9 @@ legend {
       <fieldset tal:define="resourceExists python:path('exists:portal/%s' % stylesheet.getId());"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
+        <input type="hidden" name="stylesheets.sort:records:int"
+               tal:attributes="value repeat/stylesheet/index" />
+
         <legend>
             <label class="hiddenLabel">Enabled?</label>
             <input type="checkbox" name="stylesheets.enabled:records"
@@ -199,9 +202,6 @@ legend {
                 <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
         </legend>
         
-        <input type="hidden" name="stylesheets.sort:records:int"
-               tal:attributes="value repeat/stylesheet/index" />
-
         <div class="stylesheetform">
             <label>Title</label>
             <input type="text" name="stylesheets.title:records"

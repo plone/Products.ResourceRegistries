@@ -1,8 +1,14 @@
-1.3.2 (SVN/unreleased)
+1.3.3 (SVN/unreleased)
 ======================
+
+1.3.2
+=====
 
  * Made GenericSetup importer not fail on repeated imports.
    [alecm]
+
+ * Made enabled checkbox work again.
+   [fschulze]
 
 1.3.1
 =====
@@ -52,6 +58,33 @@
  * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
    portal creation)
    [rafrombrc]
+
+1.2.4
+=====
+
+ * Made enabled checkbox work again.
+   [fschulze]
+
+1.2.3
+=====
+
+ * Backported several fixes from 1.3.1:
+   [fschulze]
+
+     - Enable use of z3 / Five resources.
+       [ree]
+
+     - Mark missing or unaccessible ressources in management screens.
+       [fschulze]
+
+     - Moved 'enabled' checkbox into legend before 'id' textbox.
+       [fschulze]
+
+     - Don't remove conditional compile instructions for IE from javascripts.
+       [fschulze]
+
+     - Fixed error when content is unicode.
+       [rocky]
 
 1.2.2
 =====

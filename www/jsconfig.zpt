@@ -170,6 +170,9 @@ legend {
       <fieldset tal:define="resourceExists python:path('exists:portal/%s' % script.getId());"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
+        <input type="hidden" name="scripts.sort:records:int"
+               tal:attributes="value repeat/script/index" />
+
         <legend>
             <label class="hiddenLabel">Enabled?</label>
             <input type="checkbox" name="scripts.enabled:records:boolean"
@@ -197,10 +200,6 @@ legend {
             </a>
             <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
         </legend>
-
-        <input type="hidden" name="scripts.sort:records:int"
-               tal:attributes="value repeat/script/index" />
-
 
         <div class="scriptform">
             <label>Condition</label>

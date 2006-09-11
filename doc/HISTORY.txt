@@ -1,5 +1,5 @@
-1.2.4 (SVN/unreleased)
-======================
+1.2.4
+=====
 
  * Made enabled checkbox work again.
    [fschulze]

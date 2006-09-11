@@ -1,1 +1,1 @@
-1.2.4 (SVN/unreleased)
+1.2.4

@@ -435,7 +435,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         If any property of the resource is changed, then cookResources of the
         registry must be called."""
         resources = self.getResourcesDict()
-        return ExplicitAcquisitionWrapper(resources.get(id, None), self)
+        resource = resources.get(id, None)
+        if resource is not None:
+            return ExplicitAcquisitionWrapper(resource, self)
+        return None
 
     security.declarePrivate('getResourceContent')
     def getResourceContent(self, item, context, original=False):

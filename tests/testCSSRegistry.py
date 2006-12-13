@@ -7,8 +7,6 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 from textwrap import dedent
 
-from Testing import ZopeTestCase
-
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
@@ -21,18 +19,19 @@ from Products.PloneTestCase.PloneTestCase import PLONE21
 
 from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces.ResourceRegistries import ICSSRegistry as z2ICSSRegistry
-from Products.ResourceRegistries.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
+from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
 
 
-class TestImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestImplementation(RegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, CSSTOOLNAME)
         self.failUnless(z2ICSSRegistry.isImplementedBy(tool))
         self.failUnless(verifyObject(z2ICSSRegistry, tool))
 
-class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestTool(RegistryTestCase):
 
     def testToolExists(self):
         self.failUnless(CSSTOOLNAME in self.portal.objectIds())
@@ -44,7 +43,7 @@ class TestTool(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(tool.manage_cssComposition())
 
 
-class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestSkin(RegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
@@ -54,7 +53,7 @@ class TestSkin(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(getattr(self.portal, 'renderAllTheStylesheets'))
 
 
-class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
+class testZMIMethods(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -66,7 +65,7 @@ class testZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(self.tool.getResources())
 
 
-class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestStylesheetRegistration(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -129,7 +128,7 @@ class TestStylesheetRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(self.tool.getResourcesDict()['ham'].getId(), 'ham')
 
 
-class TestStylesheetRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestStylesheetRenaming(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -161,7 +160,7 @@ class TestStylesheetRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'bacon')
 
 
-class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestToolSecurity(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -180,7 +179,7 @@ class TestToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
             self.fail()
 
 
-class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestToolExpression(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -204,7 +203,7 @@ class TestToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
                         'python:"eggs" in object.objectIds()', context))
 
 
-class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestStylesheetCooking(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -335,7 +334,7 @@ class TestStylesheetCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in renderedpage)
 
 
-class TestStylesheetMoving(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestStylesheetMoving(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -452,7 +451,7 @@ class TestStylesheetMoving(CSSRegistryTestCase.CSSRegistryTestCase):
                          ('bacon', 'spam', 'eggs', 'ham'))
 
 
-class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestTraversal(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -495,7 +494,7 @@ class TestTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color : red' in content)
         self.failUnless('H1 { color: blue; }' in content)
 
-class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestZODBTraversal(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -571,7 +570,7 @@ class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('purple' in content)
         self.failIf('pink' in content)
 
-class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestMergingDisabled(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -698,7 +697,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
 
-class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestPublishing(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -713,7 +712,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
     def testPublishCSSThroughTool(self):
         response = self.publish(self.toolpath + '/plone_styles.css')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
 
     def testPublishNonMagicCSSThroughTool(self):
         self.setRoles(['Manager'])
@@ -722,7 +721,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath + '/testmethod')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
 
     def testPublishPageWithInlineCSS(self):
         response = self.publish(self.portalpath)
@@ -740,7 +739,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
 
 
-class TestFivePublishing(CSSRegistryTestCase.CSSRegistryTestCase, FiveTestsBase):
+class TestFivePublishing(FunctionalRegistryTestCase, FiveTestsBase):
     'Publishing with Five'
 
     def afterSetUp(self):
@@ -773,7 +772,7 @@ class TestFivePublishing(CSSRegistryTestCase.CSSRegistryTestCase, FiveTestsBase)
         self.assertEqual('body { background-color : red }' in response.getBody(), True)
 
 
-class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestResourcePermissions(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -858,7 +857,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         response = self.publish(self.toolpath + '/testroot.css')
         self.failUnlessEqual(response.getStatus(), 200)
 
-class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestDebugMode(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -895,7 +894,7 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
-class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestCSSDefaults(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -934,7 +933,7 @@ class TestCSSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('** Plone style sheet for CSS2-capable browsers.' in o)
 
 
-class TestResourceObjects(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestResourceObjects(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -981,7 +980,7 @@ class TestResourceObjects(CSSRegistryTestCase.CSSRegistryTestCase):
                          ['eggs'])
 
 
-class TestSkinAwareness(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestSkinAwareness(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -1022,7 +1021,7 @@ class TestSkinAwareness(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('purple' in str(response))
 
 
-class TestCSSCompression(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestCSSCompression(RegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
 

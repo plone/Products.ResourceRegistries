@@ -7,8 +7,6 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 from textwrap import dedent
 
-from Testing import ZopeTestCase
-
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
@@ -21,11 +19,12 @@ from Products.PloneTestCase.PloneTestCase import PLONE21
 
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
-from Products.ResourceRegistries.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
+from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
 
 
-class TestJSImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSImplementation(RegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, JSTOOLNAME)
@@ -33,7 +32,7 @@ class TestJSImplementation(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(verifyObject(IJSRegistry, tool))
 
 
-class TestJSTool(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSTool(RegistryTestCase):
 
     def testToolExists(self):
         self.failUnless(JSTOOLNAME in self.portal.objectIds())
@@ -45,7 +44,7 @@ class TestJSTool(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(tool.manage_jsComposition())
 
 
-class TestJSSkin(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSSkin(RegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
@@ -55,7 +54,7 @@ class TestJSSkin(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(getattr(self.portal, 'renderAllTheScripts'))
 
 
-class testJSZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
+class testJSZMIMethods(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -67,7 +66,7 @@ class testJSZMIMethods(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless(self.tool.getResources())
 
 
-class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSScriptRegistration(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -94,7 +93,7 @@ class TestJSScriptRegistration(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(len(self.tool.getResources()), 0)
 
 
-class TestJSScriptRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSScriptRenaming(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -126,7 +125,7 @@ class TestJSScriptRenaming(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'bacon')
 
 
-class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSToolSecurity(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -145,7 +144,7 @@ class TestJSToolSecurity(CSSRegistryTestCase.CSSRegistryTestCase):
             self.fail()
 
 
-class TestJSToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSToolExpression(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -169,7 +168,7 @@ class TestJSToolExpression(CSSRegistryTestCase.CSSRegistryTestCase):
                         'python:"eggs" in object.objectIds()', context))
 
 
-class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSScriptCooking(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -272,7 +271,7 @@ class TestJSScriptCooking(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('background-color' in renderedpage)
 
 
-class TestScriptMoving(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestScriptMoving(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -382,7 +381,7 @@ class TestScriptMoving(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(self.tool.getResourceIds(),
                          ('bacon', 'spam', 'eggs', 'ham'))
 
-class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSTraversal(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -419,17 +418,15 @@ class TestJSTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
 
 
-class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestPublishing(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.folderpath = '/' + self.folder.absolute_url(1)
         self.tool.registerScript('test_rr_1.js')
-        self.setRoles(['Manager'])
-        self.portal.invokeFactory('Document', 'index_html')
-        self.setRoles(['Member'])
+        self.folder.invokeFactory('Document', 'index_html')
 
     def testPublishJSThroughTool(self):
         response = self.publish(self.toolpath + '/test_rr_1.js')
@@ -439,7 +436,7 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
     def testPublishNonMagicJSThroughTool(self):
         self.setRoles(['Manager'])
         body = """<dtml-var "'joined' + 'string'">"""
-        self.portal.addDTMLMethod('testmethod', file=body)
+        self.folder.addDTMLMethod('testmethod', file=body)
         self.tool.registerScript('testmethod')
         response = self.publish(self.toolpath + '/testmethod')
         self.assertEqual(response.getStatus(), 200)
@@ -447,14 +444,14 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
 
     def testPublishPageWithInlineJS(self):
         # This one fails from string/utf-8 concatenation
-        response = self.publish(self.portalpath)
+        response = self.publish(self.folderpath)
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'),
                          'text/html;charset=utf-8')
         self.tool.clearResources()
         self.tool.registerScript('test_rr_1.js', inline=True)
         # Test that the main page retains its content-type
-        response = self.publish(self.portalpath)
+        response = self.publish(self.folderpath)
         self.assertEqual(response.getHeader('Content-Type'),
                          'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
@@ -464,14 +461,14 @@ class TestPublishing(CSSRegistryTestCase.CSSRegistryTestCase):
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
         body = """<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/javascript')">/*and some js comments too*/ """
-        self.portal.addDTMLMethod('testmethod', file=body)
+        self.folder.addDTMLMethod('testmethod', file=body)
         self.tool.registerScript('testmethod', inline=True)
-        response = self.publish(self.portalpath)
+        response = self.publish(self.folderpath)
         self.assertEqual(response.getHeader('Content-Type'),
                          'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
-class TestFivePublishing(CSSRegistryTestCase.CSSRegistryTestCase, FiveTestsBase):
+class TestFivePublishing(FunctionalRegistryTestCase, FiveTestsBase):
     'Publishing with Five'
 
     def afterSetUp(self):
@@ -503,7 +500,7 @@ class TestFivePublishing(CSSRegistryTestCase.CSSRegistryTestCase, FiveTestsBase)
         self.assertEqual(response.getHeader('Content-Type')[:24], 'application/x-javascript')
         self.assertEqual("window.alert('running')" in response.getBody(), True)
 
-class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestDebugMode(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -540,7 +537,7 @@ class TestDebugMode(CSSRegistryTestCase.CSSRegistryTestCase):
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
-class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSDefaults(RegistryTestCase):
 
     # These do not run for plone 2.1 +
 
@@ -587,7 +584,7 @@ class TestJSDefaults(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failIf('&amp;dtml' in o)
         self.failUnless('portal_url' in o)
 
-class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestZODBTraversal(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -662,7 +659,7 @@ class TestZODBTraversal(CSSRegistryTestCase.CSSRegistryTestCase):
         self.failUnless('purple' in content)
         self.failIf('pink' in content)
 
-class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestResourcePermissions(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -760,7 +757,7 @@ class TestResourcePermissions(CSSRegistryTestCase.CSSRegistryTestCase):
         response = self.publish(self.toolpath + '/testroot.js')
         self.failUnlessEqual(response.getStatus(), 200)
 
-class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestMergingDisabled(RegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
@@ -892,7 +889,7 @@ class TestMergingDisabled(CSSRegistryTestCase.CSSRegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
         self.failUnless('blue' in content)
 
-class TestJSCompression(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestJSCompression(RegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
 

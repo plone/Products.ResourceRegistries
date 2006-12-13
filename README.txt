@@ -68,7 +68,9 @@ Usage
       - 'none' - the original content will not be changed
 
       - 'safe' - the content will be compressed in a way which should be safe
-                 for any workarounds for browser bugs
+                 for any workarounds for browser bugs. Conditional code for
+                 Internet Explorer is preserved since ResourceRegistries
+                 1.2.3 and 1.3.1.
 
       - 'full' - the content will be compressed with some additional rules.
                  For css all comments and most newlines are removed, this may

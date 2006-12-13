@@ -1,6 +1,9 @@
 1.3.3 (SVN/unreleased)
 ======================
 
+ * Don't wrap None in aquisition wrapper if resource is not found.
+   [tesdal]
+
 1.3.2
 =====
 

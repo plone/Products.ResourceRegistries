@@ -841,8 +841,6 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
             self.fail()
 
     def testAuthorizedOnPublish(self):
-        # FIXME - As a manager this should be accessible, but the test doesn't work
-        # when tested by hand in the browser, it does work as expected
         authstr = "%s:%s" % (portal_owner, default_password)
         response = self.publish(self.toolpath + '/testroot.css', basic=authstr)
         self.failUnlessEqual(response.getStatus(), 200)

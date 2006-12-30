@@ -1,1 +1,0 @@
-"""CSSRegistry Extensions package"""

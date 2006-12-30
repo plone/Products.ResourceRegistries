@@ -10,7 +10,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
-from Products.ResourceRegistries.interfaces.ResourceRegistries import ICSSRegistry as z2ICSSRegistry
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
@@ -98,7 +97,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security = ClassSecurityInfo()
 
     implements(ICSSRegistry)
-    __implements__ = (BaseRegistryTool.__implements__, z2ICSSRegistry,)
+    __implements__ = BaseRegistryTool.__implements__
 
     #
     # ZMI stuff

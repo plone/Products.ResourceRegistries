@@ -1,8 +1,0 @@
-ResourceRegistries 1.3 depends on changes to CMFCore/Skinnable.py in the
-CMF 1.5.5 release. So for Plone 2.1.x install CMF 1.5.5.
-
-To use with Plone 2.0.x, you have to make sure to move the header.pt
-template from the 20compatibility directory to  skins/ResourceRegistries
-
-But Plone 2.0.x uses CMF 1.4, so you need to patch CMFCore/Skinnable.py with the patch (or replacement Skinnable.py) from
-http://plone.org/products/resourceregistries/documentation/how-to/plone-2.0-compatibility/

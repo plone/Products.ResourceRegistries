@@ -10,7 +10,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
-from Products.ResourceRegistries.interfaces.ResourceRegistries import IJSRegistry as z2IJSRegistry
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
@@ -65,7 +64,7 @@ class JSRegistryTool(BaseRegistryTool):
     security = ClassSecurityInfo()
 
     implements(IJSRegistry)
-    __implements__ = (BaseRegistryTool.__implements__, z2IJSRegistry)
+    __implements__ = BaseRegistryTool.__implements__
 
     #
     # ZMI stuff

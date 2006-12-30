@@ -26,7 +26,6 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
-from Products.ResourceRegistries.interfaces.ResourceRegistries import IResourceRegistry as z2IResourceRegistry
 from Products.ResourceRegistries.interfaces import IResourceRegistry
 
 import Acquisition
@@ -158,7 +157,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
     security = ClassSecurityInfo()
     implements(IResourceRegistry)
-    __implements__ = (SimpleItem.__implements__, z2IResourceRegistry)
+    __implements__ = SimpleItem.__implements__
     manage_options = SimpleItem.manage_options
 
     attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable')

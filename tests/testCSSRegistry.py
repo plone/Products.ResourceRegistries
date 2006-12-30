@@ -15,7 +15,7 @@ from Interface.Verify import verifyObject
 
 from Products.CMFCore.utils import getToolByName
 
-from Products.PloneTestCase.PloneTestCase import PLONE21
+from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
 
 from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces.ResourceRegistries import ICSSRegistry as z2ICSSRegistry
@@ -777,7 +777,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
                                    content_type='text/css',
                                    file='body { background-color : green }')
 
-        stylesheet = self.portal.restrictedTraverse('testroot.css')
+        stylesheet = getattr(self.portal, 'testroot.css')
 
         stylesheet.manage_permission('View',['Manager'], acquire=0)
         stylesheet.manage_permission('Access contents information',['Manager'], acquire=0)
@@ -843,8 +843,8 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testAuthorizedOnPublish(self):
         # FIXME - As a manager this should be accessible, but the test doesn't work
         # when tested by hand in the browser, it does work as expected
-        self.setRoles(['Manager'])
-        response = self.publish(self.toolpath + '/testroot.css')
+        authstr = "%s:%s" % (portal_owner, default_password)
+        response = self.publish(self.toolpath + '/testroot.css', basic=authstr)
         self.failUnlessEqual(response.getStatus(), 200)
 
 class TestDebugMode(FunctionalRegistryTestCase):

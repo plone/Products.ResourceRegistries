@@ -15,7 +15,7 @@ from Interface.Verify import verifyObject
 
 from Products.CMFCore.utils import getToolByName
 
-from Products.PloneTestCase.PloneTestCase import PLONE21
+from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
 
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
@@ -743,8 +743,8 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testAuthorizedOnPublish(self):
         # FIXME - As a manager this should be accessible, but the test doesn't work
         # when tested by hand in the browser, it does work as expected
-        self.setRoles(['Manager'])
-        response = self.publish(self.toolpath + '/testroot.js')
+        authstr = "%s:%s" % (portal_owner, default_password)
+        response = self.publish(self.toolpath + '/testroot.js', basic=authstr)
         self.failUnlessEqual(response.getStatus(), 200)
 
 class TestMergingDisabled(RegistryTestCase):

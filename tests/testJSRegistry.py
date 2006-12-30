@@ -21,7 +21,6 @@ from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
-from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
 
 
 class TestJSImplementation(RegistryTestCase):
@@ -468,11 +467,10 @@ class TestPublishing(FunctionalRegistryTestCase):
                          'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
-class TestFivePublishing(FunctionalRegistryTestCase, FiveTestsBase):
+class TestFivePublishing(FunctionalRegistryTestCase):
     'Publishing with Five'
 
     def afterSetUp(self):
-        FiveTestsBase.afterSetUp(self)
         # Define some resource
         from Products.Five.zcml import load_string, load_config
         load_string(dedent('''\

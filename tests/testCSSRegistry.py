@@ -21,7 +21,6 @@ from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces.ResourceRegistries import ICSSRegistry as z2ICSSRegistry
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
-from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
 
 
 class TestImplementation(RegistryTestCase):
@@ -739,11 +738,10 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
 
 
-class TestFivePublishing(FunctionalRegistryTestCase, FiveTestsBase):
+class TestFivePublishing(FunctionalRegistryTestCase):
     'Publishing with Five'
 
     def afterSetUp(self):
-        FiveTestsBase.afterSetUp(self)
         # Define some resource
         from Products.Five.zcml import load_string, load_config
         load_string(dedent('''\

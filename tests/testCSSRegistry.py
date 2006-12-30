@@ -743,17 +743,9 @@ class TestFivePublishing(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         # Define some resource
-        from Products.Five.zcml import load_string, load_config
-        load_string(dedent('''\
-                    <configure xmlns="http://namespaces.zope.org/zope"
-                           xmlns:browser="http://namespaces.zope.org/browser"
-                           xmlns:five="http://namespaces.zope.org/five">
-                        <browser:resource
-                                   name="test_rr_1.css"
-                                   file="test_rr_1.css"
-                          />
-                    </configure>'''))
-        #
+        from Products.Five.zcml import load_config
+        import Products.ResourceRegistries.tests
+        load_config('test.zcml', Products.ResourceRegistries.tests)
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerStylesheet('++resource++test_rr_1.css')

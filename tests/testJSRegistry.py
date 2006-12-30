@@ -472,17 +472,9 @@ class TestFivePublishing(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         # Define some resource
-        from Products.Five.zcml import load_string, load_config
-        load_string(dedent('''\
-                    <configure xmlns="http://namespaces.zope.org/zope"
-                           xmlns:browser="http://namespaces.zope.org/browser"
-                           xmlns:five="http://namespaces.zope.org/five">
-                        <browser:resource
-                                   name="test_rr_1.js"
-                                   file="test_rr_1.js"
-                          />
-                    </configure>'''))
-        #
+        from Products.Five.zcml import load_config
+        import Products.ResourceRegistries.tests
+        load_config('test.zcml', Products.ResourceRegistries.tests)
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerScript('++resource++test_rr_1.js')

@@ -1,0 +1,14 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+       xmlns:browser="http://namespaces.zope.org/browser">
+
+  <browser:resource
+      name="test_rr_1.css"
+      file="test_rr_1.css"
+      />
+
+  <browser:resource
+      name="test_rr_1.js"
+      file="test_rr_1.js"
+      />
+
+</configure>

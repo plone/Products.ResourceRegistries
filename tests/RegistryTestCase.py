@@ -1,11 +1,10 @@
-from Products.PloneTestCase.ptc import PloneTestCase, Functional, setupPloneSite
+from Products.PloneTestCase import PloneTestCase
 
-PRODUCTS = ['ResourceRegistries']
+PloneTestCase.setupPloneSite()
 
-setupPloneSite(products=PRODUCTS)
-
-class RegistryTestCase(PloneTestCase):
+class RegistryTestCase(PloneTestCase.PloneTestCase):
     pass
 
-class FunctionalRegistryTestCase(Functional, PloneTestCase):
+class FunctionalRegistryTestCase(PloneTestCase.FunctionalTestCase,
+                                 PloneTestCase.PloneTestCase):
     pass

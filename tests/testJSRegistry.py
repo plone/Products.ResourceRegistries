@@ -15,13 +15,12 @@ from Interface.Verify import verifyObject
 
 from Products.CMFCore.utils import getToolByName
 
-from Products.PloneTestCase.PloneTestCase import PLONE21
+from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
 
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
-from Products.ResourceRegistries.tests.five_tests_base import FiveTestsBase
 
 
 class TestJSImplementation(RegistryTestCase):
@@ -468,23 +467,14 @@ class TestPublishing(FunctionalRegistryTestCase):
                          'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
-class TestFivePublishing(FunctionalRegistryTestCase, FiveTestsBase):
+class TestFivePublishing(FunctionalRegistryTestCase):
     'Publishing with Five'
 
     def afterSetUp(self):
-        FiveTestsBase.afterSetUp(self)
         # Define some resource
-        from Products.Five.zcml import load_string, load_config
-        load_string(dedent('''\
-                    <configure xmlns="http://namespaces.zope.org/zope"
-                           xmlns:browser="http://namespaces.zope.org/browser"
-                           xmlns:five="http://namespaces.zope.org/five">
-                        <browser:resource
-                                   name="test_rr_1.js"
-                                   file="test_rr_1.js"
-                          />
-                    </configure>'''))
-        #
+        from Products.Five.zcml import load_config
+        import Products.ResourceRegistries.tests
+        load_config('test.zcml', Products.ResourceRegistries.tests)
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerScript('++resource++test_rr_1.js')
@@ -751,10 +741,8 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
             self.fail()
 
     def testAuthorizedOnPublish(self):
-        # FIXME - As a manager this should be accessible, but the test doesn't work
-        # when tested by hand in the browser, it does work as expected
-        self.setRoles(['Manager'])
-        response = self.publish(self.toolpath + '/testroot.js')
+        authstr = "%s:%s" % (portal_owner, default_password)
+        response = self.publish(self.toolpath + '/testroot.js', basic=authstr)
         self.failUnlessEqual(response.getStatus(), 200)
 
 class TestMergingDisabled(RegistryTestCase):

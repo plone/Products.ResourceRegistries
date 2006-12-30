@@ -47,26 +47,47 @@ Usage
   rel -- Link relation. defaults to 'stylesheet', and should almost always
   stay that way. For designating alternative stylesheets.
 
+  title -- the title for alternate stylesheets
+
   rendering -- How to link the stylesheet from the html page:
 
       - 'import' - the default. normal css import
 
-      - 'link' - works better for old browsers an alternate stylesheets
+      - 'link' - works better for old browsers and is needed for alternate
+                 stylesheets
 
       - 'inline' - render the stylesheet inline instead of linking it
-        externally. Use
-        sparingly. Costs bandwidth, but is very useful for style that vary for
-        example on a per-folder-basis, like those famous header graphics bars.
+                   externally.
+                   Shouldn't be used at all!
+                   It isn't possible to create sites which validate if you do.
+                   For more information see:
+                   http://developer.mozilla.org/en/docs/Properly_Using_CSS_and_JavaScript_in_XHTML_Documents
 
   compression -- Whether and how much the resource should be compressed:
 
       - 'none' - the original content will not be changed
 
       - 'safe' - the content will be compressed in a way which should be safe
-                 for any workarounds for browser bugs
+                 for any workarounds for browser bugs. Conditional code for
+                 Internet Explorer is preserved since ResourceRegistries
+                 1.2.3 and 1.3.1.
 
-      - 'full' - the content will be heavily compressed, this might break some
-                 workarounds, only use this if you know what you are doing
+      - 'full' - the content will be compressed with some additional rules.
+                 For css all comments and most newlines are removed, this may
+                 break special browser hacks, so use with care.
+                 For javascript this encodes variables with special prefixes
+                 according to the rules described here (Special Characters):
+                 http://dean.edwards.name/packer/usage/
+                 The source code needs to be written according to those rules,
+                 otherwise it's more than likely that it will break.
+
+      - 'safe-encode' - only available for javascript
+      - 'full-encode' - only available for javascript
+                 Additionally encodes keywords. This heavily compresses the
+                 javascript, but it needs to be decoded on the fly in the
+                 browser on each load. Depending on the size of the scripts
+                 this could lead to timeouts in Firefox.
+                 Use with special care!
 
   If several stylesheets listed directly after each other in the registry have
   the same parameters and expression, they will be concatenated into a larger,

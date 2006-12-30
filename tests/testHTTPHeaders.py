@@ -6,8 +6,6 @@ import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
-from Testing import ZopeTestCase
-
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
@@ -20,9 +18,9 @@ from Products.PloneTestCase.PloneTestCase import PLONE21
 
 from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces import ICSSRegistry
-from Products.ResourceRegistries.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
-class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestHTTPHeaders(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
@@ -37,7 +35,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.portal.addDTMLMethod('testmethod', file="""<dtml-call "REQUEST.RESPONSE.setHeader('Content-Type', 'text/plain')">""")
         self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath+'/testmethod')
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
     def testIfModifiedSinceHeaders(self):
@@ -50,7 +48,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath+'/testmethod', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
         #response = self.publish(self.toolpath+'/testmethod')
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
         self.assertEqual(response.getStatus(), 200) # this should in fact send a 200
 
         # we also add an fsfile for good measure
@@ -58,7 +56,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         rs = self.tool.getEvaluatedResources(self.portal)
         response = self.publish(self.toolpath+'/test_rr_2.css', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
         self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
 
         #response = self.publish(self.toolpath+'/test_rr_2.css')
         #self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
@@ -81,7 +79,7 @@ class TestHTTPHeaders(CSSRegistryTestCase.CSSRegistryTestCase):
         rs = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(rs),1)
         response = self.publish(self.toolpath+'/'+rs[0].getId())
-        self.assertEqual(response.getHeader('Content-Type'), 'text/css')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
         #print str(response)
         self.assertEqual(int(response.getHeader('content-length')), len(response.getBody()))
         self.assertEqual(response.getStatus(), 200)

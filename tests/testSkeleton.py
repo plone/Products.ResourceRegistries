@@ -7,10 +7,10 @@ if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
 from Testing import ZopeTestCase
-from Products.ResourceRegistries.tests import CSSRegistryTestCase
+from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 
 
-class TestSomething(CSSRegistryTestCase.CSSRegistryTestCase):
+class TestSomething(RegistryTestCase):
 
     def afterSetUp(self):
         pass

@@ -1,6 +1,9 @@
 1.4 (SVN/unreleased)
 ======================
 
+ * Started to use views and viewlet managers.
+   [fschulze]
+
  * Removed compatibility stuff for Plone version lower than 3.0.
    [fschulze]
 

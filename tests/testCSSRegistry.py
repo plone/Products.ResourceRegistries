@@ -5,7 +5,8 @@
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
-from textwrap import dedent
+from zope.component import getUtility, getMultiAdapter
+from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
@@ -27,7 +28,7 @@ class TestImplementation(RegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, CSSTOOLNAME)
-        self.failUnless(ICSSRegistry.isImplementedBy(tool))
+        self.failUnless(ICSSRegistry.providedBy(tool))
         self.failUnless(verifyObject(ICSSRegistry, tool))
 
 class TestTool(RegistryTestCase):
@@ -49,7 +50,7 @@ class TestSkin(RegistryTestCase):
         self.failUnless('ResourceRegistries' in skins)
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'renderAllTheStylesheets'))
+        self.failUnless(getattr(self.portal, 'test_rr_1.css'))
 
 
 class testZMIMethods(RegistryTestCase):
@@ -299,7 +300,10 @@ class TestStylesheetCooking(RegistryTestCase):
         self.tool.registerStylesheet('ham 2 b merged', rendering='link')
         self.tool.registerStylesheet('spam', expression='string:ham', rendering='link')
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
-        all = getattr(self.portal, 'renderAllTheStylesheets')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        all = viewletmanager.render()
         evaluated = self.tool.getEvaluatedResources(self.folder)
         magic_ids = [item.getId() for item in evaluated]
         self.failUnless('background-color' in all)
@@ -310,7 +314,10 @@ class TestStylesheetCooking(RegistryTestCase):
     def testReenderingConcatenatesInline(self):
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
         self.tool.registerStylesheet('test_rr_2.css', rendering='inline')
-        all = getattr(self.portal, 'renderAllTheStylesheets')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        all = viewletmanager.render()
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)
 
@@ -562,10 +569,16 @@ class TestZODBTraversal(RegistryTestCase):
                                    file='body { background-color : purple }')
         self.tool.registerStylesheet('context.css', rendering='inline')
         self.setRoles(['Member'])
-        content = getattr(self.portal.folder1, 'renderAllTheStylesheets')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal.folder1, self.portal.folder1.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        content = viewletmanager.render()
         self.failUnless('pink' in content)
         self.failIf('purple' in content)
-        content = getattr(self.portal.folder2, 'renderAllTheStylesheets')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal.folder2, self.portal.folder2.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        content = viewletmanager.render()
         self.failUnless('purple' in content)
         self.failIf('pink' in content)
 
@@ -992,11 +1005,17 @@ class TestSkinAwareness(FunctionalRegistryTestCase):
         
     def testRenderIncludesSkinInPath(self):
         self.portal.changeSkin('PinkSkin')
-        content = getattr(self.portal, 'renderAllTheStylesheets')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        content = viewletmanager.render()
         self.failUnless('/PinkSkin/' in content)
         self.failIf('/PurpleSkin/' in content)
         self.portal.changeSkin('PurpleSkin')
-        content = getattr(self.portal, 'renderAllTheStylesheets')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        content = viewletmanager.render()
         self.failUnless('/PurpleSkin/' in content)
         self.failIf('/PinkSkin/' in content)
 

@@ -5,7 +5,8 @@
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
-from textwrap import dedent
+from zope.component import getUtility, getMultiAdapter
+from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
@@ -27,7 +28,7 @@ class TestJSImplementation(RegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, JSTOOLNAME)
-        self.failUnless(IJSRegistry.isImplementedBy(tool))
+        self.failUnless(IJSRegistry.providedBy(tool))
         self.failUnless(verifyObject(IJSRegistry, tool))
 
 
@@ -50,7 +51,7 @@ class TestJSSkin(RegistryTestCase):
         self.failUnless('ResourceRegistries' in skins)
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'renderAllTheScripts'))
+        self.failUnless(getattr(self.portal, 'test_rr_1.js'))
 
 
 class testJSZMIMethods(RegistryTestCase):
@@ -248,7 +249,10 @@ class TestJSScriptCooking(RegistryTestCase):
         self.tool.registerScript('ham2merge')
         self.tool.registerScript('spam', expression='string:spam')
         self.tool.registerScript('test_rr_1.css', inline='1')
-        all = getattr(self.portal, 'renderAllTheScripts')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
+        viewletmanager.update()
+        all = viewletmanager.render()
         evaluated = self.tool.getEvaluatedResources(self.folder)
         magic_ids = [item.getId() for item in evaluated]
         self.failUnless('background-color' in all)
@@ -258,7 +262,10 @@ class TestJSScriptCooking(RegistryTestCase):
     def testReenderingConcatenatesInline(self):
         self.tool.registerScript('test_rr_1.css', inline='1')
         self.tool.registerScript('test_rr_2.css', inline='1')
-        all = getattr(self.portal, 'renderAllTheScripts')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
+        viewletmanager.update()
+        all = viewletmanager.render()
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)
 
@@ -642,10 +649,16 @@ class TestZODBTraversal(RegistryTestCase):
                                    file="window.alert('purple')")
         self.tool.registerScript('context.js', inline=True)
         self.setRoles(['Member'])
-        content = getattr(self.portal.folder1, 'renderAllTheScripts')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal.folder1, self.portal.folder1.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
+        viewletmanager.update()
+        content = viewletmanager.render()
         self.failUnless('pink' in content)
         self.failIf('purple' in content)
-        content = getattr(self.portal.folder2, 'renderAllTheScripts')()
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal.folder2, self.portal.folder2.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
+        viewletmanager.update()
+        content = viewletmanager.render()
         self.failUnless('purple' in content)
         self.failIf('pink' in content)
 

@@ -1,0 +1,23 @@
+<tal:styles define="view context/@@resourceregistries_styles_view"
+            repeat="style view/styles">
+  <tal:rendering-link condition="python: style['rendering'] == 'link'">
+    <link rel="style"
+          type="text/css"
+          tal:attributes="href style/src;
+                          media style/media;
+                          rel style/rel;
+                          title style/title" />
+  </tal:rendering-link>
+  <tal:rendering-import condition="python: style['rendering'] == 'import'">
+    <style type="text/css"
+           tal:attributes="media style/media"
+           tal:content="structure string:<!-- @import url(${style/src}); -->">
+    </style>
+  </tal:rendering-import>
+  <tal:rendering-inline condition="python: style['rendering'] == 'inline'">
+    <style type="text/css"
+           tal:attributes="media style/media"
+           tal:content="structure string:<!--  ${style/content}  -->">
+    </style>
+  </tal:rendering-inline>
+</tal:styles>

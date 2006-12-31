@@ -1,0 +1,4 @@
+<tal:resourceregistries>
+  <tal:scripts replace="structure provider:plone.resourceregistries.scripts" />
+  <tal:styles replace="structure provider:plone.resourceregistries.styles" />
+</tal:resourceregistries>

@@ -1,4 +1,4 @@
-import re
+import re, unittest, textwrap
 
 
 class KeywordMapper:
@@ -302,10 +302,10 @@ class JavascriptPacker(Packer):
         # protect regular expressions
         self.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
         self.protect(r"""([^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
-        # multiline comments
-        self.sub(r'/\*(?!@).*?\*/', '', re.DOTALL)
         # one line comments
         self.sub(r'\s*//.*$', '', re.MULTILINE)
+        # multiline comments
+        self.sub(r'/\*(?!@).*?\*/', '', re.DOTALL)
         # strip whitespace at the beginning and end of each line
         self.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
         # whitespace after some special chars but not
@@ -345,44 +345,592 @@ class CSSPacker(Packer):
         self.protect(r'''("(?:\\"|\\\n|.)*?")''')
         # strip whitespace
         self.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
-        # remove comment contents
-        self.sub(r'/\*.*?( ?[\\/*]*\*/)', r'/*\1', re.DOTALL)
-        # remove lines with comments only (consisting of stars only)
-        self.sub(r'^/\*+\*/$', '', re.MULTILINE)
+        if level == 'full':
+            # remove comments
+            self.sub(r'/\*.*? ?[\\/*]*\*/', r'', re.DOTALL)
+            #remove more whitespace
+            self.sub(r'\s*([{,;:])\s+', r'\1')
+        else:
+            # remove comment contents
+            self.sub(r'/\*.*?( ?[\\/*]*\*/)', r'/*\1', re.DOTALL)
+            # remove lines with comments only (consisting of stars only)
+            self.sub(r'^/\*+\*/$', '', re.MULTILINE)
         # excessive newlines
         self.sub(r'\n+', '\n')
         # first newline
         self.sub(r'^\n', '')
 
-        if level == 'full':
-            #remove more whitespace
-            self.sub(r'([{,;])\s+', r'\1')
 
 
-## jspacker = JavascriptPacker('safe')
-## jspacker_full = JavascriptPacker('full')
+# be aware that the initial indentation gets removed in the following tests,
+# the inner indentation is preserved though (see textwrap.dedent)
+js_compression_tests = (
+    (
+        'standardJS',
+        """\
+            /* a comment */
 
-## def run():
-    ## script = open('cssQuery.js').read()
-    ## script = jspacker_full.pack(script)
-    ## open('output.js','w').write(script)
-    ## mapper = JavascriptKeywordMapper()
-    ## mapper.analyse(script)
-    ## keywords = mapper.getKeywords()
-    ## script = mapper.sub(script)
-    ## f = open('output1.js','w')
-    ## #f.write("keywords='%s'.split('|');\n" % "|".join(keywords))
-    ## #f.write(mapper.getDecodeFunction(name='__dEcOdE'))
-    ## f.write(mapper.getDecoder(script))
-    ## for index, keyword in enumerate(keywords):
-        ## encoded = mapper._encode(index)
-        ## if keyword == '':
-            ## replacement = encoded
-        ## else:
-            ## replacement = keyword
-        ## regexp = re.compile(r'\b%s\b' % encoded)
-        ## script = regexp.sub(lambda m: replacement, script)
-    ## open('output2.js','w').write(script)
+            function dummy() {
 
-## if __name__=='__main__':
-    ## run()
+                var localvar = 10 // one line comment
+
+                document.write(localvar);
+                return 'bar'
+            }
+        """, 
+        """\
+            function dummy(){var localvar=10
+            document.write(localvar);return 'bar'}
+        """,
+        'safe'
+    ),
+    (
+        'standardJS',
+        """\
+            /* a comment */
+
+            function dummy() {
+
+                var localvar = 10 // one line comment
+
+                document.write(localvar);
+                return 'bar'
+            }
+        """, 
+        """\
+            function dummy(){var localvar=10
+            document.write(localvar);return'bar'}""",
+        'full'
+    ),
+    (
+        'stringProtection',
+        """
+            var leafnode = this.shared.xmldata.selectSingleNode('//*[@selected]');
+            var portal_url = 'http://127.0.0.1:9080/plone';
+        """,
+        """var leafnode=this.shared.xmldata.selectSingleNode('//*[@selected]');var portal_url='http://127.0.0.1:9080/plone';"""
+    ),
+    (
+        'newlinesInStrings',
+        r"""var message = "foo: " + foo + "\nbar: " + bar;""",
+        r"""var message="foo: "+foo+"\nbar: "+bar;"""
+    ),
+    (
+        'escapedStrings',
+        r"""var message = "foo: \"something in quotes\"" + foo + "\nbar: " + bar;""",
+        r"""var message="foo: \"something in quotes\""+foo+"\nbar: "+bar;"""
+    ),
+    (
+        'whitspaceAroundPlus',
+        """\
+            var message = foo + bar;
+            message = foo++ + bar;
+            message = foo + ++bar;
+        """,
+        """\
+            var message=foo+bar;message=foo++ +bar;message=foo+ ++bar;"""
+    ),
+    (
+        'whitspaceAroundMinus',
+        """\
+            var message = foo - bar;
+            message = foo-- - bar;
+            message = foo - --bar;
+        """,
+        """\
+            var message=foo-bar;message=foo-- -bar;message=foo- --bar;"""
+    ),
+    (
+        'missingSemicolon',
+        """\
+            var x = function() {
+ 
+            } /* missing ; here */
+            next_instr;
+        """,
+        """\
+            var x=function(){}
+            next_instr;""",
+        'safe'
+    ),
+    # be aware that the following produces invalid code. You *have* to add
+    # a semicolon after a '}' followed by a normal instruction
+    (
+        'missingSemicolon',
+        """\
+            var x = function() {
+ 
+            } /* missing ; here */
+            next_instr;
+        """,
+        """\
+            var x=function(){}next_instr;""",
+        'full'
+    ),
+    # excessive semicolons after curly brackets get removed
+    (
+        'nestedCurlyBracketsWithSemicolons',
+        """\
+            function dummy(a, b) {
+                if (a > b) {
+                    do something
+                } else {
+                    do something else
+                };
+            };
+            next_instr;
+        """,
+        """\
+            function dummy(a,b){if(a>b){do something} else{do something else}};next_instr;""",
+        'safe'
+    ),
+    (
+        'nestedCurlyBracketsWithSemicolons',
+        """\
+            function dummy(a, b) {
+                if (a > b) {
+                    do something
+                } else {
+                    do something else
+                };
+            };
+            next_instr;
+        """,
+        """\
+            function dummy(a,b){if(a>b){do something}else{do something else}};next_instr;""",
+        'full'
+    ),
+    (
+        'onelineVsMultilineComment',
+        """\
+            function abc() {
+                return value;
+            }; //********************
+
+            function xyz(a, b) {
+                /* docstring for this function */
+                if (a == null) {
+                    return 1
+                }
+            }
+        """,
+        """\
+            function abc(){return value};
+            function xyz(a,b){if(a==null){return 1}}
+        """,
+        'safe'
+    ),
+    (
+        'onelineVsMultilineComment',
+        """\
+            function abc() {
+                return value;
+            }; //********************
+
+            function xyz(a, b) {
+                /* docstring for this function */
+                if (a == null) {
+                    return 1
+                }
+            }
+        """,
+        """\
+            function abc(){return value};function xyz(a,b){if(a==null){return 1}}""",
+        'full'
+    ),
+)
+
+
+css_safe_compression_tests = (
+    (
+        'commentCompression',
+        """
+            /* this is a comment */
+            #testElement {
+                property: value; /* another comment */
+            }
+            /**********/
+            /* this is a multi
+               line comment */
+            #testElement {
+                /* yet another comment */
+                property: value;
+            }
+        """,
+        """\
+            /* */
+            #testElement {
+            property: value; /* */
+            }
+            /* */
+            #testElement {
+            /* */
+            property: value;
+            }
+        """
+    ),
+    (
+        'newlineCompression',
+        """
+        
+        
+        /* this is a comment */
+        
+        #testElement {
+            property: value; /* another comment */
+        }
+        
+        /* this is a multi
+           line comment */
+        #testElement {
+        
+            /* yet another comment */
+            property: value;
+            
+        }
+        
+        
+        """,
+        """\
+            /* */
+            #testElement {
+            property: value; /* */
+            }
+            /* */
+            #testElement {
+            /* */
+            property: value;
+            }
+        """
+    ),
+    # see http://www.dithered.com/css_filters/index.html
+    (
+        'commentHacks1',
+        """
+            #testElement {
+                property/**/: value;
+                property/* */: value;
+                property /**/: value;
+                property: /**/value;
+            }
+        """,
+        """\
+            #testElement {
+            property/**/: value;
+            property/* */: value;
+            property /**/: value;
+            property: /**/value;
+            }
+        """
+    ),
+    (
+        'commentHacks2',
+        """
+            selector/* */ {  }
+        """,
+        """\
+            selector/* */ {  }
+        """
+    ),
+    (
+        'commentHacks3',
+        """
+            selector/* foobar */ {  }
+        """,
+        """\
+            selector/* */ {  }
+        """
+    ),
+    (
+        'commentHacks4',
+        """
+            selector/**/ {  }
+        """,
+        """\
+            selector/**/ {  }
+        """
+    ),
+    (
+        'commentHacks5',
+        """
+            /* \*/
+            rules
+            /* */
+        """,
+        """\
+            /* \*/
+            rules
+            /* */
+        """
+    ),
+    (
+        'commentHacks6',
+        """
+            /* foobar \*/
+            rules
+            /* */
+        """,
+        """\
+            /* \*/
+            rules
+            /* */
+        """
+    ),
+    (
+        'commentHacks7',
+        """
+            /*/*/
+            rules
+            /* */
+        """,
+        """\
+            /*/*/
+            rules
+            /* */
+        """
+    ),
+    (
+        'commentHacks8',
+        """
+            /*/*//*/
+            rules
+            /* */
+        """,
+        """\
+            /*/*//*/
+            rules
+            /* */
+        """
+    ),
+    (
+        'stringProtection',
+        """
+            /* test string protection */
+            #selector,
+            #another {
+                content: 'foo; bar';
+            }
+        """,
+        """\
+            /* */
+            #selector,
+            #another {
+            content: 'foo; bar';
+            }
+        """
+    ),
+)
+
+css_full_compression_tests = (
+    (
+        'commentCompression',
+        """
+            /* this is a comment */
+            #testElement {
+                property: value; /* another comment */
+            }
+            /**********/
+            /* this is a multi
+               line comment */
+            #testElement {
+                /* yet another comment */
+                property: value;
+            }
+        """,
+        """\
+            #testElement{property:value;}
+            #testElement{property:value;}
+        """
+    ),
+    (
+        'newlineCompression',
+        """
+        
+        
+        /* this is a comment */
+        
+        #testElement {
+            property: value; /* another comment */
+        }
+        
+        /* this is a multi
+           line comment */
+        #testElement {
+        
+            /* yet another comment */
+            property: value;
+            
+        }
+        
+        
+        """,
+        """\
+            #testElement{property:value;}
+            #testElement{property:value;}
+        """
+    ),
+    # see http://www.dithered.com/css_filters/index.html
+    # in full compression all hacks get removed
+    (
+        'commentHacks1',
+        """
+            #testElement {
+                property/**/: value;
+                property/* */: value;
+                property /**/: value;
+                property: /**/value;
+            }
+        """,
+        """\
+            #testElement{property:value;property:value;property:value;property:value;}
+        """
+    ),
+    (
+        'commentHacks2',
+        """
+            selector/* */ {  }
+        """,
+        """\
+            selector{}
+        """
+    ),
+    (
+        'commentHacks3',
+        """
+            selector/* foobar */ {  }
+        """,
+        """\
+            selector{}
+        """
+    ),
+    (
+        'commentHacks4',
+        """
+            selector/**/ {  }
+        """,
+        """\
+            selector{}
+        """
+    ),
+    (
+        'commentHacks5',
+        """
+            /* \*/
+            rules
+            /* */
+        """,
+        """\
+            rules
+        """
+    ),
+    (
+        'commentHacks6',
+        """
+            /* foobar \*/
+            rules
+            /* */
+        """,
+        """\
+            rules
+        """
+    ),
+    (
+        'commentHacks7',
+        """
+            /*/*/
+            rules
+            /* */
+        """,
+        """\
+            rules
+        """
+    ),
+    (
+        'commentHacks8',
+        """
+            /*/*//*/
+            rules
+            /* */
+        """,
+        """\
+            rules
+        """
+    ),
+    (
+        'stringProtection',
+        """
+            /* test string protection and full compression */
+            #selector,
+            #another {
+                content: 'foo; bar';
+            }
+        """,
+        """\
+            #selector,#another{content:'foo; bar';}
+        """
+    ),
+)
+
+class PackerTestCase(unittest.TestCase):
+    def __init__(self, name, input, output, packer):
+        unittest.TestCase.__init__(self)
+        self.name = name
+        self.input = input
+        self.output = output
+        self.packer = packer
+
+    def __str__(self):
+        return self.name
+
+    def runTest(self):
+        self.assertEqual(self.packer.pack(self.input), self.output)
+
+
+def test_suite():
+    suite = unittest.TestSuite()
+
+    jspacker = {
+        'safe': JavascriptPacker('safe'),
+        'full': JavascriptPacker('full'),
+    }
+    csspacker = {
+        'safe': CSSPacker('safe'),
+        'full': CSSPacker('full'),
+    }
+
+    for info in js_compression_tests:
+        name = info[0]
+        input = textwrap.dedent(info[1])
+        output = textwrap.dedent(info[2])
+        if (len(info) == 4):
+            compression = info[3].split(",")
+        else:
+            compression = ("safe", "full")
+
+        for packer in compression:
+            suite.addTest(PackerTestCase("%s (%s)" % (name, packer),
+                                         input, output,
+                                         jspacker[packer]))
+
+    packer = "safe"
+    for name, input, output in css_safe_compression_tests:
+        input = textwrap.dedent(input)
+        output = textwrap.dedent(output)
+
+        suite.addTest(PackerTestCase("%s (%s)" % (name, packer),
+                                     input, output,
+                                     csspacker[packer]))
+
+    packer = "full"
+    for name, input, output in css_full_compression_tests:
+        input = textwrap.dedent(input)
+        output = textwrap.dedent(output)
+
+        suite.addTest(PackerTestCase("%s (%s)" % (name, packer),
+                                     input, output,
+                                     csspacker[packer]))
+
+    return suite
+
+if __name__ == '__main__':
+    unittest.main(defaultTest='test_suite')

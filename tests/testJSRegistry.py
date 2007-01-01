@@ -21,7 +21,7 @@ from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
-
+from Products.ResourceRegistries.tools.packer import test_suite as packer_tests
 
 class TestJSImplementation(RegistryTestCase):
 
@@ -527,53 +527,6 @@ class TestDebugMode(FunctionalRegistryTestCase):
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
-class TestJSDefaults(RegistryTestCase):
-
-    # These do not run for plone 2.1 +
-
-    def afterSetUp(self):
-        self.tool = getattr(self.portal, JSTOOLNAME)
-
-    def testClearingScripts(self):
-        self.failUnless(self.tool.getResources())
-        self.tool.clearResources()
-        self.failIf(self.tool.getResources())
-
-    def testDefaultsInstall(self):
-        scriptids = self.tool.getResourceIds()
-        self.failUnless('plone_menu.js' in scriptids)
-        self.failUnless('plone_javascript_variables.js' in scriptids)
-        self.failUnless('test_rr_1.js' in scriptids)
-
-    def testTraverseToConcatenatedDefaults(self):
-        scripts = self.tool.getEvaluatedResources(self.portal)
-        for s in scripts:
-            try:
-                magic = s.getId()
-                self.portal.restrictedTraverse('portal_javascripts/%s' % magic)
-            except KeyError:
-                self.fail()
-
-    def testUserConditionOnMenuScript(self):
-        scripts1 = self.tool.getEvaluatedResources(self.portal)
-        self.logout()
-        scripts2 = self.tool.getEvaluatedResources(self.portal)
-        self.failUnless(len(scripts1) > len(scripts2))
-
-    def testCallingOfConcatenatedScripts(self):
-        stylesheets = self.tool.getEvaluatedResources(self.portal)
-        for s in stylesheets:
-            if 'ploneScripts' in s.getId():
-                output = self.portal.restrictedTraverse(
-                             'portal_javascripts/%s' % s.getId())
-                break
-        if not output:
-            self.fail()
-        o = str(output)[:]
-        self.failIf('&lt;dtml-call' in o)
-        self.failIf('&amp;dtml' in o)
-        self.failUnless('portal_url' in o)
-
 class TestZODBTraversal(RegistryTestCase):
 
     def afterSetUp(self):
@@ -877,64 +830,6 @@ class TestMergingDisabled(RegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
         self.failUnless('blue' in content)
 
-class TestJSCompression(RegistryTestCase):
-    def afterSetUp(self):
-        self.tool = getattr(self.portal, JSTOOLNAME)
-
-    def testCompression(self):
-        input = """
-/* a comment */
-
-function dummy() {
-
-    var localvar = 10 // one line comment
-
-    document.write(localvar);
-    return 'bar'
-}
-"""
-        expected = """function dummy(){var localvar=10
-document.write(localvar);return 'bar'}
-"""
-        got = self.tool._compressJS(input, 'safe')
-        self.assertEqual(got, expected)
-
-    def testStringProtection(self):
-        input = """
-var leafnode = this.shared.xmldata.selectSingleNode('//*[@selected]');
-var portal_url = 'http://127.0.0.1:9080/plone';
-"""
-        expected = """var leafnode=this.shared.xmldata.selectSingleNode('//*[@selected]');var portal_url='http://127.0.0.1:9080/plone';"""
-        got = self.tool._compressJS(input, 'safe')
-        self.assertEqual(got, expected)
-
-    def testNewlinesInStrings(self):
-        input = r"""var message = "foo: " + foo + "\nbar: " + bar;"""
-        expected = r"""var message="foo: "+foo+"\nbar: "+bar;"""
-        got = self.tool._compressJS(input, 'safe')
-        self.assertEqual(got, expected)
-
-    def testEscapedStrings(self):
-        input = r"""var message = "foo: \"something in quotes\"" + foo + "\nbar: " + bar;"""
-        expected = r"""var message="foo: \"something in quotes\""+foo+"\nbar: "+bar;"""
-        got = self.tool._compressJS(input, 'safe')
-        self.assertEqual(got, expected)
-
-    def testWhitspaceAroundPlusMinus(self):
-        input = r"""var message = foo + bar;
-message = foo++ + bar;
-message = foo + ++bar;"""
-        expected = r"""var message=foo+bar;message=foo++ +bar;message=foo+ ++bar;"""
-        got = self.tool._compressJS(input, 'safe')
-        self.assertEqual(got, expected)
-
-        input = r"""var message = foo - bar;
-message = foo-- - bar;
-message = foo - --bar;"""
-        expected = r"""var message=foo-bar;message=foo-- -bar;message=foo- --bar;"""
-        got = self.tool._compressJS(input, 'safe')
-        self.assertEqual(got, expected)
-
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -956,14 +851,6 @@ def test_suite():
     suite.addTest(makeSuite(TestZODBTraversal))
     suite.addTest(makeSuite(TestMergingDisabled))
     suite.addTest(makeSuite(TestResourcePermissions))
-    suite.addTest(makeSuite(TestJSCompression))
-
-    if not PLONE21:
-        # We must not test for the defaults in Plone 2.1 because they are
-        # all different. Plone2.1 has tests in CMFPlone/tests for defaults
-        # and migrations
-        suite.addTest(makeSuite(TestJSDefaults))
-
 
     return suite
 

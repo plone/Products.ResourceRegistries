@@ -7,6 +7,22 @@
  * Removed compatibility stuff for Plone version lower than 3.0.
    [fschulze]
 
+1.3.4 (SVN/unreleased)
+======================
+
+ * Fixed order of oneline and multiline comment removal in javascript packer.
+   [fschulze]
+
+ * Fixed validation warning about multiple comments when rendering resources
+   inline.
+   [fschulze]
+
+ * Made css "full" packing more aggressive.
+   [fschulze]
+
+ * Cleaned up testing framework and made all tests run properly.
+   [fschulze, hannosch]
+
 1.3.3
 =====
 

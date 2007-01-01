@@ -333,10 +333,17 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         return True
 
     security.declarePrivate('generateId')
-    def generateId(self):
+    def generateId(self, res_id, prev_id=None):
         """Generate a random id."""
-        return '%s%04d%s' % (self.filename_base, random.randint(0, 9999),
-                             self.filename_appendix)
+        id_parts = res_id.split('.')
+        if (len(id_parts) > 1):
+            base = '.'.join(id_parts[:-1])
+            appendix = ".%s" % id_parts[-1]
+        else:
+            base = id_parts[0]
+            appendix = self.filename_appendix
+        base = base.replace('++', '')
+        return '%s-cachekey%04d%s' % (base, random.randint(0, 9999), appendix)
 
     security.declarePrivate('finalizeResourceMerging')
     def finalizeResourceMerging(self, resource, previtem):
@@ -375,18 +382,18 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         if self.concatenatedresources.has_key(prev_id):
                             self.concatenatedresources[prev_id].append(res_id)
                         else:
-                            magic_id = self.generateId()
+                            magic_id = self.generateId(res_id, prev_id)
                             self.concatenatedresources[magic_id] = [prev_id, res_id]
                             previtem._setId(magic_id)
                     else:
-                        if resource.getCookable():
-                            magic_id = self.generateId()
+                        if resource.getCookable():# or resource.getCacheable():
+                            magic_id = self.generateId(resource.getId())
                             self.concatenatedresources[magic_id] = [resource.getId()]
                             resource._setId(magic_id)
                         results.append(resource)
                 else:
-                    if resource.getCookable():
-                        magic_id = self.generateId()
+                    if resource.getCookable():# or resource.getCacheable():
+                        magic_id = self.generateId(resource.getId())
                         self.concatenatedresources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)
                     results.append(resource)

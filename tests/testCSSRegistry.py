@@ -622,7 +622,7 @@ class TestMergingDisabled(RegistryTestCase):
         magicId = None
         for style in styles:
             id = style.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicId = id
         self.failUnless(magicId)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
@@ -642,7 +642,7 @@ class TestMergingDisabled(RegistryTestCase):
         magicId = None
         for style in styles:
             id = style.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicId = id
         self.failUnless(magicId)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
@@ -693,7 +693,7 @@ class TestMergingDisabled(RegistryTestCase):
         magicIds = []
         for style in styles:
             id = style.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicIds.append(id)
         self.assertEqual(len(magicIds), 2)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[0]))
@@ -831,7 +831,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
         magicId = None
         for style in styles:
             id = style.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicId = id
         self.failUnless(magicId)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))

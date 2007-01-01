@@ -684,7 +684,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
         magicId = None
         for script in scripts:
             id = script.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicId = id
         self.failUnless(magicId)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
@@ -756,7 +756,7 @@ class TestMergingDisabled(RegistryTestCase):
         magicId = None
         for script in scripts:
             id = script.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicId = id
         self.failUnless(magicId)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
@@ -776,7 +776,7 @@ class TestMergingDisabled(RegistryTestCase):
         magicId = None
         for script in scripts:
             id = script.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicId = id
         self.failUnless(magicId)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
@@ -827,7 +827,7 @@ class TestMergingDisabled(RegistryTestCase):
         magicIds = []
         for script in scripts:
             id = script.getId()
-            if id.startswith(self.tool.filename_base):
+            if '-cachekey' in id:
                 magicIds.append(id)
         self.assertEqual(len(magicIds), 2)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[0]))

@@ -317,7 +317,7 @@ class JavascriptPacker(Packer):
         self.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
         # whitespace after some special chars but not
         # before function declaration
-        self.sub(r'([{;\[(,=&|\?:<>%!/\x00])\s+(?!function)', r'\1')
+        self.sub(r'([{;\[(,=&|\?:<>%!/])\s+(?!function)', r'\1')
         # after an equal sign a function definition is ok
         self.sub(r'=\s+(?=function)', r'=')
         if level == 'full':
@@ -556,6 +556,37 @@ js_compression_tests = (
             var x=function(){}next_instr;""",
         'full'
     ),
+    (
+        'missingSemicolon2',
+        """\
+            id=id || 'ids:list'  // defaults to ids:list, this is the most common usage
+
+            if (selectbutton.isSelected==null){
+                initialState=initialState || false;
+                selectbutton.isSelected=initialState;
+                }
+        """,
+        """\
+            id=id||'ids:list'
+            if(selectbutton.isSelected==null){initialState=initialState||false;selectbutton.isSelected=initialState}
+        """,
+        'safe'
+    ),
+    (
+        'missingSemicolon2',
+        """\
+            id=id || 'ids:list'  // defaults to ids:list, this is the most common usage
+
+            if (selectbutton.isSelected==null){
+                initialState=initialState || false;
+                selectbutton.isSelected=initialState;
+                }
+        """,
+        """\
+            id=id||'ids:list'
+            if(selectbutton.isSelected==null){initialState=initialState||false;selectbutton.isSelected=initialState}""",
+        'full'
+    ),
     # excessive semicolons after curly brackets get removed
     (
         'nestedCurlyBracketsWithSemicolons',
@@ -643,8 +674,10 @@ js_compression_tests = (
             /*@end @*/
         """,
         """\
-            /*@cc_on @*//*@if (@_win32)
-            document.write("<script id=__ie_onload defer src=javascript:void(0)><\\/script>");var script=document.getElementById("__ie_onload");script.onreadystatechange=function(){if(this.readyState=="complete"){DOMContentLoadedInit()}};/*@end @*/"""
+            /*@cc_on @*/
+            /*@if (@_win32)
+             document.write("<script id=__ie_onload defer src=javascript:void(0)><\\/script>");var script=document.getElementById("__ie_onload");script.onreadystatechange=function(){if(this.readyState=="complete"){DOMContentLoadedInit()}};/*@end @*/
+        """
     ),
 )
 

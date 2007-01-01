@@ -290,15 +290,20 @@ class JavascriptPacker(Packer):
             
             self.keywordSub(r"""\b_[A-Za-z\d]\w*""", lambda i: "_%i" % i)
     
-            # protect strings
-            # this is more correct, but needs more testing
-            # it has to be more accurate because of the more aggresive packing later
-            self.protect(r"""(?<=return|..case|.....[=\[|(,?:+])\s*((?P<quote>['"])(?:\\(?P=quote)|\\\n|.)*?(?P=quote))""", re.DOTALL)
-        else:
-            # protect strings
-            # these sometimes catch to much, but in safe mode this doesn't hurt
-            self.protect(r"""('(?:\\'|\\\n|.)*?')""")
-            self.protect(r'''("(?:\\"|\\\n|.)*?")''')
+        # protect strings
+        # these sometimes catch to much, but in safe mode this doesn't hurt
+        
+        # the parts:
+        # match a single quote
+        # match anything but the single quote, a backslash and a newline "[^'\\\n]"
+        # or match a null escape (\0 not followed by another digit) "\\0(?![0-9])"
+        # or match a character escape (no newline) "\\[^\n]"
+        # do this until there is another single quote "(?:<snip>)*?'"
+        # all this return one group "(<snip>)"
+        self.protect(r"""('(?:[^'\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?')""")
+        # the same for double quotes
+        self.protect(r"""("(?:[^"\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?")""")
+
         # protect regular expressions
         self.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
         self.protect(r"""([^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
@@ -399,7 +404,7 @@ js_compression_tests = (
         """, 
         """\
             function dummy(){var localvar=10
-            document.write(localvar);return'bar'}""",
+            document.write(localvar);return 'bar'}""",
         'full'
     ),
     (
@@ -419,6 +424,88 @@ js_compression_tests = (
         'escapedStrings',
         r"""var message = "foo: \"something in quotes\"" + foo + "\nbar: " + bar;""",
         r"""var message="foo: \"something in quotes\""+foo+"\nbar: "+bar;"""
+    ),
+    (
+        'escapedStrings2',
+        r"""kukit.kssp.string = kukit.tk.mkParser('string', {
+    "'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',
+    "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
+    });
+kukit.kssp.string.prototype.process = function() {
+    // collect up the value of the string, omitting the quotes
+    this.txt = '';
+    for (var i=1; i<this.result.length-1; i++) {
+        this.txt += this.result[i].txt;
+    }
+};
+
+kukit.kssp.string2 = kukit.tk.mkParser('string', {
+    '"': 'this.emitAndReturn(new kukit.kssp.dquote(this.src))',
+    "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
+    });
+kukit.kssp.string2.prototype.process = kukit.kssp.string.prototype.process; 
+
+
+kukit.kssp.backslashed = kukit.tk.mkParser('backslashed', {});
+kukit.kssp.backslashed.prototype.nextStep = function(table) {
+    // digest the next character and store it as txt
+    var src = this.src;
+    var length = src.text.length;
+    if (length < src.pos + 1) {
+        this.emitError('Missing character after backslash');
+    } else { 
+        this.result.push(new kukit.tk.Fraction(src, src.pos+1));
+        this.src.pos += 1;
+        this.finished = true;
+    }
+};
+kukit.kssp.backslashed.prototype.process = function() {
+    this.txt = this.result[1].txt;
+};
+        """,
+        r"""kukit.kssp.string=kukit.tk.mkParser('string',{"'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string.prototype.process=function(){this.txt='';for(var i=1;i<this.result.length-1;i++){this.txt+=this.result[i].txt}};kukit.kssp.string2=kukit.tk.mkParser('string',{'"':'this.emitAndReturn(new kukit.kssp.dquote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string2.prototype.process=kukit.kssp.string.prototype.process;kukit.kssp.backslashed=kukit.tk.mkParser('backslashed',{});kukit.kssp.backslashed.prototype.nextStep=function(table){var src=this.src;var length=src.text.length;if(length<src.pos+1){this.emitError('Missing character after backslash')} else{this.result.push(new kukit.tk.Fraction(src,src.pos+1));this.src.pos+=1;this.finished=true}};kukit.kssp.backslashed.prototype.process=function(){this.txt=this.result[1].txt};""",
+        'safe'
+    ),
+    (
+        'escapedStrings2',
+        r"""kukit.kssp.string = kukit.tk.mkParser('string', {
+    "'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',
+    "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
+    });
+kukit.kssp.string.prototype.process = function() {
+    // collect up the value of the string, omitting the quotes
+    this.txt = '';
+    for (var i=1; i<this.result.length-1; i++) {
+        this.txt += this.result[i].txt;
+    }
+};
+
+kukit.kssp.string2 = kukit.tk.mkParser('string', {
+    '"': 'this.emitAndReturn(new kukit.kssp.dquote(this.src))',
+    "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
+    });
+kukit.kssp.string2.prototype.process = kukit.kssp.string.prototype.process; 
+
+
+kukit.kssp.backslashed = kukit.tk.mkParser('backslashed', {});
+kukit.kssp.backslashed.prototype.nextStep = function(table) {
+    // digest the next character and store it as txt
+    var src = this.src;
+    var length = src.text.length;
+    if (length < src.pos + 1) {
+        this.emitError('Missing character after backslash');
+    } else { 
+        this.result.push(new kukit.tk.Fraction(src, src.pos+1));
+        this.src.pos += 1;
+        this.finished = true;
+    }
+};
+kukit.kssp.backslashed.prototype.process = function() {
+    this.txt = this.result[1].txt;
+};
+        """,
+        r"""kukit.kssp.string=kukit.tk.mkParser('string',{"'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string.prototype.process=function(){this.txt='';for(var i=1;i<this.result.length-1;i++){this.txt+=this.result[i].txt}};kukit.kssp.string2=kukit.tk.mkParser('string',{'"':'this.emitAndReturn(new kukit.kssp.dquote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string2.prototype.process=kukit.kssp.string.prototype.process;kukit.kssp.backslashed=kukit.tk.mkParser('backslashed',{});kukit.kssp.backslashed.prototype.nextStep=function(table){var src=this.src;var length=src.text.length;if(length<src.pos+1){this.emitError('Missing character after backslash')}else{this.result.push(new kukit.tk.Fraction(src,src.pos+1));this.src.pos+=1;this.finished=true}};kukit.kssp.backslashed.prototype.process=function(){this.txt=this.result[1].txt};""",
+        'full'
     ),
     (
         'whitspaceAroundPlus',
@@ -933,4 +1020,6 @@ def test_suite():
     return suite
 
 if __name__ == '__main__':
+    # packer = JavascriptPacker("full")
+    # print packer.pack(js_compression_tests[5][1])
     unittest.main(defaultTest='test_suite')

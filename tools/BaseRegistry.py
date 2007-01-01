@@ -529,7 +529,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             # Add start/end notes to the resource for better
             # understanding and debugging
             if content:
-                output += '\n/* ----- %s ----- */\n' % (id,)
+                output += '\n/* - %s - */\n' % (id,)
                 if original:
                     output += content
                 else:

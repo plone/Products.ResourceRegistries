@@ -95,7 +95,7 @@ class JSRegistryTool(BaseRegistryTool):
  * Some of these parts have 3rd party licenses or copyright information attached
  * Such information is valid for that section,
  * not for the entire composite file
- * originating files are separated by ----- filename.js -----
+ * originating files are separated by - filename.js -
  */
 """
     resource_class = JavaScript

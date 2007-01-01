@@ -302,10 +302,10 @@ class JavascriptPacker(Packer):
         # protect regular expressions
         self.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
         self.protect(r"""([^\w\$\/'"*)\?:]\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
-        # multiline comments
-        self.sub(r'/\*(?!@).*?\*/', '', re.DOTALL)
         # one line comments
         self.sub(r'\s*//.*$', '', re.MULTILINE)
+        # multiline comments
+        self.sub(r'/\*(?!@).*?\*/', '', re.DOTALL)
         # strip whitespace at the beginning and end of each line
         self.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
         # whitespace after some special chars but not
@@ -498,6 +498,44 @@ js_compression_tests = (
         """,
         """\
             function dummy(a,b){if(a>b){do something}else{do something else}};next_instr;""",
+        'full'
+    ),
+    (
+        'onelineVsMultilineComment',
+        """\
+            function abc() {
+                return value;
+            }; //********************
+
+            function xyz(a, b) {
+                /* docstring for this function */
+                if (a == null) {
+                    return 1
+                }
+            }
+        """,
+        """\
+            function abc(){return value};
+            function xyz(a,b){if(a==null){return 1}}
+        """,
+        'safe'
+    ),
+    (
+        'onelineVsMultilineComment',
+        """\
+            function abc() {
+                return value;
+            }; //********************
+
+            function xyz(a, b) {
+                /* docstring for this function */
+                if (a == null) {
+                    return 1
+                }
+            }
+        """,
+        """\
+            function abc(){return value};function xyz(a,b){if(a==null){return 1}}""",
         'full'
     ),
 )

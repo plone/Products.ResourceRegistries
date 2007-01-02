@@ -386,13 +386,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                             self.concatenatedresources[magic_id] = [prev_id, res_id]
                             previtem._setId(magic_id)
                     else:
-                        if resource.getCookable():# or resource.getCacheable():
+                        if resource.getCookable() or resource.getCacheable():
                             magic_id = self.generateId(resource.getId())
                             self.concatenatedresources[magic_id] = [resource.getId()]
                             resource._setId(magic_id)
                         results.append(resource)
                 else:
-                    if resource.getCookable():# or resource.getCacheable():
+                    if resource.getCookable() or resource.getCacheable():
                         magic_id = self.generateId(resource.getId())
                         self.concatenatedresources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)

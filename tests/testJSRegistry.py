@@ -742,7 +742,7 @@ class TestMergingDisabled(RegistryTestCase):
     def testNumberOfResources(self):
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 2)
-        self.assertEqual(len(self.tool.concatenatedresources), 4)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 2)
 
@@ -750,19 +750,23 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.moveResourceToBottom('simple2.js')
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 2)
-        self.assertEqual(len(self.tool.concatenatedresources), 4)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 2)
-        magicId = None
+        magicIds = []
         for script in scripts:
             id = script.getId()
             if '-cachekey' in id:
-                magicId = id
-        self.failUnless(magicId)
-        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
+                magicIds.append(id)
+        self.failUnless(magicIds[-1].startswith('simple2'))
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[-2]))
         self.failUnless('running' in content)
         self.failUnless('green' in content)
         self.failIf('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[-1]))
+        self.failIf('running' in content)
+        self.failIf('green' in content)
+        self.failUnless('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
         self.failUnless('blue' in content)
 
@@ -770,7 +774,7 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.moveResourceToTop('simple2.js')
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 2)
-        self.assertEqual(len(self.tool.concatenatedresources), 4)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 2)
         magicId = None
@@ -791,7 +795,7 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.moveResourceDown('simple2.js')
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 3)
-        self.assertEqual(len(self.tool.concatenatedresources), 5)
+        self.assertEqual(len(self.tool.concatenatedresources), 6)
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 3)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
@@ -821,7 +825,7 @@ class TestMergingDisabled(RegistryTestCase):
         #Now have [[green,running],blue,[purple,pink]]
         self.assertEqual(len(self.tool.getResources()), 5)
         self.assertEqual(len(self.tool.cookedresources), 3)
-        self.assertEqual(len(self.tool.concatenatedresources), 7)
+        self.assertEqual(len(self.tool.concatenatedresources), 8)
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 3)
         magicIds = []
@@ -829,13 +833,13 @@ class TestMergingDisabled(RegistryTestCase):
             id = script.getId()
             if '-cachekey' in id:
                 magicIds.append(id)
-        self.assertEqual(len(magicIds), 2)
+        self.assertEqual(len(magicIds), 3)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[0]))
         self.failUnless('running' in content)
         self.failUnless('green' in content)
         self.failIf('pink' in content)
         self.failIf('purple' in content)
-        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[1]))
+        content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[2]))
         self.failUnless('pink' in content)
         self.failUnless('purple' in content)
         self.failIf('running' in content)

@@ -608,7 +608,7 @@ class TestMergingDisabled(RegistryTestCase):
     def testNumberOfResources(self):
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 2)
-        self.assertEqual(len(self.tool.concatenatedresources), 4)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 2)
 
@@ -616,19 +616,23 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.moveResourceToBottom('test_rr_2.css')
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 2)
-        self.assertEqual(len(self.tool.concatenatedresources), 4)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 2)
-        magicId = None
+        magicIds = []
         for style in styles:
             id = style.getId()
             if '-cachekey' in id:
-                magicId = id
-        self.failUnless(magicId)
-        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+                magicIds.append(id)
+        self.failUnless(magicIds[-1].startswith('test_rr_2'))
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[-2]))
         self.failUnless('red' in content)
         self.failUnless('green' in content)
         self.failIf('blue' in content)
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[-1]))
+        self.failIf('red' in content)
+        self.failIf('green' in content)
+        self.failUnless('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
         self.failUnless('blue' in content)
 
@@ -636,7 +640,7 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.moveResourceToTop('test_rr_2.css')
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 2)
-        self.assertEqual(len(self.tool.concatenatedresources), 4)
+        self.assertEqual(len(self.tool.concatenatedresources), 5)
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 2)
         magicId = None
@@ -657,7 +661,7 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.moveResourceDown('test_rr_2.css')
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 3)
-        self.assertEqual(len(self.tool.concatenatedresources), 5)
+        self.assertEqual(len(self.tool.concatenatedresources), 6)
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 3)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
@@ -687,7 +691,7 @@ class TestMergingDisabled(RegistryTestCase):
         #Now have [[green,red],blue,[purple,pink]]
         self.assertEqual(len(self.tool.getResources()), 5)
         self.assertEqual(len(self.tool.cookedresources), 3)
-        self.assertEqual(len(self.tool.concatenatedresources), 7)
+        self.assertEqual(len(self.tool.concatenatedresources), 8)
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 3)
         magicIds = []
@@ -695,13 +699,13 @@ class TestMergingDisabled(RegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicIds.append(id)
-        self.assertEqual(len(magicIds), 2)
+        self.assertEqual(len(magicIds), 3)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[0]))
         self.failUnless('red' in content)
         self.failUnless('green' in content)
         self.failIf('pink' in content)
         self.failIf('purple' in content)
-        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[1]))
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[2]))
         self.failUnless('pink' in content)
         self.failUnless('purple' in content)
         self.failIf('red' in content)
@@ -821,8 +825,9 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testRemovedFromResources(self):
         styles = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in styles]
+        self.assertEqual(len(self.tool.concatenatedresources), 4)
         self.failIf('testroot.css' in ids)
-        self.failUnless('test_rr_1.css' in self.tool.concatenatedresources[ids[0]])
+        self.failUnless('test_rr_1.css' in self.tool.concatenatedresources[ids[1]])
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.css')

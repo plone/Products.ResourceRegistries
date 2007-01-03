@@ -1,5 +1,5 @@
-1.3.4 (SVN/unreleased)
-======================
+1.3.4
+=====
 
  * Improved IE conditional compilation protection, it now works in "full"
    compression.

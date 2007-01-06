@@ -58,6 +58,16 @@ def getDummyFileForContent(name, ctype):
     output.headers = {'content-type': ctype}
     return File(name, name, output)
 
+def getCharsetFromContentType(contenttype, default='utf-8'):
+    contenttype = contenttype.lower()
+    if 'charset=' in contenttype:
+        i = contenttype.index('charset=')
+        charset = contenttype[i+8:]
+        charset = charset.split(';')[0]
+        return charset
+    else:
+        return default
+
 class Resource(Persistent):
     security = ClassSecurityInfo()
 
@@ -163,7 +173,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable')
     filename_base = 'ploneResources'
     filename_appendix = '.res'
-    merged_output_prefix = ''
+    merged_output_prefix = u''
     cache_duration = 3600
     resource_class = Resource
 
@@ -231,7 +241,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             site_props = portal_props.site_properties
             charset = site_props.getProperty('default_charset', 'utf-8')
             output = output.encode(charset)
-            contenttype += ';charset=' + charset
+            if 'charset=' not in contenttype:
+                contenttype += ';charset=' + charset
         
         out = StringIO(output)
         out.headers = {'content-type': contenttype}
@@ -453,7 +464,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         resources = self.getResourcesDict()
         if ids is not None:
             ids = ids[:]
-        output = ""
+        output = u""
         if len(ids) > 1:
             output = output + self.merged_output_prefix
 
@@ -473,21 +484,24 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     #Can't do anything other than attempt a getattr
                     obj = getattr(context, id)
             except (AttributeError, KeyError):
-                output += "\n/* XXX ERROR -- could not find '%s'*/\n" % id
-                content = ''
+                output += u"\n/* XXX ERROR -- could not find '%s'*/\n" % id
+                content = u''
                 obj = None
             except Unauthorized:
                 #If we're just returning a single resource, raise an Unauthorized,
                 #otherwise we're merging resources in which case just log an error
                 if len(ids) > 1:
                     #Object probably isn't published yet
-                    output += "\n/* XXX ERROR -- access to '%s' not authorized */\n" % id
-                    content = ''
+                    output += u"\n/* XXX ERROR -- access to '%s' not authorized */\n" % id
+                    content = u''
                     obj = None
                 else:
                     raise
 
             if obj is not None:
+                portal_props = getToolByName(self, 'portal_properties')
+                site_props = portal_props.site_properties
+                default_charset = site_props.getProperty('default_charset', 'utf-8')
                 if isinstance(obj, z3_Resource):
                     # z3 resources
                     # XXX this is a temporary solution, we wrap the five resources
@@ -509,6 +523,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         pass
                     # Now, get the content.
                     content = obj.GET()
+                    contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
+                    contenttype = getCharsetFromContentType(contenttype, default_charset)
+                    content = unicode(content, contenttype)
                     # Now restore the headers and for safety, check that we
                     # have a 20x response. If not, we have a problem and
                     # some browser would hang indefinitely at this point.
@@ -518,30 +535,41 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 elif hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)
-                
+                    contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
+                    contenttype = getCharsetFromContentType(contenttype, default_charset)
+                    content = unicode(content, contenttype)
                 elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'Filesystem File':
-                   obj._updateFromFS()
-                   content = obj._readFile(0)
+                    obj._updateFromFS()
+                    content = obj._readFile(0)
+                    contenttype = getCharsetFromContentType(obj.content_type, default_charset)
+                    content = unicode(content, contenttype)
                 elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'ATFile':
-                    content = str(obj)
+                    f = obj.getFile()
+                    contenttype = getCharsetFromContentType(f.getContentType(), default_charset)
+                    content = unicode(str(f), contenttype)
                 # We should add more explicit type-matching checks
                 elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                     content = obj.index_html(self.REQUEST,
                                              self.REQUEST.RESPONSE)
+                    if not isinstance(content, unicode):
+                        content = unicode(content, default_charset)
                 elif callable(obj):
                     content = obj(self.REQUEST, self.REQUEST.RESPONSE)
+                    if not isinstance(content, unicode):
+                        content = unicode(content, default_charset)
                 else:
                     content = str(obj)
+                    content = unicode(content, default_charset)
 
             # Add start/end notes to the resource for better
             # understanding and debugging
             if content:
-                output += '\n/* - %s - */\n' % (id,)
+                output += u'\n/* - %s - */\n' % (id,)
                 if original:
                     output += content
                 else:
                     output += self.finalizeContent(resources[id], content)
-                output += '\n'
+                output += u'\n'
         return output
 
     #

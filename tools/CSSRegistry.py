@@ -121,7 +121,7 @@ class CSSRegistryTool(BaseRegistryTool):
                              'getCacheable', 'getRel', 'getRendering')
     filename_base = 'ploneStyles'
     filename_appendix = '.css'
-    merged_output_prefix = ''
+    merged_output_prefix = u''
     cache_duration = config.CSS_CACHE_DURATION
     resource_class = Stylesheet
 

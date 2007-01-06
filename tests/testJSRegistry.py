@@ -848,6 +848,42 @@ class TestMergingDisabled(RegistryTestCase):
         self.failUnless('blue' in content)
 
 
+class TestUnicodeAwareness(RegistryTestCase):
+
+    def afterSetUp(self):
+        from Products.Five.zcml import load_config
+        import Products.ResourceRegistries.tests
+        load_config('test.zcml', Products.ResourceRegistries.tests)
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        body = "/* add a comment with unicode\n   \xc3\x9bercool! */\nwindow.alert('running')\n"
+        self.setRoles(['Manager'])
+        self.portal.addDTMLMethod('testmethod.js', file=body)
+        self.portal.invokeFactory('File',
+                                   id='testfile.js',
+                                   format='application/x-javascript',
+                                   content_type='application/x-javascript;charset=utf-8',
+                                   file=body)
+        self.setRoles(['Member'])
+
+    def testGetOriginal(self):
+        # this needs to be first because it's a zpt returning unicode
+        self.tool.registerScript('test_rr_1.js')
+        self.tool.registerScript('++resource++test_rr_1.js')
+        self.tool.registerScript('test_rr_2.js')
+        self.tool.registerScript('test_rr_3.js')
+        self.tool.registerScript('testmethod.js')
+        self.tool.registerScript('testfile.js')
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        magicId = None
+        for script in scripts:
+            id = script.getId()
+            if '-cachekey' in id:
+                magicId = id
+        self.failUnless(magicId)
+        content = self.tool.getResourceContent(magicId, self.portal, original=True)
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -868,6 +904,7 @@ def test_suite():
     suite.addTest(makeSuite(TestZODBTraversal))
     suite.addTest(makeSuite(TestMergingDisabled))
     suite.addTest(makeSuite(TestResourcePermissions))
+    suite.addTest(makeSuite(TestUnicodeAwareness))
 
     return suite
 

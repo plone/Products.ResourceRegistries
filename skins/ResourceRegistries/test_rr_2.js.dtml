@@ -1,0 +1,5 @@
+/* <dtml-call "REQUEST.response.setHeader('content-type','text/javascript;charset=utf-8')"> */
+
+/* add a comment with unicode
+   Übercool! */
+window.alert('running')

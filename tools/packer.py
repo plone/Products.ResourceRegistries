@@ -273,6 +273,20 @@ class Packer:
 class JavascriptPacker(Packer):
     def __init__(self, level='safe'):
         Packer.__init__(self)
+        if level == 'full':
+            # encode local variables. those are preceeded by dollar signs
+            # the amount of dollar signs says how many characters are preserved
+            # any trailing digits are preserved as well
+            # $name -> n, $$name -> na, $top1 -> t1, $top2 -> t2
+            def _dollar_replacement(match):
+                length = len(match.group(2))
+                start = length - max(length - len(match.group(3)), 0)
+                result = match.group(1)[start:start+length] + match.group(4)
+                return result
+            self.sub(r"""((\$+)([a-zA-Z\$_]+))(\d*)\b""", _dollar_replacement)
+            
+            self.keywordSub(r"""\b_[A-Za-z\d]\w*""", lambda i: "_%i" % i)
+    
         # protect strings
         # these sometimes catch to much, but in safe mode this doesn't hurt
         
@@ -298,20 +312,6 @@ class JavascriptPacker(Packer):
         self.sub(r'\s*//.*$', '', re.MULTILINE)
         # remove multiline comments
         self.sub(r'/\*.*?\*/', '', re.DOTALL)
-
-        if level == 'full':
-            # encode local variables. those are preceeded by dollar signs
-            # the amount of dollar signs says how many characters are preserved
-            # any trailing digits are preserved as well
-            # $name -> n, $$name -> na, $top1 -> t1, $top2 -> t2
-            def _dollar_replacement(match):
-                length = len(match.group(2))
-                start = length - max(length - len(match.group(3)), 0)
-                result = match.group(1)[start:start+length] + match.group(4)
-                return result
-            self.sub(r"""((\$+)([a-zA-Z\$_]+))(\d*)\b""", _dollar_replacement)
-            
-            self.keywordSub(r"""(\b_[A-Za-z\d]\w+)""", lambda i: "_%i" % i)
 
         # strip whitespace at the beginning and end of each line
         self.sub(r'^[ \t\r\f\v]*(.*?)[ \t\r\f\v]*$', r'\1', re.MULTILINE)
@@ -678,51 +678,6 @@ js_compression_tests = (
             /*@if (@_win32)
              document.write("<script id=__ie_onload defer src=javascript:void(0)><\\/script>");var script=document.getElementById("__ie_onload");script.onreadystatechange=function(){if(this.readyState=="complete"){DOMContentLoadedInit()}};/*@end @*/
         """
-    ),
-    # variable encoding
-    (
-        'localVars',
-        """\
-            function dummy($node, $$value) {
-                $node.className = $$value;
-            }
-        """,
-        """\
-            function dummy(n,va){n.className=va}""",
-        'full'
-    ),
-    (
-        'privateVars',
-        """\
-            function dummy(_node, _value) {
-                _node.className = _value;
-            }
-        """,
-        """\
-            function dummy(_1,_0){_1.className=_0}""",
-        'full'
-    ),
-    (
-        'noDoubleUnderscoresAtBeginning',
-        """\
-            function dummy(__node, _value) {
-                __node.className = _value;
-            }
-        """,
-        """\
-            function dummy(__node,_0){__node.className=_0}""",
-        'full'
-    ),
-    (
-        'atAtLeastTwoChars',
-        """\
-            function dummy(_a, _va) {
-                _a.className = _va;
-            }
-        """,
-        """\
-            function dummy(_a,_0){_a.className=_0}""",
-        'full'
     ),
 )
 

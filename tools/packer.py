@@ -1,4 +1,5 @@
-import re, unittest, textwrap
+import sys, re, unittest, textwrap
+from optparse import OptionParser, OptionValueError
 
 
 class KeywordMapper:
@@ -367,6 +368,38 @@ class CSSPacker(Packer):
         # first newline
         self.sub(r'^\n', '')
 
+
+optparser = OptionParser()
+
+optparser.add_option("-o", "--output", dest="filename",
+                     help="Write output to FILE", metavar="FILE")
+
+optparser.add_option("", "--test", action="store_true", dest="run_tests",
+                     help="Run test suite")
+
+def js_packer_callback(option, opt_str, value, parser, *args, **kwargs):
+    if parser.values.css:
+        raise OptionValueError("only one packer can be used at once")
+    parser.values.javascript = True
+
+optparser.add_option("-j", "--javascript", action="callback",
+                     dest="javascript", callback=js_packer_callback,
+                     help="Force to use javascript packer")
+
+def css_packer_callback(option, opt_str, value, parser, *args, **kwargs):
+    if parser.values.javascript:
+        raise OptionValueError("only one packer can be used at once")
+    parser.values.css = True
+
+optparser.add_option("-c", "--css", action="callback",
+                     dest="css", callback=css_packer_callback,
+                     help="Force to use css packer")
+
+optparser.add_option("-l", "--level", dest="level", default="safe",
+                     help="Declare which level of packing to use (safe, full), default is 'safe'")
+
+optparser.add_option("-e", "--encode", action="store_true", dest="encode",
+                     help="Encode keywords (only javascript)")
 
 
 # be aware that the initial indentation gets removed in the following tests,
@@ -1118,5 +1151,43 @@ def test_suite():
 
     return suite
 
+
+def run():
+    (options, args) = optparser.parse_args()
+
+    if options.run_tests:
+        unittest.main(defaultTest='test_suite', argv=sys.argv[:1])
+        return
+
+    if options.javascript:
+        packer = JavascriptPacker(options.level)
+    elif options.css:
+        packer = CSSPacker(options.level)
+    elif len(args):
+        print >> sys.stderr, "Autodetection of packer not implemented yet."
+        sys.exit(1)
+    else:
+        print >> sys.stderr, "You have to specify the packer for input from stdin."
+        sys.exit(1)
+
+    if not len(args):
+        args = [sys.stdin]
+
+    mapper = None
+    if options.encode and isinstance(packer, JavascriptPacker):
+        mapper = JavascriptKeywordMapper()
+
+    for f in args:
+        if isinstance(f, basestring):
+            f = open(f)
+        s = f.read()
+        f.close()
+        result = packer.pack(s)
+        if mapper is not None:
+            mapper.analyse(result)
+            result = mapper.sub(result)
+            result = mapper.getDecoder(result)
+        print result
+
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    run()

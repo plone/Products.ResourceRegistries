@@ -284,9 +284,8 @@ class JavascriptPacker(Packer):
         # or match a character escape (no newline) "\\[^\n]"
         # do this until there is another single quote "(?:<snip>)*?'"
         # all this return one group "(<snip>)"
-        self.protect(r"""('(?:[^'\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?')""")
-        # the same for double quotes
-        self.protect(r"""("(?:[^"\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?")""")
+        self.protect(r"""('(?:[^'\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?'|"""
+                     r""""(?:[^"\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?")""")
 
         # protect regular expressions
         self.protect(r"""\s+(\/[^\/\n\r\*][^\/\n\r]*\/g?i?)""")
@@ -497,13 +496,13 @@ js_compression_tests = (
             kukit.kssp.backslashed.prototype.process = function() {
                 this.txt = this.result[1].txt;
             };
-                    """,
-                    r"""kukit.kssp.string=kukit.tk.mkParser('string',{"'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string.prototype.process=function(){this.txt='';for(var i=1;i<this.result.length-1;i++){this.txt+=this.result[i].txt}};kukit.kssp.string2=kukit.tk.mkParser('string',{'"':'this.emitAndReturn(new kukit.kssp.dquote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string2.prototype.process=kukit.kssp.string.prototype.process;kukit.kssp.backslashed=kukit.tk.mkParser('backslashed',{});kukit.kssp.backslashed.prototype.nextStep=function(table){var src=this.src;var length=src.text.length;if(length<src.pos+1){this.emitError('Missing character after backslash')} else{this.result.push(new kukit.tk.Fraction(src,src.pos+1));this.src.pos+=1;this.finished=true}};kukit.kssp.backslashed.prototype.process=function(){this.txt=this.result[1].txt};""",
-                    'safe'
-                ),
-                (
-                    'escapedStrings2',
-                    r"""kukit.kssp.string = kukit.tk.mkParser('string', {
+        """,
+        r"""kukit.kssp.string=kukit.tk.mkParser('string',{"'":'this.emitAndReturn(new kukit.kssp.quote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string.prototype.process=function(){this.txt='';for(var i=1;i<this.result.length-1;i++){this.txt+=this.result[i].txt}};kukit.kssp.string2=kukit.tk.mkParser('string',{'"':'this.emitAndReturn(new kukit.kssp.dquote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string2.prototype.process=kukit.kssp.string.prototype.process;kukit.kssp.backslashed=kukit.tk.mkParser('backslashed',{});kukit.kssp.backslashed.prototype.nextStep=function(table){var src=this.src;var length=src.text.length;if(length<src.pos+1){this.emitError('Missing character after backslash')} else{this.result.push(new kukit.tk.Fraction(src,src.pos+1));this.src.pos+=1;this.finished=true}};kukit.kssp.backslashed.prototype.process=function(){this.txt=this.result[1].txt};""",
+        'safe'
+    ),
+    (
+        'escapedStrings2',
+        r"""kukit.kssp.string = kukit.tk.mkParser('string', {
                 "'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',
                 "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
                 });
@@ -539,7 +538,25 @@ js_compression_tests = (
                 this.txt = this.result[1].txt;
             };
         """,
-        r"""kukit.kssp.string=kukit.tk.mkParser('string',{"'": 'this.emitAndReturn(new kukit.kssp.quote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string.prototype.process=function(){this.txt='';for(var i=1;i<this.result.length-1;i++){this.txt+=this.result[i].txt}};kukit.kssp.string2=kukit.tk.mkParser('string',{'"':'this.emitAndReturn(new kukit.kssp.dquote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string2.prototype.process=kukit.kssp.string.prototype.process;kukit.kssp.backslashed=kukit.tk.mkParser('backslashed',{});kukit.kssp.backslashed.prototype.nextStep=function(table){var src=this.src;var length=src.text.length;if(length<src.pos+1){this.emitError('Missing character after backslash')}else{this.result.push(new kukit.tk.Fraction(src,src.pos+1));this.src.pos+=1;this.finished=true}};kukit.kssp.backslashed.prototype.process=function(){this.txt=this.result[1].txt};""",
+        r"""kukit.kssp.string=kukit.tk.mkParser('string',{"'":'this.emitAndReturn(new kukit.kssp.quote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string.prototype.process=function(){this.txt='';for(var i=1;i<this.result.length-1;i++){this.txt+=this.result[i].txt}};kukit.kssp.string2=kukit.tk.mkParser('string',{'"':'this.emitAndReturn(new kukit.kssp.dquote(this.src))',"\\":'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'});kukit.kssp.string2.prototype.process=kukit.kssp.string.prototype.process;kukit.kssp.backslashed=kukit.tk.mkParser('backslashed',{});kukit.kssp.backslashed.prototype.nextStep=function(table){var src=this.src;var length=src.text.length;if(length<src.pos+1){this.emitError('Missing character after backslash')}else{this.result.push(new kukit.tk.Fraction(src,src.pos+1));this.src.pos+=1;this.finished=true}};kukit.kssp.backslashed.prototype.process=function(){this.txt=this.result[1].txt};""",
+        'full'
+    ),
+    (
+        'mixingSingleAndDoubleQuotes',
+        """\
+            alert("Address '" + $address + "' not found");
+        """,
+        """\
+            alert("Address '"+$address+"' not found");""",
+        'safe'
+    ),
+    (
+        'mixingSingleAndDoubleQuotes',
+        """\
+            alert("Address '" + $address + "' not found");
+        """,
+        """\
+            alert("Address '"+a+"' not found");""",
         'full'
     ),
     (

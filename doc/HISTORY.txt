@@ -1,6 +1,15 @@
 1.3.5 (SVN/unreleased)
 ======================
 
+ * Fixed string protection for strings which mix single and double quotes.
+   [fschulze]
+
+ * Made packer.py usable as a standalone commandline tool.
+   [fschulze]
+
+ * Fixed several issues in 'full' compression.
+   [fschulze]
+
 1.3.4
 =====
 

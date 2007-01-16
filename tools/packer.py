@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys, re, unittest, textwrap
 from optparse import OptionParser, OptionValueError
 

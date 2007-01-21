@@ -9,13 +9,13 @@ _REG_TITLE = 'Stylesheet registry'
 
 def importCSSRegistry(context):
     """
-    Import javascript registry.
+    Import CSS registry.
     """
     return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
 
 def exportCSSRegistry(context):
     """
-    Export javascript registry.
+    Export CSS registry.
     """
     return exportResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
 

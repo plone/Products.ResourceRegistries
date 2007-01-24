@@ -31,7 +31,6 @@ from Products.ResourceRegistries.interfaces import IResourceRegistry
 
 import Acquisition
 from thread import get_ident
-from Products.CMFCore.Skinnable import SKINDATA
 
 # version agnostic import of z3_Resource
 try:

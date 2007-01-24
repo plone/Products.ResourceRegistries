@@ -5,7 +5,7 @@ from resourceregistry import ResourceRegistryNodeAdapter, \
 
 _FILENAME = 'jsregistry.xml'
 _REG_ID = 'portal_javascripts'
-_REG_TITLE = 'Javacript registry'
+_REG_TITLE = 'Javascript registry'
 
 def importJSRegistry(context):
     """

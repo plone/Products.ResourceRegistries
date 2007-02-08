@@ -108,6 +108,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
 
             data = {}
             method = reg_method
+            position = None
             for key, value in child.attributes.items():
                 key = str(key)
                 if key == 'update':
@@ -116,6 +117,18 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                 if key == 'remove':
                     method = unreg_method
                     break
+                if key == 'position-before':
+                    position = ('Before', value)
+                    continue
+                if key == 'position-after':
+                    postion = ('After', value)
+                    continue
+                if key == 'position-top':
+                    position = ('ToTop',)
+                    continue
+                if key == 'position-bottom':
+                    position = ('ToBottom',)
+                    continue
                 if key == 'id':
                     res_id = str(value)
                 elif value.lower() == 'false':
@@ -142,3 +155,6 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                     method=update_method
             if method == update_method:
                 method(res_id, **data)
+            if position is not None:
+                moveMethod = getattr(registry, 'moveResource' + position[0])
+                moveMethod(res_id, *position[1:])

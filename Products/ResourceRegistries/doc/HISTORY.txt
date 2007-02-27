@@ -1,5 +1,11 @@
-1.4.0 (SVN/unreleased)
-======================
+1.4.0-beta1
+===========
+
+ * Fixed test failures caused by changes in Zope 2.10.
+   [fschulze]
+
+ * Ported bugfixes from 1.3 line.
+   [fschulze]
 
 1.4.0-alpha2
 ============

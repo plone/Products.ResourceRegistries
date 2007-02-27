@@ -1,11 +1,8 @@
-1.3.7 (SVN/unreleased)
-======================
+1.3.6
+=====
 
  * Invalidate cache when cooking resources if the registry is assigned to a
    RAMCache or similar cache manager.
-
-1.3.6
-=====
 
  * Fixed string replacement during packing when several resources got packed
    in different threads at once, which resulted in exchanged strings.

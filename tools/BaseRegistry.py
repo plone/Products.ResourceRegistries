@@ -357,6 +357,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'cookResources')
     def cookResources(self):
         """Cook the stored resources."""
+        if self.ZCacheable_isCachingEnabled():
+            self.ZCacheable_invalidate()
         resources = [r.copy() for r in self.getResources() if r.getEnabled()]
         self.concatenatedresources = {}
         self.cookedresources = ()

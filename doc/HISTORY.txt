@@ -1,6 +1,9 @@
 1.3.7 (SVN/unreleased)
 ======================
 
+ * Invalidate cache when cooking resources if the registry is assigned to a
+   RAMCache or similar cache manager.
+
 1.3.6
 =====
 

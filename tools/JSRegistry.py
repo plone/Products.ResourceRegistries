@@ -107,10 +107,14 @@ class JSRegistryTool(BaseRegistryTool):
 
     def _compressJS(self, content, level='safe'):
         encode_marker = "/* sTART eNCODE */\n%s\n/* eND eNCODE */"
-        if level == 'full' or level == 'full-encode':
+        if level == 'full-encode':
             return encode_marker % JavascriptPacker('full').pack(content)
-        elif level == 'safe' or level == 'safe-encode':
+        elif level == 'safe-encode':
             return encode_marker % JavascriptPacker('safe').pack(content)
+        elif level == 'full':
+            return JavascriptPacker('full').pack(content)
+        elif level == 'safe':
+            return JavascriptPacker('safe').pack(content)
         else:
             return content
 

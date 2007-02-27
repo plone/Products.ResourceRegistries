@@ -19,10 +19,6 @@ import re
 from packer import JavascriptPacker, JavascriptKeywordMapper
 
 
-jspacker = JavascriptPacker('safe')
-jspacker_full = JavascriptPacker('full')
-
-
 class JavaScript(Resource):
     security = ClassSecurityInfo()
 
@@ -111,14 +107,10 @@ class JSRegistryTool(BaseRegistryTool):
 
     def _compressJS(self, content, level='safe'):
         encode_marker = "/* sTART eNCODE */\n%s\n/* eND eNCODE */"
-        if level == 'full-encode':
-            return encode_marker % jspacker_full.pack(content)
-        elif level == 'safe-encode':
-            return encode_marker % jspacker.pack(content)
-        elif level == 'full':
-            return jspacker_full.pack(content)
-        elif level == 'safe':
-            return jspacker.pack(content)
+        if level == 'full' or level == 'full-encode':
+            return encode_marker % JavascriptPacker('full').pack(content)
+        elif level == 'safe' or level == 'safe-encode':
+            return encode_marker % JavascriptPacker('safe').pack(content)
         else:
             return content
 

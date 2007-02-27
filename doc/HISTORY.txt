@@ -1,6 +1,9 @@
 1.3.6 (SVN/unreleased)
 ======================
 
+ * Fixed a rare problem, where strings were exchanged during packing.
+   [fschulze]
+
 1.3.5
 =====
 

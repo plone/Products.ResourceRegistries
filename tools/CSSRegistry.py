@@ -19,10 +19,6 @@ import re
 from packer import CSSPacker
 
 
-csspacker = CSSPacker('safe')
-csspacker_full = CSSPacker('full')
-
-
 class Stylesheet(Resource):
     security = ClassSecurityInfo()
 
@@ -166,9 +162,9 @@ class CSSRegistryTool(BaseRegistryTool):
 
     def _compressCSS(self, content, level='safe'):
         if level == 'full':
-            return csspacker_full.pack(content)
+            return CSSPacker('full').pack(content)
         elif level == 'safe':
-            return csspacker.pack(content)
+            return CSSPacker('safe').pack(content)
         else:
             return content
 

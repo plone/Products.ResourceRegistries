@@ -453,13 +453,13 @@ class TestPublishing(FunctionalRegistryTestCase):
         response = self.publish(self.folderpath)
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'),
-                         'text/html;charset=utf-8')
+                         'text/html; charset=iso-8859-15')
         self.tool.clearResources()
         self.tool.registerScript('test_rr_1.js', inline=True)
         # Test that the main page retains its content-type
         response = self.publish(self.folderpath)
         self.assertEqual(response.getHeader('Content-Type'),
-                         'text/html;charset=utf-8')
+                         'text/html; charset=iso-8859-15')
         self.assertEqual(response.getStatus(), 200)
 
     def testPublishPageWithInlineJS2(self):
@@ -471,7 +471,7 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.tool.registerScript('testmethod', inline=True)
         response = self.publish(self.folderpath)
         self.assertEqual(response.getHeader('Content-Type'),
-                         'text/html;charset=utf-8')
+                         'text/html; charset=iso-8859-15')
         self.assertEqual(response.getStatus(), 200)
 
 class TestFivePublishing(FunctionalRegistryTestCase):

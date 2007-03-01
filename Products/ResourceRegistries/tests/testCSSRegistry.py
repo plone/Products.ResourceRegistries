@@ -743,7 +743,7 @@ class TestPublishing(FunctionalRegistryTestCase):
         response = self.publish(self.portalpath)
         self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'),
-                         'text/html; charset=iso-8859-15')
+                         'text/html;charset=utf-8')
         self.tool.clearResources()
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
@@ -751,7 +751,7 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.portal.addDTMLMethod('testmethod', file=body)
         self.tool.registerStylesheet('testmethod', rendering='inline')
         response = self.publish(self.portalpath)
-        self.assertEqual(response.getHeader('Content-Type'), 'text/html; charset=iso-8859-15')
+        self.assertEqual(response.getHeader('Content-Type'), 'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
 

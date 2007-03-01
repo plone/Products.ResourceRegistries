@@ -1,5 +1,8 @@
-1.4.0 (SVN/unreleased)
-======================
+1.4.0-beta2
+===========
+
+ * Reverted fix of tests, because Zope was wrong.
+   [fschulze]
 
 1.4.0-beta1
 ===========

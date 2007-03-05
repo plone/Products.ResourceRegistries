@@ -117,16 +117,16 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                 if key == 'remove':
                     method = unreg_method
                     break
-                if key == 'position-before':
+                if key in ('position-before', 'insert-before'):
                     position = ('Before', value)
                     continue
-                if key == 'position-after':
+                if key in ('position-after', 'insert-after'):
                     postion = ('After', value)
                     continue
-                if key == 'position-top':
+                if key in ('position-top', 'insert-top'):
                     position = ('ToTop',)
                     continue
-                if key == 'position-bottom':
+                if key in ('position-bottom', 'insert-bottom'):
                     position = ('ToBottom',)
                     continue
                 if key == 'id':

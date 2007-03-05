@@ -1,5 +1,11 @@
 1.3.7 (SVN/unreleased)
 ======================
+ * For compatibility with GenericSetup conventions, the import steps now 
+   support 'insert-before' and  'insert-after' as aliases for 
+   'position-before' and 'position-after', while 'insert-top' and 
+   'insert-bottom' are aliases for 'position-top' and 'position-bottom',
+   respectively.
+   [mj]
 
 1.3.6
 =====

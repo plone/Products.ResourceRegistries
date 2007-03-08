@@ -11,6 +11,7 @@ from Globals import InitializeClass, Persistent, PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized
 
 from zope.interface import implements
+from zope.component import getUtility, queryUtility
 
 from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 
@@ -21,8 +22,12 @@ from OFS.Cache import Cacheable
 
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
+
+from Products.CMFCore.interfaces import IPropertiesTool
+from Products.CMFCore.interfaces import ISkinsTool
+from Products.CMFCore.interfaces import IURLTool
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
@@ -237,7 +242,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         output, contenttype = data
         
         if isinstance(output, unicode):
-            portal_props = getToolByName(self, 'portal_properties')
+            portal_props = getUtility(IPropertiesTool)
             site_props = portal_props.site_properties
             charset = site_props.getProperty('default_charset', 'utf-8')
             output = output.encode(charset)
@@ -255,7 +260,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
         # First see if it is a skin
-        skintool = getToolByName(self, 'portal_skins')
+        skintool = getUtility(ISkinsTool)
         skins = skintool.getSkinSelections()
         if name in skins:
             return Skin(name).__of__(self)
@@ -423,7 +428,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """
         try:
             if expression and context is not None:
-                portal = getToolByName(self, 'portal_url').getPortalObject()
+                portal = getUtility(IURLTool).getPortalObject()
 
                 # Find folder (code courtesy of CMFCore.ActionsTool)
                 if context is None or not hasattr(context, 'aq_base'):
@@ -471,7 +476,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             output = output + self.merged_output_prefix
 
         portal = None
-        u_tool = getToolByName(self, 'portal_url', None)
+        u_tool = queryUtility(IURLTool)
         if u_tool:
             portal = u_tool.getPortalObject()
 
@@ -501,7 +506,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     raise
 
             if obj is not None:
-                portal_props = getToolByName(self, 'portal_properties')
+                portal_props = getUtility(IPropertiesTool)
                 site_props = portal_props.site_properties
                 default_charset = site_props.getProperty('default_charset', 'utf-8')
                 if isinstance(obj, z3_Resource):
@@ -756,7 +761,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         # though since they indicate an error on the part of the designer/developer
         # or are considered legal by the Unit Tests!
         portal = None
-        u_tool = getToolByName(self, 'portal_url', None)
+        u_tool = queryUtility(IURLTool)
         if u_tool:
             portal = u_tool.getPortalObject()
 

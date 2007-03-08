@@ -14,7 +14,7 @@ from zExceptions import NotFound
 from AccessControl import Unauthorized
 from Interface.Verify import verifyObject
 
-from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.interfaces import IURLTool
 
 from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
 
@@ -486,7 +486,7 @@ class TestFivePublishing(FunctionalRegistryTestCase):
         self.tool.clearResources()
         self.tool.registerScript('++resource++test_rr_1.js')
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.portalpath = '/' + getUtility(IURLTool)(1)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
@@ -502,7 +502,7 @@ class TestDebugMode(FunctionalRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
-        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.portalpath = '/' + getUtility(IURLTool)(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
 
     def testDebugModeSplitting(self):

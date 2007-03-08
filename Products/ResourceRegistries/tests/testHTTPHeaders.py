@@ -12,7 +12,8 @@ from zExceptions import NotFound
 from AccessControl import Unauthorized
 from Interface.Verify import verifyObject
 
-from Products.CMFCore.utils import getToolByName
+from zope.component import getUtility
+from Products.CMFCore.interfaces import IURLTool
 
 from Products.PloneTestCase.PloneTestCase import PLONE21
 
@@ -26,7 +27,7 @@ class TestHTTPHeaders(FunctionalRegistryTestCase):
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.tool.clearResources()
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.portalpath = '/' + getUtility(IURLTool)(1)
 
     def testContentTypeHeaders(self):
         # Test that the main page retains its content-type

@@ -5,6 +5,7 @@ from AccessControl import ClassSecurityInfo
 from zope.interface import implements
 from zope.component import getUtility
 
+from Products.CMFCore.utils import registerToolInterface
 from Products.CMFPlone.interfaces import IPloneTool
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -240,3 +241,4 @@ class JSRegistryTool(BaseRegistryTool):
         return output
 
 InitializeClass(JSRegistryTool)
+registerToolInterface('portal_javascripts', IJSRegistry)

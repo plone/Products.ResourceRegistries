@@ -63,9 +63,6 @@ class ICSSRegistry(Interface):
     id = Attribute('id',
                    """ The tool's ID.
 
-                   o BBB:  for use in 'getToolByName';  in the future, prefer
-                   'zapi.getUtility(ICSSRegistry)'.
-
                    o Must be set to 'portal_css'.
                    """)
 
@@ -89,9 +86,6 @@ class IJSRegistry(Interface):
 
     id = Attribute('id',
                    """ The tool's ID.
-
-                   o BBB:  for use in 'getToolByName';  in the future, prefer
-                   'zapi.getUtility(IJSRegistry)'.
 
                    o Must be set to 'portal_javascripts'.
                    """)

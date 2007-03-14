@@ -1,14 +1,16 @@
-from Acquisition import aq_inner
+from zope.component import getUtility
+
 from Products.PythonScripts.standard import url_quote
 from Products.Five.browser import BrowserView
-from Products.CMFCore.utils import getToolByName
+
+from Products.ResourceRegistries.interfaces import IJSRegistry
 
 
 class ScriptsView(BrowserView):
     """ Information for script rendering. """
 
     def registry(self):
-        return getToolByName(aq_inner(self.context), 'portal_javascripts')
+        return getUtility(IJSRegistry)
 
     def skinname(self):
         return self.context.getCurrentSkinName()

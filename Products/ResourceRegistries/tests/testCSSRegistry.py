@@ -1,10 +1,6 @@
 #
 # CSSRegistry Tests
 #
-
-import os, sys
-if __name__ == '__main__':
-    execfile(os.path.join(sys.path[0], 'framework.py'))
 from zope.component import getUtility, getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
@@ -1018,6 +1014,3 @@ def test_suite():
     suite.addTest(makeSuite(TestSkinAwareness))
 
     return suite
-
-if __name__ == '__main__':
-    framework()

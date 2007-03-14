@@ -2,10 +2,6 @@
 # CSSRegistry Tests
 #
 
-import os, sys
-if __name__ == '__main__':
-    execfile(os.path.join(sys.path[0], 'framework.py'))
-
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from zExceptions import NotFound
@@ -92,6 +88,3 @@ def test_suite():
     suite.addTest(makeSuite(TestHTTPHeaders))
 
     return suite
-
-if __name__ == '__main__':
-    framework()

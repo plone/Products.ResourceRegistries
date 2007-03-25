@@ -1,5 +1,5 @@
-1.4.0 (SVN/unreleased)
-======================
+1.4.0-beta3
+===========
 
  * Replace usage of getToolByNames with getUtility.
    [wichert, hannosch]

@@ -1,13 +1,15 @@
 <tal:scripts define="view context/@@resourceregistries_scripts_view"
              repeat="script view/scripts">
-  <tal:no-inline condition="not:script/inline">
-    <script type="text/javascript"
-            tal:attributes="src script/src">
-    </script>
-  </tal:no-inline>
-  <tal:inline condition="script/inline">
-    <script type="text/javascript"
-            tal:content="structure string:<!--  ${script/content}  // -->">
-    </script>
-  </tal:inline>
+  <tal:block define="inline script/inline">
+    <tal:no-inline condition="not:inline">
+      <script type="text/javascript"
+              tal:attributes="src script/src">
+      </script>
+    </tal:no-inline>
+    <tal:inline condition="inline">
+      <script type="text/javascript"
+              tal:content="structure string:<!--  ${script/content}  // -->">
+      </script>
+    </tal:inline>
+  </tal:block>
 </tal:scripts>

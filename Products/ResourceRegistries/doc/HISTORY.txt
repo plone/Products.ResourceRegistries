@@ -1,6 +1,9 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+ * Slightly optimized the viewlet manager templates.
+   [hannosch]
+
 1.4.0-beta3
 ===========
 

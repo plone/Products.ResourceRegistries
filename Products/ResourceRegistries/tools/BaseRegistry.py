@@ -27,7 +27,7 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
 from Products.CMFCore.interfaces import IPropertiesTool
 from Products.CMFCore.interfaces import ISkinsTool
-from Products.CMFCore.interfaces import IURLTool
+from Products.CMFCore.interfaces import ISiteRoot
 
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
@@ -428,7 +428,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """
         try:
             if expression and context is not None:
-                portal = getUtility(IURLTool).getPortalObject()
+                portal = getUtility(ISiteRoot)
 
                 # Find folder (code courtesy of CMFCore.ActionsTool)
                 if context is None or not hasattr(context, 'aq_base'):
@@ -475,10 +475,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         if len(ids) > 1:
             output = output + self.merged_output_prefix
 
-        portal = None
-        u_tool = queryUtility(IURLTool)
-        if u_tool:
-            portal = u_tool.getPortalObject()
+        portal = queryUtility(ISiteRoot)
 
         if context == self and portal is not None:
             context = portal
@@ -754,31 +751,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         # filter results by expression
         results = [item for item in results
                    if self.evaluateExpression(item.getExpression(), context)]
-
-        # filter out resources to which the user does not have access
-        # this is mainly cosmetic but saves raising lots of Unauthorized
-        # requests whilst resources are in their private state. 404s should stay
-        # though since they indicate an error on the part of the designer/developer
-        # or are considered legal by the Unit Tests!
-        portal = None
-        u_tool = queryUtility(IURLTool)
-        if u_tool:
-            portal = u_tool.getPortalObject()
-
-        if portal is not None:
-            #If we don't have a portal object, just let'em through - the stylesheets will raise
-            # an Unauthorized when requested though
-            for item in results:
-                id = item.getId()
-                if not id.startswith(self.filename_base):
-                    try:
-                        obj = portal.restrictedTraverse(id)
-                    except Unauthorized:
-                        #Only include links to Unauthorized objects if we're debugging
-                        if not self.getDebugMode():
-                            results.remove(item)
-                    except (AttributeError, KeyError):
-                        pass
 
         return results
 

@@ -121,7 +121,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                     position = ('Before', value)
                     continue
                 if key in ('position-after', 'insert-after'):
-                    postion = ('After', value)
+                    position = ('After', value)
                     continue
                 if key in ('position-top', 'insert-top'):
                     position = ('ToTop',)

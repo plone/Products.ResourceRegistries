@@ -1,6 +1,10 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+ * Fixed typo which prevented position-after/insert-after in gs profiles to
+   work.
+   [fschulze]
+
  * Slightly optimized the viewlet manager templates.
    [hannosch]
 

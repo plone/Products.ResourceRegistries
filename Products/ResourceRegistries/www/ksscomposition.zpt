@@ -1,0 +1,40 @@
+<div tal:replace="structure here/manage_page_header" />
+
+<style type="text/css">
+.notFound,
+.notFound a {
+    color: red;
+}
+</style>
+
+<div tal:replace="structure here/manage_tabs" />
+
+<p>Overview of which kineticstylesheets are merged to create composite kineticstylesheets.</p> 
+
+<ul tal:define="portal_url python:here.portal_url()">
+    <li tal:repeat="entry python:here.getCookedResources()">
+        <div>
+            <a href="" tal:attributes="href string:${portal_url}/portal_kss/${entry/getId}">
+                <b tal:content="entry/getId">ploneCustom.kss</b>
+            </a>
+            <tal:block tal:condition="entry/getExpression | nothing">
+            - <span tal:replace="entry/getExpression" />
+            </tal:block>
+        </div>
+        <ul tal:define="sheets here/concatenatedresources">
+          <tal:kineticstylesheets tal:define="portal python:here.portal_url.getPortalObject();"
+                           tal:repeat="subentry python:sheets.get(entry.getId())">
+            <li tal:define="resourceExists python:path('exists:portal/%s' % subentry);"
+                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
+                <a href="" tal:attributes="href string:${portal_url}/portal_kss/${subentry}"
+                            tal:content="subentry">
+                    plone.kss
+                </a>
+                <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
+            </li>
+          </tal:kineticstylesheets>
+        </ul>
+    </li>
+</ul>
+
+<div tal:replace="structure here/manage_page_footer" />

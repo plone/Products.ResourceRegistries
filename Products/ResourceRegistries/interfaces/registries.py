@@ -81,6 +81,29 @@ class ICSSRegistry(Interface):
         """Save stylesheet data from form submission."""
 
 
+class IKSSRegistry(Interface):
+    """A tool for registering and evaluating kineticstylesheet linkage."""
+
+    id = Attribute('id',
+                   """ The tool's ID.
+
+                   o Must be set to 'portal_kss'.
+                   """)
+
+    def registerKineticStylesheet(id, expression='', enabled=1):
+        """Register a kineticstylesheet."""
+
+    def manage_addKineticStylesheet(id, expression='', 
+                                    enabled=True , REQUEST=None):
+        """Add kineticstylesheet from a ZMI form."""
+
+    def manage_removeKineticStylesheet(id, REQUEST=None):
+        """Remove kineticstylesheet from the ZMI."""
+
+    def manage_saveKineticStylesheets(REQUEST=None):
+        """Save kineticstylesheet data from form submission."""
+
+
 class IJSRegistry(Interface):
     """A tool for registering and evaluating script linkage."""
 

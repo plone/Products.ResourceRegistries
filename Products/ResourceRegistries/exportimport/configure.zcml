@@ -18,4 +18,11 @@
            Products.GenericSetup.interfaces.ISetupEnviron"
       />
 
+  <adapter
+      factory=".kssregistry.KSSRegistryNodeAdapter"
+      provides="Products.GenericSetup.interfaces.IBody"
+      for="Products.ResourceRegistries.interfaces.IKSSRegistry
+           Products.GenericSetup.interfaces.ISetupEnviron"
+      />
+
 </configure>

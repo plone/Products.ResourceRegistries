@@ -1,0 +1,296 @@
+<div tal:replace="structure here/manage_page_header" />
+
+<script type="text/javascript">
+function getSortInput(node) {
+    var iterNode = null;
+    for (var i = 0; i<node.childNodes.length; i++) {
+        iterNode = node.childNodes[i];
+        if (iterNode.nodeType == 1 &&
+            iterNode.nodeName == 'INPUT' &&
+            iterNode.name == 'kineticstylesheets.sort:records:int') {
+            return iterNode;
+        }
+        if (iterNode.hasChildNodes()) {
+            var result = getSortInput(iterNode);
+            if (result) {
+                return result;
+            }
+        }
+    }
+    return null;
+}
+ 
+function exchangeSortValues(a, b) {
+    var aInput = getSortInput(a);
+    var bInput = getSortInput(b);
+    if (!(aInput && bInput)) return false;
+    var tmp = aInput.value;
+    aInput.value = bInput.value;
+    bInput.value = tmp;
+    return true;
+}
+ 
+ 
+function moveDown(node) {
+    var node, fieldset, nextBlock = null;
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode;
+    }
+    fieldset = node;
+    nextBlock = fieldset.nextSibling;
+    if (nextBlock) {
+        var shifted = shiftBlocks(nextBlock, fieldset);
+        if (!shifted) {
+            return true; // follow the link normally
+        } else {
+            return false; // don't follow the link normally
+        }
+    }
+}
+ 
+function moveUp(node) {
+    var node, fieldset, previousBlock = null;
+    while (node.nodeName != 'FIELDSET') {
+        node = node.parentNode;
+    }
+    fieldset = node;
+    previousBlock = fieldset.previousSibling
+    if (previousBlock) {
+        var shifted = shiftBlocks(fieldset, previousBlock);
+        if (!shifted) {
+            return true; // follow the link normally
+        } else {
+            return false; // don't follow the link normally
+        }
+    }
+}
+ 
+function shiftBlocks(fieldset, block) {
+    while (block.nodeType == 3) {
+         block = block.previousSibling;
+    }
+    while (fieldset.nodeType == 3) {
+         fieldset = fieldset.nextSibling;
+    }
+    var exchanged = exchangeSortValues(fieldset, block);
+    if (!exchanged) {
+        return false;
+    }
+    fieldset.parentNode.insertBefore(fieldset, block);
+    return true;
+}
+</script>
+
+<style type="text/css">
+div.kineticstylesheetform{
+    width: 45%;
+    float: left;
+}
+
+form {
+    margin-bottom: 3em;
+}
+
+fieldset label,fieldset input,fieldset  select {
+    font-size: 80%;
+    font-family: sans-serif;
+    float: left;
+}
+
+legend input {
+    float: none;
+}
+
+fieldset label {
+    width: 11em;
+    text-align: right;
+    padding: 0.2em 0.4em;
+    font-weight: bold;
+    clear: left;
+}
+
+
+fieldset {
+    margin: 0.2em;
+    border: 1px solid black;
+    margin-bottom: 0.5em;
+    padding-bottom: 0;
+    clear: both;
+}
+
+legend {
+    font-size: 90%;
+}
+
+#debugmodelabel{
+    font-weight : bold;
+}
+
+.hiddenLabel {
+    display: block;
+    background: transparent;
+    background-image: none; /* */
+    border: none;
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    margin: -1px 0 0 -1px;
+    width: 1px;
+}
+
+.notFound {
+    background-color: #ffce7b;
+    border: 1px solid #ffa500;
+}
+
+</style>
+
+<div tal:replace="structure here/manage_tabs" />
+
+<form action="manage_saveKineticStylesheets"
+      tal:attributes="action python:here.absolute_url()+'/manage_saveKineticStylesheets'"
+      method="post">
+
+    <p>
+        <input type="checkbox" id="debugmode" name="debugmode:boolean"
+               tal:attributes="checked here/getDebugMode" />
+        <label for="debugmode" id="debugmodelabel">Debug/development mode</label>
+        In debug-/development mode, kineticstylesheets are not merged to composites, and caching and compression of kss is disabled. The registry also sends http-headers to prevent browsers from caching the kineticstylesheets. <br />Recommended during kss-related development. Remember to  turn it off again, as the debugmode affects performance. 
+    </p>
+
+    <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
+
+    <p>The order of the kineticstylesheets in this form is the same as the
+    order in the header of the resulting HTML code. Use the up/down arrows
+    to change the rendering order.</p>
+
+    
+    <tal:kineticstylesheets tal:define="portal python:here.portal_url.getPortalObject();"
+                     tal:repeat="kineticstylesheet here/getResources">
+      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % kineticstylesheet.getId());"
+                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
+
+        <input type="hidden" name="kineticstylesheets.sort:records:int"
+               tal:attributes="value repeat/kineticstylesheet/index" />
+
+        <legend>
+            <label class="hiddenLabel">Enabled?</label>
+            <input type="checkbox" name="kineticstylesheets.enabled:records"
+                   title="Enabled?"
+                   tal:attributes="checked kineticstylesheet/getEnabled">
+            <input type="hidden" name="kineticstylesheets.enabled:records:boolean:default" value="False" />
+
+            <input type="text" name="kineticstylesheets.id:records" size="30"
+                   tal:attributes="value kineticstylesheet/getId">
+
+                <a onclick="return moveUp(this);" href="#"
+                   title="Move up"
+                   tal:attributes="href string:moveResourceUp?id=${kineticstylesheet/getId}">
+                     &uarr;
+                </a>
+                <a onclick="return moveDown(this);" href="#"
+                   title="Move down"
+                   tal:attributes="href string:moveResourceDown?id=${kineticstylesheet/getId}">
+                     &darr;
+                </a>
+                <a href="#" 
+                   title="Remove"
+                   style="color: red;"
+                   tal:attributes="href string:manage_removeKineticStylesheet?id=${kineticstylesheet/getId}">
+                    x
+                </a>
+                <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
+        </legend>
+        
+        <div class="kineticstylesheetform">
+            <label>Condition</label>
+            <input type="text" name="kineticstylesheets.expression:records"
+                   tal:attributes="value kineticstylesheet/getExpression">
+
+            <label>Merging allowed?</label>
+            <input type="checkbox" name="kineticstylesheets.cookable:records:boolean"
+                   tal:attributes="checked kineticstylesheet/getCookable | default" />
+            <input type="hidden" name="kineticstylesheets.cookable:records:boolean:default" value="False" />
+
+            <label>Caching allowed?</label>
+            <input type="checkbox" name="kineticstylesheets.cacheable:records:boolean"
+                   tal:attributes="checked kineticstylesheet/getCacheable | default" />
+            <input type="hidden" name="kineticstylesheets.cacheable:records:boolean:default" value="False" />
+        </div>
+
+        <div class="kineticstylesheetform">
+            <label>Compression type</label>
+            <select name="kineticstylesheets.compression:records">
+                <option tal:repeat="r here/getCompressionOptions"
+                        tal:attributes="value r;
+                                        selected python:r == kineticstylesheet.getCompression()"
+                        tal:content="r">safe</option>
+            </select>
+        </div>
+
+        <div style="clear: both;">&nbsp;</div>
+        
+
+      </fieldset>
+    </tal:kineticstylesheets>
+
+    <input type="submit" i18n:attributes="value" value="Save" />
+
+</form>
+
+<form action="manage_addKineticStylesheet"
+      tal:attributes="action python:here.absolute_url()+'/manage_addKineticStylesheet'"
+      method="post">
+
+    <fieldset>
+
+          <legend>Add a new kineticstylesheet</legend>
+
+          <div>
+              <label>ID</label>
+              <input type="text" name="id" size="50" />
+          </div>
+
+          <div>
+              <label>Condition</label>
+              <input type="text" name="expression" size="50" />
+          </div>
+
+          <div>
+              <label>Compression type</label>
+              <select name="compression">
+                  <option tal:repeat="r here/getCompressionOptions"
+                          tal:attributes="value r;
+                                          selected python:r=='safe'"
+                          tal:content="r">safe</option>
+              </select>
+          </div>
+
+          <div>
+              <label>Enabled?</label>
+              <input type="checkbox" name="enabled" checked="1" />
+          </div>
+
+          <div>
+              <label>Merging allowed?</label>
+              <input type="checkbox" name="cookable:boolean" checked="1" />
+              <input type="hidden" name="cookable:boolean:default" value="False" />
+          </div>
+
+          <div>
+              <label>Caching allowed?</label>
+              <input type="checkbox" name="cacheable:boolean" checked="1" />
+              <input type="hidden" name="cacheable:boolean:default" value="False" />
+          </div>
+
+          <div>
+              <input type="submit" i18n:attributes="value" value="Add" />
+          </div>
+          <p style="clear:both">&nbsp;</p>
+
+
+    </fieldset>
+
+</form>
+
+<div tal:replace="structure here/manage_page_footer" />

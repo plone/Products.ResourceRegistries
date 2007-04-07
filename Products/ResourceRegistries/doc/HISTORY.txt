@@ -1,6 +1,9 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+ * Added portal_kss as registry for kss files.
+   [fschulze]
+
  * Added missing enabled property handling to updateScript.
    [fschulze]
 

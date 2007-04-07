@@ -23,6 +23,13 @@
         permission="zope2.View"
         />
 
+    <browser:viewletManager
+        name="plone.resourceregistries.kineticstylesheets"
+        provides="Products.ResourceRegistries.interfaces.IHtmlHeadStyles"
+        template="kss.pt"
+        permission="zope2.View"
+        />
+
     <browser:page
         for="*"
         name="resourceregistries_scripts_view"
@@ -30,7 +37,7 @@
         permission="zope.Public"
         allowed_interface=".interfaces.IScriptsView"
         />
- 
+
     <browser:page
         for="*"
         name="resourceregistries_styles_view"
@@ -38,5 +45,13 @@
         permission="zope.Public"
         allowed_interface=".interfaces.IStylesView"
         />
- 
+
+    <browser:page
+        for="*"
+        name="resourceregistries_kss_view"
+        class=".kss.KSSView"
+        permission="zope.Public"
+        allowed_interface=".interfaces.IKSSView"
+        />
+
 </configure>

@@ -7,6 +7,11 @@
       />
 
   <browser:resource
+      name="test_rr_1.kss"
+      file="test_rr_1.kss"
+      />
+
+  <browser:resource
       name="test_rr_1.js"
       file="test_rr_1.js"
       />

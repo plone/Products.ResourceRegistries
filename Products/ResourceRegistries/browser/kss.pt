@@ -1,0 +1,6 @@
+<tal:styles define="view context/@@resourceregistries_kss_view"
+            repeat="kss view/kineticstylesheets">
+  <link rel="kinetic-stylesheet"
+        type="text/css"
+        tal:attributes="href kss/src" />
+</tal:styles>

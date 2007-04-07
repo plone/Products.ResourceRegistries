@@ -202,6 +202,8 @@ class JSRegistryTool(BaseRegistryTool):
             script.setExpression(data['expression'])
         if data.get('inline', None) is not None:
             script.setInline(data['inline'])
+        if data.get('enabled', None) is not None:
+            script.setEnabled(data['enabled'])
         if data.get('cookable', None) is not None:
             script.setCookable(data['cookable'])
         if data.get('compression', None) is not None:

@@ -1,6 +1,9 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+ * Added missing enabled property handling to updateScript.
+   [fschulze]
+
  * Fixed typo which prevented position-after/insert-after in gs profiles to
    work.
    [fschulze]

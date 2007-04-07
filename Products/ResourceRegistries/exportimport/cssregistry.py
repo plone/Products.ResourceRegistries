@@ -11,13 +11,13 @@ def importCSSRegistry(context):
     """
     Import CSS registry.
     """
-    return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    return importResRegistry(context, ICSSRegistry, _REG_TITLE, _FILENAME)
 
 def exportCSSRegistry(context):
     """
     Export CSS registry.
     """
-    return exportResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    return exportResRegistry(context, ICSSRegistry, _REG_TITLE, _FILENAME)
 
 
 class CSSRegistryNodeAdapter(ResourceRegistryNodeAdapter):

@@ -11,13 +11,13 @@ def importKSSRegistry(context):
     """
     Import KSS registry.
     """
-    return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    return importResRegistry(context, IKSSRegistry, _REG_TITLE, _FILENAME)
 
 def exportKSSRegistry(context):
     """
     Export KSS registry.
     """
-    return exportResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    return exportResRegistry(context, IKSSRegistry, _REG_TITLE, _FILENAME)
 
 
 class KSSRegistryNodeAdapter(ResourceRegistryNodeAdapter):

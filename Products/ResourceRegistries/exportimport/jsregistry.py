@@ -11,13 +11,13 @@ def importJSRegistry(context):
     """
     Import javascript registry.
     """
-    return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    return importResRegistry(context, IJSRegistry, _REG_TITLE, _FILENAME)
 
 def exportJSRegistry(context):
     """
     Export javascript registry.
     """
-    return exportResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    return exportResRegistry(context, IJSRegistry, _REG_TITLE, _FILENAME)
 
 
 class JSRegistryNodeAdapter(ResourceRegistryNodeAdapter):

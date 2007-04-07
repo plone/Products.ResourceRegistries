@@ -158,3 +158,5 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
             if position is not None:
                 moveMethod = getattr(registry, 'moveResource' + position[0])
                 moveMethod(res_id, *position[1:])
+
+        registry.cookResources()

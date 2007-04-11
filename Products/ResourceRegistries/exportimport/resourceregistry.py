@@ -17,7 +17,7 @@ def importResRegistry(context, reg_interface, reg_title, filename):
     """
     site = context.getSite()
     logger = context.getLogger('resourceregistry')
-    res_reg = getUtility(reg_interface)
+    res_reg = queryUtility(reg_interface)
 
     body = context.readDataFile(filename)
     if body is None:

@@ -121,7 +121,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                     position = ('Before', value)
                     continue
                 if key in ('position-after', 'insert-after'):
-                    postion = ('After', value)
+                    position = ('After', value)
                     continue
                 if key in ('position-top', 'insert-top'):
                     position = ('ToTop',)
@@ -158,3 +158,5 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
             if position is not None:
                 moveMethod = getattr(registry, 'moveResource' + position[0])
                 moveMethod(res_id, *position[1:])
+
+        registry.cookResources()

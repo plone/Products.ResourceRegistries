@@ -7,13 +7,6 @@
  * Added portal_kss as registry for kss files.
    [fschulze]
 
- * Added missing enabled property handling to updateScript.
-   [fschulze]
-
- * Fixed typo which prevented position-after/insert-after in gs profiles to
-   work.
-   [fschulze]
-
  * Slightly optimized the viewlet manager templates.
    [hannosch]
 
@@ -45,6 +38,19 @@
    [fschulze]
 
  * Removed compatibility stuff for Plone version lower than 3.0.
+   [fschulze]
+
+1.3.8
+=====
+
+ * Cook resources after GS profile import.
+   [fschulze]
+
+ * Added missing enabled property handling to updateScript.
+   [fschulze]
+
+ * Fixed typo which prevented position-after/insert-after in GS profiles to
+   work.
    [fschulze]
 
 1.3.7

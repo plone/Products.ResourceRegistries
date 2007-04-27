@@ -1,12 +1,10 @@
-from DateTime import DateTime
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from zope.interface import implements
-from zope.component import getUtility
 
 from Products.CMFCore.utils import registerToolInterface
-from Products.CMFPlone.interfaces import IPloneTool
+from Products.CMFCore.utils import getToolByName
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
@@ -219,8 +217,17 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""
-        plone_utils = getUtility(IPloneTool)
-        encoding = plone_utils.getSiteEncoding()
+        plone_utils = getToolByName(self, 'plone_utils')
+        try:
+            encoding = plone_utils.getSiteEncoding()
+        except AttributeError:
+            # For Plone < 2.1
+            pprop = getToolByName(self, 'portal_properties')
+            default = 'utf-8'
+            try:
+                encoding = pprop.site_properties.getProperty('default_charset', default)
+            except AttributeError:
+                encoding = default
         return 'application/x-javascript;charset=%s' % encoding
 
     security.declarePrivate('getResourceContent')

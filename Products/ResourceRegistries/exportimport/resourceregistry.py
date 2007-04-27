@@ -1,23 +1,19 @@
-from xml.dom.minidom import parseString
-
 from zope.app import zapi
 
-from zope.component import getUtility, queryUtility
+from Products.CMFCore.utils import getToolByName
 
-from Products.GenericSetup.interfaces import INode
 from Products.GenericSetup.interfaces import IBody
-from Products.GenericSetup.utils import PrettyDocument
-from Products.GenericSetup.utils import I18NURI
+#from Products.GenericSetup.utils import I18NURI
 from Products.GenericSetup.utils import XMLAdapterBase
 
 
-def importResRegistry(context, reg_interface, reg_title, filename):
+def importResRegistry(context, reg_id, reg_title, filename):
     """
     Import resource registry.
     """
     site = context.getSite()
     logger = context.getLogger('resourceregistry')
-    res_reg = queryUtility(reg_interface)
+    res_reg = getToolByName(site, reg_id)
 
     body = context.readDataFile(filename)
     if body is None:
@@ -32,13 +28,13 @@ def importResRegistry(context, reg_interface, reg_title, filename):
     importer.body = body
     logger.info("%s imported." % reg_title)
 
-def exportResRegistry(context, reg_interface, reg_title, filename):
+def exportResRegistry(context, reg_id, reg_title, filename):
     """
     Export resource registry.
     """
     site = context.getSite()
     logger = context.getLogger('resourceregistry')
-    res_reg = queryUtility(reg_interface)
+    res_reg = getToolByName(site, reg_id, None)
     if res_reg is None:
         logger.info("%s: Nothing to export." % reg_title)
         return
@@ -71,7 +67,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         Import the object from the DOM node.
         """
         if self.environ.shouldPurge():
-            registry = getUtility(self.__used_for__)
+            registry = getToolByName(self.context, self.registry_id)
             registry.clearResources()
 
         self._initResources(node)
@@ -81,7 +77,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         Extract the information for each of the registered resources.
         """
         fragment = self._doc.createDocumentFragment()
-        registry = getUtility(self.__used_for__)
+        registry = getToolByName(self.context, self.registry_id)
         resources = registry.getResources()
         for resource in resources:
             data = resource._data.copy()
@@ -98,7 +94,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         Initialize the registered resources based on the contents of
         the provided DOM node.
         """
-        registry = getUtility(self.__used_for__)
+        registry = getToolByName(self.context, self.registry_id)
         reg_method = getattr(registry, self.register_method)
         unreg_method = getattr(registry, self.unregister_method)
         update_method = getattr(registry, self.update_method)

@@ -1,16 +1,14 @@
-from zope.component import getUtility
-
+from Acquisition import aq_inner
 from Products.PythonScripts.standard import url_quote
 from Products.Five.browser import BrowserView
-
-from Products.ResourceRegistries.interfaces import ICSSRegistry
+from Products.CMFCore.utils import getToolByName
 
 
 class StylesView(BrowserView):
     """ Information for style rendering. """
 
     def registry(self):
-        return getUtility(ICSSRegistry)
+        return getToolByName(aq_inner(self.context), 'portal_css')
 
     def skinname(self):
         return self.context.getCurrentSkinName()

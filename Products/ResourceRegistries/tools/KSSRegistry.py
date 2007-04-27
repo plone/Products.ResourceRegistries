@@ -1,12 +1,10 @@
-from DateTime import DateTime
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from zope.interface import implements
-from zope.component import getUtility
 
 from Products.CMFCore.utils import registerToolInterface
-from Products.CMFPlone.interfaces import IPloneTool
+from Products.CMFCore.utils import getToolByName
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
@@ -16,7 +14,6 @@ from Products.ResourceRegistries.interfaces import IKSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
-import re
 from packer import CSSPacker
 
 
@@ -196,7 +193,7 @@ class KSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""
-        plone_utils = getUtility(IPloneTool)
+        plone_utils = getToolByName(self, 'plone_utils')
         encoding = plone_utils.getSiteEncoding()
         return 'text/css;charset=%s' % encoding
 

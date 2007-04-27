@@ -1,7 +1,7 @@
 #
 # CSSRegistry Tests
 #
-from zope.component import getUtility, getMultiAdapter
+from zope.component import getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
@@ -10,7 +10,7 @@ from zExceptions import NotFound
 from AccessControl import Unauthorized
 from Interface.Verify import verifyObject
 
-from Products.CMFCore.interfaces import IURLTool
+from Products.CMFCore.utils import getToolByName
 
 from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
 
@@ -601,7 +601,7 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('plone_styles.kss')
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getUtility(IURLTool)(1)
+        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
@@ -633,7 +633,7 @@ class TestFivePublishing(FunctionalRegistryTestCase):
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('++resource++test_rr_1.kss')
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getUtility(IURLTool)(1)
+        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
@@ -734,7 +734,7 @@ class TestDebugMode(FunctionalRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, KSSTOOLNAME)
         self.tool.clearResources()
-        self.portalpath = '/' + getUtility(IURLTool)(1)
+        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
 
     def testDebugModeSplitting(self):
@@ -819,7 +819,7 @@ class TestSkinAwareness(FunctionalRegistryTestCase):
         self.tool = getattr(self.portal, KSSTOOLNAME)
         self.skinstool = getattr(self.portal, 'portal_skins')
         self.tool.clearResources()
-        self.portalpath = '/' + getUtility(IURLTool)(1)
+        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.setRoles(['Manager'])
         self.skinstool.manage_addFolder(id='pink')

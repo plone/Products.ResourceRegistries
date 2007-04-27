@@ -1,9 +1,6 @@
 1.4.0 (SVN/unreleased)
 ======================
 
- * Replaced usage of getToolByNames with getUtility in GS profile support.
-   [fschulze]
-
  * Added portal_kss as registry for kss files.
    [fschulze]
 

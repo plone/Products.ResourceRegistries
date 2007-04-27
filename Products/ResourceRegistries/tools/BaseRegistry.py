@@ -22,19 +22,14 @@ from OFS.Cache import Cacheable
 
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
-from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.utils import UniqueObject, getToolByName
 
-from Products.CMFCore.interfaces import IPropertiesTool
-from Products.CMFCore.interfaces import ISkinsTool
 from Products.CMFCore.interfaces import ISiteRoot
 
-from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
 
 import Acquisition
-from thread import get_ident
 
 
 # version agnostic import of z3_Resource
@@ -242,7 +237,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         output, contenttype = data
         
         if isinstance(output, unicode):
-            portal_props = getUtility(IPropertiesTool)
+            portal_props = getToolByName(self, 'portal_properties')
             site_props = portal_props.site_properties
             charset = site_props.getProperty('default_charset', 'utf-8')
             output = output.encode(charset)
@@ -260,7 +255,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
         # First see if it is a skin
-        skintool = getUtility(ISkinsTool)
+        skintool = getToolByName(self, 'portal_skins')
         skins = skintool.getSkinSelections()
         if name in skins:
             return Skin(name).__of__(self)
@@ -503,7 +498,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     raise
 
             if obj is not None:
-                portal_props = getUtility(IPropertiesTool)
+                portal_props = getToolByName(self, 'portal_properties')
                 site_props = portal_props.site_properties
                 default_charset = site_props.getProperty('default_charset', 'utf-8')
                 if isinstance(obj, z3_Resource):

@@ -13,12 +13,13 @@ def importResRegistry(context, reg_id, reg_title, filename):
     """
     site = context.getSite()
     logger = context.getLogger('resourceregistry')
-    res_reg = getToolByName(site, reg_id)
 
     body = context.readDataFile(filename)
     if body is None:
         logger.info("%s: Nothing to import" % reg_title)
         return
+
+    res_reg = getToolByName(site, reg_id)
 
     importer = zapi.queryMultiAdapter((res_reg, context), IBody)
     if importer is None:

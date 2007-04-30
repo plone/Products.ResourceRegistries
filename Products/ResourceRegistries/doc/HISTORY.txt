@@ -1,5 +1,5 @@
-1.4.0 (SVN/unreleased)
-======================
+1.4.0-beta4
+===========
 
  * Switched back to getToolByName.
    [wichert]

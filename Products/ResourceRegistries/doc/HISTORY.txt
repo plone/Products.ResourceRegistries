@@ -1,6 +1,9 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+ * Switched back to getToolByName.
+   [wichert]
+
  * Added portal_kss as registry for kss files.
    [fschulze]
 

@@ -970,6 +970,105 @@ class TestSkinAwareness(FunctionalRegistryTestCase):
         self.failUnless('purple' in str(response))
 
 
+class TestCachingHeaders(FunctionalRegistryTestCase):
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.skins_tool = getToolByName(self.portal, 'portal_skins')
+        self.tool.clearResources()
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+        self.toolpath = '/' + self.tool.absolute_url(1)
+
+    def testCachingHeadersFromTool(self):
+        self.tool.registerStylesheet('ham')
+        # Publish
+        response = self.publish(self.toolpath+'/ham')
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+        # Publish again
+        response = self.publish(self.toolpath+'/ham')
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+    def testCachingHeadersFromSkin(self):
+        self.tool.registerStylesheet('ham')
+        # Publish in normal mode
+        skinpath = self.skins_tool.getDefaultSkin()
+        url = '%s/%s/ham' % (self.toolpath, skinpath)
+        response = self.publish(url)
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+        # Publish again
+        response = self.publish(url)
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+    def testCachingHeadersFromToolWithRAMCache(self):
+        ram_cache_id = 'RAMCache'
+        self.tool.ZCacheable_setManagerId(ram_cache_id)
+        self.tool.ZCacheable_setEnabled(1)
+        self.tool.registerStylesheet('ham')
+        # Publish
+        response = self.publish(self.toolpath+'/ham')
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+        # Publish again
+        response = self.publish(self.toolpath+'/ham')
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+    def testCachingHeadersFromSkinWithRAMCache(self):
+        ram_cache_id = 'RAMCache'
+        self.tool.ZCacheable_setManagerId(ram_cache_id)
+        self.tool.ZCacheable_setEnabled(1)
+        self.tool.registerStylesheet('ham')
+        # Publish in normal mode
+        skinpath = self.skins_tool.getDefaultSkin()
+        url = '%s/%s/ham' % (self.toolpath, skinpath)
+        response = self.publish(url)
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+        # Publish again
+        response = self.publish(url)
+        now = DateTime()
+        days = 7
+        soon = now + days
+        self.assertEqual(response.getStatus(), 200)
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -992,6 +1091,7 @@ def test_suite():
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestResourceObjects))
     suite.addTest(makeSuite(TestSkinAwareness))
+    suite.addTest(makeSuite(TestCachingHeaders))
 
     return suite
 

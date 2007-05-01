@@ -194,14 +194,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """Return a resource from the registry."""
         original = self.REQUEST.get('original', False)
         output = self.getResourceContent(item, self, original)
-        if self.getDebugMode() or not self.isCacheable(item):
-            duration = 0
-        else:
-            duration = self.cache_duration  # duration in seconds
-        seconds = float(duration)*24.0*3600.0
-        response = self.REQUEST.RESPONSE
-        response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
-        response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
         contenttype = self.getContentType()
         return (output, contenttype)
 
@@ -217,6 +209,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         # stuff has taken place (e.g. authentication).
         kw = {'skin':skin,'name':name}
         data = None
+        duration = self.cache_duration  # duration in seconds
         if not self.getDebugMode() and self.isCacheable(name):
             if self.ZCacheable_isCachingEnabled():
                 data = self.ZCacheable_get(keywords=kw)
@@ -233,9 +226,15 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 self.ZCacheable_set(data, keywords=kw)
         else:
             data = self.__getitem__(name)
-        
+            duration = 0
+
         output, contenttype = data
-        
+
+        seconds = float(duration)*24.0*3600.0
+        response = self.REQUEST.RESPONSE
+        response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
+        response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
+
         if isinstance(output, unicode):
             portal_props = getToolByName(self, 'portal_properties')
             site_props = portal_props.site_properties

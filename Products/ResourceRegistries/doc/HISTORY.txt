@@ -1,5 +1,5 @@
-1.4.0 (SVN/unreleased)
-======================
+1.4.0-beta5
+===========
 
  * Fixed setting of cache headers when the registry is associated with a
    RAMCache.

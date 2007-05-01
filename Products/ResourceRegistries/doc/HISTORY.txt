@@ -1,6 +1,10 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+ * Fixed setting of cache headers when the registry is associated with a
+   RAMCache.
+   [fschulze]
+
 1.4.0-beta4
 ===========
 

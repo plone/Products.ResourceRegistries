@@ -1,5 +1,5 @@
-1.3.9 (SVN/unreleased)
-======================
+1.3.9
+=====
 
  * Fixed setting of cache headers when the registry is associated with a
    RAMCache.

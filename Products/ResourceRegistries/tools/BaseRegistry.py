@@ -11,7 +11,6 @@ from Globals import InitializeClass, Persistent, PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized
 
 from zope.interface import implements
-from zope.component import getUtility, queryUtility
 
 from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 
@@ -23,8 +22,6 @@ from OFS.Cache import Cacheable
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
 from Products.CMFCore.utils import UniqueObject, getToolByName
-
-from Products.CMFCore.interfaces import ISiteRoot
 
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
@@ -422,7 +419,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """
         try:
             if expression and context is not None:
-                portal = getUtility(ISiteRoot)
+                portal = getToolByName(context, 'portal_url').getPortalObject()
 
                 # Find folder (code courtesy of CMFCore.ActionsTool)
                 if context is None or not hasattr(context, 'aq_base'):
@@ -469,7 +466,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         if len(ids) > 1:
             output = output + self.merged_output_prefix
 
-        portal = queryUtility(ISiteRoot)
+        portal = getToolByName(context, 'portal_url').getPortalObject()
 
         if context == self and portal is not None:
             context = portal

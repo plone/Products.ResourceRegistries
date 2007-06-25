@@ -1,16 +1,15 @@
-from zope.component import getUtility
+from Acquisition import aq_inner
 
-from Products.PythonScripts.standard import url_quote
+from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
-
-from Products.ResourceRegistries.interfaces import IKSSRegistry
+from Products.PythonScripts.standard import url_quote
 
 
 class KSSView(BrowserView):
     """ Information for kss rendering. """
 
     def registry(self):
-        return getUtility(IKSSRegistry)
+        return getToolByName(aq_inner(self.context), 'portal_kss')
 
     def skinname(self):
         return self.context.getCurrentSkinName()

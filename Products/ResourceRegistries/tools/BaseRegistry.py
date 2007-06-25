@@ -139,7 +139,7 @@ class Skin(Acquisition.Implicit):
     def __before_publishing_traverse__(self, object, REQUEST):
         """ Pre-traversal hook. Specify the skin. 
         """
-        self.changeSkin(self._skin)
+        self.changeSkin(self._skin, REQUEST)
 
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
@@ -474,6 +474,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         if context == self and portal is not None:
             context = portal
 
+        portal_props = getToolByName(self, 'portal_properties')
+        site_props = portal_props.site_properties
+        default_charset = site_props.getProperty('default_charset', 'utf-8')
+
         for id in ids:
             try:
                 if portal is not None:
@@ -497,9 +501,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     raise
 
             if obj is not None:
-                portal_props = getToolByName(self, 'portal_properties')
-                site_props = portal_props.site_properties
-                default_charset = site_props.getProperty('default_charset', 'utf-8')
                 if isinstance(obj, z3_Resource):
                     # z3 resources
                     # XXX this is a temporary solution, we wrap the five resources

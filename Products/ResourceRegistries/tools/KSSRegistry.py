@@ -3,7 +3,6 @@ from AccessControl import ClassSecurityInfo
 
 from zope.interface import implements
 
-from Products.CMFCore.utils import registerToolInterface
 from Products.CMFCore.utils import getToolByName
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -199,4 +198,3 @@ class KSSRegistryTool(BaseRegistryTool):
 
 
 InitializeClass(KSSRegistryTool)
-registerToolInterface('portal_kss', IKSSRegistry)

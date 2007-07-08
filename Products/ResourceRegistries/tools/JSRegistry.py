@@ -179,7 +179,8 @@ class JSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', inline=False, enabled=True,
-                       cookable=True, compression='safe', cacheable=True):
+                       cookable=True, compression='safe', cacheable=True,
+                       skipCooking=False):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,
@@ -188,7 +189,7 @@ class JSRegistryTool(BaseRegistryTool):
                             cookable=cookable,
                             compression=compression,
                             cacheable=cacheable)
-        self.storeResource(script)
+        self.storeResource(script, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateScript')
     def updateScript(self, id, **data):

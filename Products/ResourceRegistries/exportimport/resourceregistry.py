@@ -144,12 +144,15 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                 method(res_id)
             elif method == reg_method:
                 try:
+                    data['skipCooking'] = True
                     method(res_id, **data)
+                    del data['skipCooking']
                 except ValueError, e:
                     # this feels a bit dirty too, but we always want to update
                     # if the resource already exists (in which case 'ValueError:
                     # Duplicate id ...' is raised.
                     method=update_method
+                    del data['skipCooking']
             if method == update_method:
                 method(res_id, **data)
             if position is not None:

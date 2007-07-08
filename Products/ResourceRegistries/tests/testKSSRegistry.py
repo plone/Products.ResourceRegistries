@@ -601,7 +601,7 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('plone_styles.kss')
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
+        self.portalpath = '/' + getToolByName(self.portal, "portal_url")(1)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
@@ -633,7 +633,7 @@ class TestFivePublishing(FunctionalRegistryTestCase):
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('++resource++test_rr_1.kss')
         self.toolpath = '/' + self.tool.absolute_url(1)
-        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
+        self.portalpath = '/' + getToolByName(self.portal, "portal_url")(1)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
         self.setRoles(['Member'])
@@ -734,7 +734,7 @@ class TestDebugMode(FunctionalRegistryTestCase):
     def afterSetUp(self):
         self.tool = getattr(self.portal, KSSTOOLNAME)
         self.tool.clearResources()
-        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
+        self.portalpath = '/' + getToolByName(self.portal, "portal_url")(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
 
     def testDebugModeSplitting(self):
@@ -819,7 +819,7 @@ class TestSkinAwareness(FunctionalRegistryTestCase):
         self.tool = getattr(self.portal, KSSTOOLNAME)
         self.skinstool = getattr(self.portal, 'portal_skins')
         self.tool.clearResources()
-        self.portalpath = '/' + getToolByName(self, "portal_url")(1)
+        self.portalpath = '/' + getToolByName(self.portal, "portal_url")(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.setRoles(['Manager'])
         self.skinstool.manage_addFolder(id='pink')

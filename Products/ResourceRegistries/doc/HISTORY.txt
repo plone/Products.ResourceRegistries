@@ -4,6 +4,10 @@
 1.4.0-beta5
 ===========
 
+ * Changed the exportimport handlers to only cook the resources once at the end
+   and not after each new resource has been added.
+   [hannosch]
+
  * Fixed setting of cache headers when the registry is associated with a
    RAMCache.
    [fschulze]

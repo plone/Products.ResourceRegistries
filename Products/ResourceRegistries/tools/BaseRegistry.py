@@ -301,13 +301,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 raise ValueError, 'Duplicate id %s' %(id)
 
     security.declarePrivate('storeResource')
-    def storeResource(self, resource):
+    def storeResource(self, resource, skipCooking=False):
         """Store a resource."""
         self.validateId(resource.getId(), self.getResources())
         resources = list(self.resources)
         resources.append(resource)
         self.resources = tuple(resources)
-        self.cookResources()
+        if not skipCooking:
+            self.cookResources()
 
     security.declarePrivate('clearResources')
     def clearResources(self):
@@ -406,7 +407,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         self.concatenatedresources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)
                     results.append(resource)
-    
+
         resources = self.getResources()
         for resource in resources:
             self.concatenatedresources[resource.getId()] = [resource.getId()]

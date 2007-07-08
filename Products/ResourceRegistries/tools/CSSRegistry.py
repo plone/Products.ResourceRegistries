@@ -124,7 +124,7 @@ class CSSRegistryTool(BaseRegistryTool):
     #
 
     security.declarePrivate('storeResource')
-    def storeResource(self, resource):
+    def storeResource(self, resource, skipCooking=False):
         """Store a resource."""
         self.validateId(resource.getId(), self.getResources())
         resources = list(self.getResources())
@@ -134,7 +134,8 @@ class CSSRegistryTool(BaseRegistryTool):
         else:
             resources.append(resource)
         self.resources = tuple(resources)
-        self.cookResources()
+        if not skipCooking:
+            self.cookResources()
 
     security.declarePrivate('clearStylesheets')
     def clearStylesheets(self):
@@ -238,7 +239,8 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1,
-                           cookable=True, compression='safe', cacheable=True):
+                           cookable=True, compression='safe', cacheable=True,
+                           skipCooking=False):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,
@@ -250,7 +252,7 @@ class CSSRegistryTool(BaseRegistryTool):
                                 cookable=cookable,
                                 compression=compression,
                                 cacheable=cacheable)
-        self.storeResource(stylesheet)
+        self.storeResource(stylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateStylesheet')
     def updateStylesheet(self, id, **data):

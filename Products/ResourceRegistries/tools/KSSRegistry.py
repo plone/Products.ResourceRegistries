@@ -157,7 +157,7 @@ class KSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerKineticStylesheet')
     def registerKineticStylesheet(self, id, expression='', enabled=1,
                                   cookable=True, compression='safe',
-                                  cacheable=True):
+                                  cacheable=True, skipCooking=False):
         """Register a kineticstylesheet."""
         kineticstylesheet = KineticStylesheet(id,
                                 expression=expression,
@@ -165,7 +165,7 @@ class KSSRegistryTool(BaseRegistryTool):
                                 cookable=cookable,
                                 compression=compression,
                                 cacheable=cacheable)
-        self.storeResource(kineticstylesheet)
+        self.storeResource(kineticstylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateKineticStylesheet')
     def updateKineticStylesheet(self, id, **data):

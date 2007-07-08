@@ -100,7 +100,7 @@ class Resource(Persistent):
 
     security.declarePublic('getEnabled')
     def getEnabled(self):
-        return self._data['enabled']
+        return bool(self._data['enabled'])
 
     security.declareProtected(permissions.ManagePortal, 'setEnabled')
     def setEnabled(self, enabled):
@@ -174,7 +174,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     cache_duration = 3600
     resource_class = Resource
 
-    debugmode = False # backward compatibility for old instances
+    debugmode = False
+    autogroupingmode = False
 
     #
     # Private Methods
@@ -186,6 +187,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         self.cookedresources = ()
         self.concatenatedresources = {}
         self.debugmode = False
+        self.autogroupingmode = False
 
     def __getitem__(self, item):
         """Return a resource from the registry."""
@@ -340,6 +342,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 return False
         return True
 
+    security.declarePrivate('sortResources')
+    def sortResourceKey(self, resource):
+        """Returns a sort key for the resource."""
+        return [getattr(resource, attr)() for attr in
+                self.attributes_to_compare]
+
     security.declarePrivate('generateId')
     def generateId(self, res_id, prev_id=None):
         """Generate a random id."""
@@ -381,6 +389,17 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             results = [x for x in resources]
         else:
             results = []
+            if self.getAutoGroupingMode():
+                # Sort resources according to their sortkey first, so resources
+                # with compatible keys will be merged.
+                def _sort_position(r):
+                    key = self.sortResourceKey(r[0])
+                    key.append(r[1])
+                    return key
+                # We need to respect the resource position inside the sort groups
+                positioned_resources = [(r, resources.index(r)) for r in resources]
+                positioned_resources.sort(key=_sort_position)
+                resources = [r[0] for r in positioned_resources]
             for resource in resources:
                 if results:
                     previtem = results[-1]
@@ -734,6 +753,17 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def setDebugMode(self, value):
         """Set whether resource merging should be disabled."""
         self.debugmode = value
+        self.cookResources()
+
+    security.declareProtected(permissions.ManagePortal, 'getAutoGroupingMode')
+    def getAutoGroupingMode(self):
+        """Is resource merging disabled?"""
+        return self.autogroupingmode
+
+    security.declareProtected(permissions.ManagePortal, 'setAutoGroupingMode')
+    def setAutoGroupingMode(self, value):
+        """Set whether resource merging should be disabled."""
+        self.autogroupingmode = bool(value)
         self.cookResources()
 
     security.declareProtected(permissions.View, 'getEvaluatedResources')

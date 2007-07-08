@@ -146,8 +146,10 @@ class JSRegistryTool(BaseRegistryTool):
 
         Updates the whole sequence. For editing and reordering.
         """
-        debugmode = REQUEST.get('debugmode',False)
+        debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
+        autogroupingmode = REQUEST.get('autogroupingmode', False)
+        self.setAutoGroupingMode(autogroupingmode)
         records = REQUEST.form.get('scripts')
         records.sort(lambda a, b: a.sort-b.sort)
         self.resources = ()

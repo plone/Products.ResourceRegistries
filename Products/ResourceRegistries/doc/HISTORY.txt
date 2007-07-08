@@ -4,6 +4,12 @@
 1.4.0-beta5
 ===========
 
+ * Added a new automatic grouping mode feature. It is turned off by default.
+   When enabled the resources will first be sorted into groups with the same
+   merging-relevant settings and after that merged. In the groups the order of
+   the resources in the registries will be preserved.
+   [hannosch]
+
  * Changed the exportimport handlers to only cook the resources once at the end
    and not after each new resource has been added.
    [hannosch]

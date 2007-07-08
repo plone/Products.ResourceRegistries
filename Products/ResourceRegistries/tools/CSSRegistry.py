@@ -204,6 +204,8 @@ class CSSRegistryTool(BaseRegistryTool):
         """
         debugmode = REQUEST.get('debugmode',False)
         self.setDebugMode(debugmode)
+        autogroupingmode = REQUEST.get('autogroupingmode', False)
+        self.setAutoGroupingMode(autogroupingmode)
         records = REQUEST.get('stylesheets')
         records.sort(lambda a, b: a.sort - b.sort)
         self.resources = ()

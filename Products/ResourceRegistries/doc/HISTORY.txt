@@ -1,8 +1,8 @@
 1.4.0 (SVN/unreleased)
 ======================
 
-1.4.0-beta5
-===========
+1.4.0-rc1
+=========
 
  * Added a new automatic grouping mode feature. It is turned off by default.
    When enabled the resources will first be sorted into groups with the same
@@ -13,6 +13,9 @@
  * Changed the exportimport handlers to only cook the resources once at the end
    and not after each new resource has been added.
    [hannosch]
+
+1.4.0-beta5
+===========
 
  * Fixed setting of cache headers when the registry is associated with a
    RAMCache.

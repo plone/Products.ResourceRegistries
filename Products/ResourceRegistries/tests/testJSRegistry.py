@@ -177,6 +177,10 @@ class TestJSScriptCooking(RegistryTestCase):
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 1)
         self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
+        self.tool.setAutoGroupingMode(True)
+        self.assertEqual(len(self.tool.getResources()), 3)
+        self.assertEqual(len(self.tool.cookedresources), 1)
+        self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
 
     def testScriptCookingValues(self):
         self.tool.registerScript('ham')
@@ -206,25 +210,43 @@ class TestJSScriptCooking(RegistryTestCase):
         self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
         self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
+        self.tool.setAutoGroupingMode(True)
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
+        magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
+        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
+        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[0]])
+        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+
     def testGetEvaluatedScriptsWithExpression(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam', expression='python:1')
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
+        self.tool.setAutoGroupingMode(True)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testGetEvaluatedScriptsWithFailingExpression(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam', expression='python:0')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
+        self.tool.setAutoGroupingMode(True)
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testGetEvaluatedScriptsWithContextualExpression(self):
         self.folder.invokeFactory('Document', 'eggs')
         self.tool.registerScript('spam', expression='python:"eggs" in object.objectIds()')
+        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
+        self.tool.setAutoGroupingMode(True)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testCollapsingScriptsLookup(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam', expression='string:spam')
         self.tool.registerScript('spam spam', expression='string:spam')
+        evaluated = self.tool.getEvaluatedResources(self.folder)
+        self.assertEqual(len(evaluated), 2)
+        self.tool.setAutoGroupingMode(True)
         evaluated = self.tool.getEvaluatedResources(self.folder)
         self.assertEqual(len(evaluated), 2)
 

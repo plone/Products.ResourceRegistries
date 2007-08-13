@@ -1,6 +1,10 @@
 1.4.0 (SVN/unreleased)
 ======================
 
+  * Add support for automatic grouping mode to the GenericSetup export/import
+    code.
+    [wichert]
+
 1.4.0-rc1
 =========
 

@@ -58,6 +58,8 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         Export the object as a DOM node.
         """
         node = self._getObjectNode('object')
+        registry = getToolByName(self.context, self.registry_id)
+        node.setAttribute('autogroup', str(registry.getAutoGroupingMode()))
         #node.setAttribute('xmlns:i18n', I18NURI)
         child = self._extractResourceInfo()
         node.appendChild(child)
@@ -67,9 +69,15 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         """
         Import the object from the DOM node.
         """
+        registry = getToolByName(self.context, self.registry_id)
         if self.environ.shouldPurge():
-            registry = getToolByName(self.context, self.registry_id)
             registry.clearResources()
+        
+        for key, value in node.attributes.items():
+            key = str(key)
+            value = value.lower().strip()
+            if key == 'autogroup':
+                registry.setAutoGroupingMode(value in [ 'true', 'yes', '1'])
 
         self._initResources(node)
 

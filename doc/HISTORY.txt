@@ -1,5 +1,5 @@
-1.4.0 (SVN/unreleased)
-======================
+1.4.0
+=====
 
   * Add support for automatic grouping mode to the GenericSetup export/import
     code.

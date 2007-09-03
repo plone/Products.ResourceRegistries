@@ -1,6 +1,10 @@
 1.4.1 (SVN/unreleased)
 ======================
 
+  * Added '/' to the strings that are filtered out in
+    BaseRegistry.generateId(). This fixes #7048.
+    [davconvent]
+
 1.4.0
 =====
 

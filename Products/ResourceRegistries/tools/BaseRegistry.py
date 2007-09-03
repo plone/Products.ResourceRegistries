@@ -358,7 +358,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         else:
             base = id_parts[0]
             appendix = self.filename_appendix
-        base = base.replace('++', '')
+        base = base.replace('++', '').replace('/', '')
         return '%s-cachekey%04d%s' % (base, random.randint(0, 9999), appendix)
 
     security.declarePrivate('finalizeResourceMerging')

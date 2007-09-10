@@ -1,5 +1,5 @@
-1.4.1 (SVN/unreleased)
-======================
+1.4.1
+=====
 
   * Added '/' to the strings that are filtered out in
     BaseRegistry.generateId(). This fixes #7048.

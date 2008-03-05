@@ -789,8 +789,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         # File objects and other might manipulate the headers,
         # something we don't want. we set the saved headers back
         self.REQUEST.RESPONSE.headers = headers
-        # This should probably be solved a cleaner way
-        return str(output)
+        return output
 
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):

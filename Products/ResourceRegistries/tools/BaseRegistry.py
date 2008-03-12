@@ -538,10 +538,11 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     except KeyError:
                         pass
                     # Now, get the content.
-                    content = obj.GET()
-                    contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
-                    contenttype = getCharsetFromContentType(contenttype, default_charset)
-                    content = unicode(content, contenttype)
+                    content = getattr(obj, obj.__browser_default__(self.REQUEST[1][0])()
+                    if not isintance(obj, unicode): 
+                        contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
+                        contenttype = getCharsetFromContentType(contenttype, default_charset)
+                        content = unicode(content, contenttype)
                     # Now restore the headers and for safety, check that we
                     # have a 20x response. If not, we have a problem and
                     # some browser would hang indefinitely at this point.

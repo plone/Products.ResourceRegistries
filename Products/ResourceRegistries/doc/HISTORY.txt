@@ -1,6 +1,9 @@
 1.4.2 (SVN/unreleased)
 ======================
 
+  * Support Z3 template resources (not just file and image resources).
+    [mj]
+
 1.4.1
 =====
 

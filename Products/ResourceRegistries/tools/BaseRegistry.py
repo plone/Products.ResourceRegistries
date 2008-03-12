@@ -538,7 +538,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     except KeyError:
                         pass
                     # Now, get the content.
-                    content = getattr(obj, obj.__browser_default__(self.REQUEST)[1][0])()
+                    method = obj.__browser_default__(self.REQUEST)[1][0]
+                    method = method == 'HEAD' and 'GET' or method
+                    content = getattr(obj, method)()
                     if not isinstance(content, unicode): 
                         contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
                         contenttype = getCharsetFromContentType(contenttype, default_charset)

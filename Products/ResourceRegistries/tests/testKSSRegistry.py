@@ -6,7 +6,6 @@ from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
-from zExceptions import NotFound
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
 
@@ -339,7 +338,7 @@ class TestKineticStylesheetMoving(RegistryTestCase):
         self.tool.registerKineticStylesheet('eggs')
         self.assertEqual(self.tool.getResourceIds(),
                          ('ham', 'spam', 'eggs'))
-        self.assertRaises(NotFound, self.tool.moveResourceUp, 'foo')
+        self.assertRaises(ValueError, self.tool.moveResourceUp, 'foo')
 
     def testKineticStylesheetMoveToBottom(self):
         self.tool.registerKineticStylesheet('ham')

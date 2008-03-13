@@ -6,7 +6,6 @@ from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
-from zExceptions import NotFound
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
 
@@ -347,7 +346,7 @@ class TestScriptMoving(RegistryTestCase):
         self.tool.registerScript('eggs')
         self.assertEqual(self.tool.getResourceIds(),
                          ('ham', 'spam', 'eggs'))
-        self.assertRaises(NotFound, self.tool.moveResourceUp, 'foo')
+        self.assertRaises(ValueError, self.tool.moveResourceUp, 'foo')
 
     def testScriptMoveToBottom(self):
         self.tool.registerScript('ham')

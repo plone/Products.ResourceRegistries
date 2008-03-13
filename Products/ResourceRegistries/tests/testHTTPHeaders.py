@@ -4,7 +4,6 @@
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
-from zExceptions import NotFound
 from AccessControl import Unauthorized
 from Interface.Verify import verifyObject
 

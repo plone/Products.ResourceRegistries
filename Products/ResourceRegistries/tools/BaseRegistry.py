@@ -6,7 +6,6 @@ from StringIO import StringIO
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
-from zExceptions import NotFound
 from Globals import InitializeClass, Persistent, PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized
 
@@ -742,10 +741,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def getResourcePosition(self, id):
         """Get the position (order) of an resource given its id."""
         resource_ids = list(self.getResourceIds())
-        try:
-            return resource_ids.index(id)
-        except ValueError:
-            raise NotFound, 'Resource %s was not found' % str(id)
+        return resource_ids.index(id)
 
     security.declareProtected(permissions.ManagePortal, 'getDebugMode')
     def getDebugMode(self):

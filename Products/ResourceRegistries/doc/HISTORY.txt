@@ -1,6 +1,13 @@
 1.4.2 (SVN/unreleased)
 ======================
 
+  * Revert part of r7143: returning NotFound from a API call is never
+    the right thing to do since it makes the publisher show a object-not-found
+    page, hiding the real error. Restore the old behaviour and raise a
+    ValueError instead. This fixes mysterious not-found errors from
+    GenericSetup imports.
+    [wichert]
+
   * Support Z3 template resources (not just file and image resources).
     [mj]
 

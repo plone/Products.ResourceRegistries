@@ -1,5 +1,5 @@
-1.4.2 (SVN/unreleased)
-======================
+1.4.2
+=====
 
   * Properly encode the resource id. This fixes moving of resource without JS
     and removing recources which contain special chars like plus signs.

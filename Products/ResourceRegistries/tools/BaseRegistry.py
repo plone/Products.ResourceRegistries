@@ -3,6 +3,7 @@ import random
 # we *have* to use StringIO here, because we can't add attributes to cStringIO
 # instances (needed in BaseRegistryTool.__getitem__).
 from StringIO import StringIO
+from urllib import quote_plus
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
@@ -85,6 +86,9 @@ class Resource(Persistent):
     security.declarePublic('getId')
     def getId(self):
         return self._data['id']
+
+    def getQuotedId(self):
+        return quote_plus(self._data['id'])
 
     def _setId(self, id):
         self._data['id'] = id

@@ -191,18 +191,18 @@ legend {
 
                 <a onclick="return moveUp(this);" href="#"
                    title="Move up"
-                   tal:attributes="href string:moveResourceUp?id=${kineticstylesheet/getId}">
+                   tal:attributes="href string:moveResourceUp?id=${kineticstylesheet/getQuotedId}">
                      &uarr;
                 </a>
                 <a onclick="return moveDown(this);" href="#"
                    title="Move down"
-                   tal:attributes="href string:moveResourceDown?id=${kineticstylesheet/getId}">
+                   tal:attributes="href string:moveResourceDown?id=${kineticstylesheet/getQuotedId}">
                      &darr;
                 </a>
                 <a href="#" 
                    title="Remove"
                    style="color: red;"
-                   tal:attributes="href string:manage_removeKineticStylesheet?id=${kineticstylesheet/getId}">
+                   tal:attributes="href string:manage_removeKineticStylesheet?id=${kineticstylesheet/getQuotedId}">
                     x
                 </a>
                 <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>

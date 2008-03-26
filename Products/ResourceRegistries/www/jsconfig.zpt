@@ -191,15 +191,15 @@ legend {
 
             <a onclick="return moveUp(this);" href="#"
                title="Move up"
-               tal:attributes="href string:moveResourceUp?id=${script/getId}">
+               tal:attributes="href string:moveResourceUp?id=${script/getQuotedId}">
                  &uarr;
             </a>
             <a onclick="return moveDown(this);" href="#"
                title="Move down"
-               tal:attributes="href string:moveResourceDown?id=${script/getId}">
+               tal:attributes="href string:moveResourceDown?id=${script/getQuotedId}">
                  &darr;
             </a>
-            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getId}"
+            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getQuotedId}"
                style="color: red;"
                title="Remove">
                  x

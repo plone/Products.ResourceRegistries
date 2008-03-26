@@ -12,13 +12,14 @@ class KSSView(BrowserView):
         return getToolByName(aq_inner(self.context), 'portal_kss')
 
     def skinname(self):
-        return self.context.getCurrentSkinName()
+        return aq_inner(self.context).getCurrentSkinName()
 
     def kineticstylesheets(self):
         registry = self.registry()
         registry_url = registry.absolute_url()
+        context = aq_inner(self.context)
 
-        kineticstylesheets = registry.getEvaluatedResources(self.context)
+        kineticstylesheets = registry.getEvaluatedResources(context)
         skinname = url_quote(self.skinname())
         result = []
         for kss in kineticstylesheets:

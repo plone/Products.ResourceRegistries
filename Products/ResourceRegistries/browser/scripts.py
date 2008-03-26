@@ -11,20 +11,20 @@ class ScriptsView(BrowserView):
         return getToolByName(aq_inner(self.context), 'portal_javascripts')
 
     def skinname(self):
-        return self.context.getCurrentSkinName()
+        return aq_inner(self.context).getCurrentSkinName()
 
     def scripts(self):
         registry = self.registry()
         registry_url = registry.absolute_url()
+        context = aq_inner(self.context)
 
-        scripts = registry.getEvaluatedResources(self.context)
+        scripts = registry.getEvaluatedResources(context)
         skinname = url_quote(self.skinname())
         result = []
         for script in scripts:
             inline = bool(script.getInline())
             if inline:
-                content = registry.getInlineResource(script.getId(),
-                                                     self.context)
+                content = registry.getInlineResource(script.getId(), context)
                 data = {'inline': inline,
                         'content': content}
             else:

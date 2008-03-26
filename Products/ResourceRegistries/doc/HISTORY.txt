@@ -1,6 +1,9 @@
 1.4.3 (SVN/unreleased)
 ======================
 
+  * Fixed potential Acquisition problems in viewlets.
+    [hannosch]
+
 1.4.2
 =====
 

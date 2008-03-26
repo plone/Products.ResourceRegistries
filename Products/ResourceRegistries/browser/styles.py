@@ -11,13 +11,14 @@ class StylesView(BrowserView):
         return getToolByName(aq_inner(self.context), 'portal_css')
 
     def skinname(self):
-        return self.context.getCurrentSkinName()
+        return aq_inner(self.context).getCurrentSkinName()
 
     def styles(self):
         registry = self.registry()
         registry_url = registry.absolute_url()
+        context = aq_inner(self.context)
 
-        styles = registry.getEvaluatedResources(self.context)
+        styles = registry.getEvaluatedResources(context)
         skinname = url_quote(self.skinname())
         result = []
         for style in styles:
@@ -35,8 +36,7 @@ class StylesView(BrowserView):
                         'media': style.getMedia(),
                         'src': src}
             elif rendering == 'inline':
-                content = registry.getInlineResource(style.getId(),
-                                                     self.context)
+                content = registry.getInlineResource(style.getId(), context)
                 data = {'rendering': rendering,
                         'media': style.getMedia(),
                         'content': content}

@@ -5,7 +5,7 @@
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from AccessControl import Unauthorized
-from Interface.Verify import verifyObject
+from zope.interface.verify import verifyObject
 
 from Products.CMFCore.utils import getToolByName
 

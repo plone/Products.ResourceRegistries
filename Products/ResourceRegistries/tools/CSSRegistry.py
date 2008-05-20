@@ -91,7 +91,6 @@ class CSSRegistryTool(BaseRegistryTool):
     security = ClassSecurityInfo()
 
     implements(ICSSRegistry)
-    __implements__ = BaseRegistryTool.__implements__
 
     #
     # ZMI stuff

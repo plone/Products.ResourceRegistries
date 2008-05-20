@@ -49,7 +49,6 @@ class KSSRegistryTool(BaseRegistryTool):
     security = ClassSecurityInfo()
 
     implements(IKSSRegistry)
-    __implements__ = BaseRegistryTool.__implements__
 
     #
     # ZMI stuff

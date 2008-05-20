@@ -59,7 +59,6 @@ class JSRegistryTool(BaseRegistryTool):
     security = ClassSecurityInfo()
 
     implements(IJSRegistry)
-    __implements__ = BaseRegistryTool.__implements__
 
     #
     # ZMI stuff

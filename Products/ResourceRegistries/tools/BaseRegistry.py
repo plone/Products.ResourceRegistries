@@ -168,7 +168,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
     security = ClassSecurityInfo()
     implements(IResourceRegistry)
-    __implements__ = SimpleItem.__implements__
     manage_options = SimpleItem.manage_options
 
     attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable')
@@ -542,7 +541,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     except KeyError:
                         pass
                     # Now, get the content.
-                    method = obj.__browser_default__(self.REQUEST)[1][0]
+                    try:
+                        method = obj.__browser_default__(self.REQUEST)[1][0]
+                    except AttributeError: # zope.app.publisher.browser.fileresource
+                        method = obj.browserDefault(self.REQUEST)[0].__name__
                     method = method == 'HEAD' and 'GET' or method
                     content = getattr(obj, method)()
                     if not isinstance(content, unicode): 

@@ -1,6 +1,9 @@
 1.4.3 (SVN/unreleased)
 ======================
 
+  * Purge old zope2 Interface interfaces for Zope 2.12 compatibility.
+    [elro]
+
   * Encode inline resources using the site encoding.
     Fixes http://dev.plone.org/plone/ticket/7522
     [wichert]

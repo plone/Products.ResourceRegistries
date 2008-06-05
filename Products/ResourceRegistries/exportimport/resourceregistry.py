@@ -121,7 +121,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                     continue
                 if key == 'remove':
                     method = unreg_method
-                    break
+                    continue
                 if key in ('position-before', 'insert-before'):
                     position = ('Before', value)
                     continue

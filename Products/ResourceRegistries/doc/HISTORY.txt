@@ -1,6 +1,9 @@
 1.4.3 (SVN/unreleased)
 ======================
 
+  * Ensure that resources can be removed in xml.
+    [maurits]
+
   * Purge old zope2 Interface interfaces for Zope 2.12 compatibility.
     [elro]
 

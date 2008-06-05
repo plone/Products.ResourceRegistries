@@ -1,5 +1,6 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-       xmlns:browser="http://namespaces.zope.org/browser">
+       xmlns:browser="http://namespaces.zope.org/browser"
+       xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <browser:resource
       name="test_rr_1.css"
@@ -14,6 +15,15 @@
   <browser:resource
       name="test_rr_1.js"
       file="test_rr_1.js"
+      />
+
+  <genericsetup:registerProfile
+      name="test"
+      title="ResourceRegistries"
+      directory="test_profile"
+      description="Test Profile for ResourceRegistries"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       />
 
 </configure>

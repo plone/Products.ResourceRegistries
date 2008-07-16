@@ -1,6 +1,10 @@
 1.4.3 (SVN/unreleased)
 ======================
 
+  * Fixed error where non-traversable resources could be registered. This closes
+    http://dev.plone.org/plone/ticket/8153
+    [dunlapm]
+
   * Ensure that resources can be removed in xml.
     [maurits]
 

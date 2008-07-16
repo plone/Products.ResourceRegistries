@@ -71,6 +71,8 @@ class Resource(Persistent):
 
     def __init__(self, id, **kwargs):
         self._data = PersistentMapping()
+        if id.startswith('/') or id.endswith('/') or '//' in id:
+            raise ValueError, "Invalid Resource ID: %s" %id
         self._data['id'] = id
         self._data['expression'] = kwargs.get('expression', '')
         self._data['enabled'] = kwargs.get('enabled', True)

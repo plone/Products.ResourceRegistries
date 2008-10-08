@@ -1,5 +1,5 @@
-1.4.3 (SVN/unreleased)
-======================
+1.4.3
+=====
 
   * Fixed error where non-traversable resources could be registered. This closes
     http://dev.plone.org/plone/ticket/8153

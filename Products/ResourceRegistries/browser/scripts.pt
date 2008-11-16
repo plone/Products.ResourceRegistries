@@ -8,7 +8,7 @@
     </tal:no-inline>
     <tal:inline condition="inline">
       <script type="text/javascript"
-              tal:content="structure string:<!--  ${script/content}  // -->">
+              tal:content="structure string:&lt;!--  ${script/content}  // --&gt;">
       </script>
     </tal:inline>
   </tal:block>

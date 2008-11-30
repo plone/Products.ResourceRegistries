@@ -1,6 +1,9 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Added 'context' as an alias for 'object' in action expressions.
+    [davisagli, hannosch]
+
 1.4.3
 =====
 

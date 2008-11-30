@@ -462,6 +462,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
                 __traceback_info__ = (folder, portal, context, expression)
                 ec = createExprContext(folder, portal, context)
+                # add 'context' as an alias for 'object'
+                ec.setGlobal('context', context)
                 return Expression(expression)(ec)
             else:
                 return 1

@@ -74,7 +74,8 @@ class Resource(Persistent):
         if id.startswith('/') or id.endswith('/') or '//' in id:
             raise ValueError, "Invalid Resource ID: %s" %id
         self._data['id'] = id
-        self._data['expression'] = kwargs.get('expression', '')
+        expression = kwargs.get('expression', '')
+        self.setExpression(expression)
         self._data['enabled'] = kwargs.get('enabled', True)
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
@@ -96,12 +97,22 @@ class Resource(Persistent):
     def _setId(self, id):
         self._data['id'] = id
 
+    security.declarePublic('getCookedExpression')
+    def getCookedExpression(self):
+        # Automatic inline migration of expressions
+        if 'cooked_expression' not in self._data:
+            expr = Expression(self._data['expression'])
+            self._data['cooked_expression'] = expr
+        return self._data['cooked_expression']
+
     security.declarePublic('getExpression')
     def getExpression(self):
         return self._data['expression']
 
     security.declareProtected(permissions.ManagePortal, 'setExpression')
     def setExpression(self, expression):
+        # Update the cooked expression
+        self._data['cooked_expression'] = Expression( expression )
         self._data['expression'] = expression
 
     security.declarePublic('getEnabled')
@@ -443,7 +454,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         displayed.
         """
         try:
-            if expression and context is not None:
+            if expression.text and context is not None:
                 portal = getToolByName(context, 'portal_url').getPortalObject()
 
                 # Find folder (code courtesy of CMFCore.ActionsTool)
@@ -464,7 +475,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 ec = createExprContext(folder, portal, context)
                 # add 'context' as an alias for 'object'
                 ec.setGlobal('context', context)
-                return Expression(expression)(ec)
+                return expression(ec)
             else:
                 return 1
         except AttributeError:
@@ -782,8 +793,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         results = self.getCookedResources()
 
         # filter results by expression
-        results = [item for item in results
-                   if self.evaluateExpression(item.getExpression(), context)]
+        results = [item for item in results if
+                   self.evaluateExpression(item.getCookedExpression(), context)]
 
         return results
 

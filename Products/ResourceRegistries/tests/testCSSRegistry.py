@@ -9,6 +9,7 @@ from DateTime import DateTime
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
 
+from Products.CMFCore.Expression import Expression
 from Products.CMFCore.utils import getToolByName
 
 from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
@@ -182,20 +183,23 @@ class TestToolExpression(RegistryTestCase):
 
     def testSimplestExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression('python:1', context))
-        self.failIf(self.tool.evaluateExpression('python:0', context))
-        self.failUnless(self.tool.evaluateExpression('python:0+1', context))
+        self.failUnless(self.tool.evaluateExpression(
+            Expression('python:1'), context))
+        self.failIf(self.tool.evaluateExpression(
+            Expression('python:0'), context))
+        self.failUnless(self.tool.evaluateExpression(
+            Expression('python:0+1'), context))
 
     def testNormalExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression('object/absolute_url',
-                                                     context))
+        self.failUnless(self.tool.evaluateExpression(
+            Expression('object/absolute_url'), context))
 
     def testExpressionInFolder(self):
         self.folder.invokeFactory('Document', 'eggs')
         context = self.folder
         self.failUnless(self.tool.evaluateExpression(
-                        'python:"eggs" in object.objectIds()', context))
+            Expression('python:"eggs" in object.objectIds()'), context))
 
 
 class TestStylesheetCooking(RegistryTestCase):

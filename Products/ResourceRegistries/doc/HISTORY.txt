@@ -1,6 +1,10 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Store the cooked expressions as a real persistent expression object,
+    instead of compiling the expression on every view.
+    [hannosch]
+
   * Added 'context' as an alias for 'object' in action expressions.
     [davisagli, hannosch]
 

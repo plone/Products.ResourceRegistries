@@ -1,4 +1,4 @@
-<tal:block define="_dummy python:request.response.setHeader('content-type','text/javascript;;charset=utf-8')" />
+<tal:block define="dummy python:request.response.setHeader('content-type','text/javascript;;charset=utf-8')" />
 <metal:block i18n:domain="plone">
 /* add a comment with unicode
    Übercool! */

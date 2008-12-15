@@ -454,6 +454,11 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.folderpath = '/' + self.folder.absolute_url(1)
         self.tool.registerScript('test_rr_1.js')
         self.folder.invokeFactory('Document', 'index_html')
+        self.setRoles(['Manager'])
+        self.workflow = self.portal.portal_workflow
+        self.workflow.doActionFor(self.folder, 'publish')
+        self.workflow.doActionFor(self.folder.index_html, 'publish')
+        self.setRoles(['Member'])
 
     def testPublishJSThroughTool(self):
         response = self.publish(self.toolpath + '/test_rr_1.js')

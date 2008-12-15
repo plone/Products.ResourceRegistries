@@ -1,10 +1,9 @@
 from Products.PloneTestCase import PloneTestCase
 
-PloneTestCase.setupPloneSite(extension_profiles=['Products.CMFPlone:testfixture'])
+PloneTestCase.setupPloneSite()
 
 class RegistryTestCase(PloneTestCase.PloneTestCase):
     pass
 
-class FunctionalRegistryTestCase(PloneTestCase.FunctionalTestCase,
-                                 PloneTestCase.PloneTestCase):
+class FunctionalRegistryTestCase(PloneTestCase.FunctionalTestCase):
     pass

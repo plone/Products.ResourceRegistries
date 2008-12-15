@@ -752,6 +752,8 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
         self.setRoles(['Manager'])
         self.portal.invokeFactory('Document', 'index_html')
+        self.workflow = self.portal.portal_workflow
+        self.workflow.doActionFor(self.portal.index_html, 'publish')
         self.setRoles(['Member'])
 
     def testPublishCSSThroughTool(self):

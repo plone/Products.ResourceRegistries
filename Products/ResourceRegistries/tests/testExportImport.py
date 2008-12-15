@@ -23,6 +23,13 @@ class TestExportImport(RegistryTestCase):
         self.assertEqual(result['steps'],
                          [u'toolset', u'componentregistry', 'jsregistry'])
 
+    def test_snapshot(self):
+        # GenericSetup snapshot should work
+        self.setRoles(['Manager'])
+        tool = self.portal.portal_setup
+        snapshot_id = tool._mangleTimestampName('test')
+        tool.createSnapshot(snapshot_id)
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite

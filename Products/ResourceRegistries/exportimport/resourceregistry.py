@@ -90,6 +90,8 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         resources = registry.getResources()
         for resource in resources:
             data = resource._data.copy()
+            if 'cooked_expression' in data:
+                del data['cooked_expression']
             child = self._doc.createElement(self.resource_type)
             for key, value in data.items():
                 if type(value) == type(True) or type(value) == type(0):

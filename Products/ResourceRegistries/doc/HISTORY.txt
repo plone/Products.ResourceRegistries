@@ -1,6 +1,11 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Do not try to export the `cooked_expression` into the GenericSetup
+    profiles. It is only an internal optimization and the value is reflected
+    in the `expression` value.
+    [hannosch]
+
   * Store the cooked expressions as a real persistent expression object,
     instead of compiling the expression on every view.
     [hannosch]

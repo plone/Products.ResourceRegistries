@@ -12,13 +12,13 @@
     <tal:rendering-import condition="python: rendering == 'import'">
       <style type="text/css"
              tal:attributes="media style/media"
-             tal:content="structure string:&lt;!-- @import url(${style/src}); --&gt;">
+             tal:content="structure string:@import url(${style/src});">
       </style>
     </tal:rendering-import>
     <tal:rendering-inline condition="python: rendering == 'inline'">
       <style type="text/css"
              tal:attributes="media style/media"
-             tal:content="structure string:&lt;!--  ${style/content}  --&gt;">
+             tal:content="structure style/content">
       </style>
     </tal:rendering-inline>
   </tal:block>

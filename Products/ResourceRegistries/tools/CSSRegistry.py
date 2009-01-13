@@ -26,6 +26,13 @@ class Stylesheet(Resource):
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'import')
         self._data['compression'] = kwargs.get('compression', 'safe')
+        if self._data['external']:
+            if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
+                self._data['compression'] = 'none' #we have to assume none because of the default values
+                #raise ValueError, "Compression method %s not allowed for External Resource" % (self._data['compression'],)
+            if self._data['rendering'] not in config.CSS_EXTERNAL_RENDER_METHODS:
+                raise ValueError, "Render method %s not allowed for External Resource" % (self._data['rendering'],)
+            
 
     security.declarePublic('getMedia')
     def getMedia(self):
@@ -63,6 +70,9 @@ class Stylesheet(Resource):
 
     security.declareProtected(permissions.ManagePortal, 'setRendering')
     def setRendering(self, rendering):
+        if self.isExternalResource() and rendering not in config.CSS_EXTERNAL_RENDER_METHODS:
+            raise ValueError, "Rendering method %s not valid, must be one of: %s" % (rendering,
+                                                                                     ', '.join(config.CSS_EXTERNAL_RENDER_METHODS))
         self._data['rendering'] = rendering
 
     security.declarePublic('getCompression')
@@ -76,6 +86,8 @@ class Stylesheet(Resource):
 
     security.declareProtected(permissions.ManagePortal, 'setCompression')
     def setCompression(self, compression):
+        if self.isExternalResource() and compression not in config.CSS_COMPRESSION_METHODS:
+            raise ValueError, "Compression method %s not valid, must be one of: %s" % (compression, ', '.join(config.CSS_EXTERNAL_COMPRESSION_METHODS))
         self._data['compression'] = compression
 
 InitializeClass(Stylesheet)
@@ -144,12 +156,15 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('compareResources')
     def compareResources(self, sheet1, sheet2 ):
         """Check if two resources are compatible."""
+        if 'alternate' in sheet1.getRel():
+            return False
+            # this part needs a test
+        if sheet1.isExternalResource():
+            return False
         for attr in self.attributes_to_compare:
             if getattr(sheet1, attr)() != getattr(sheet2, attr)():
                 return False
-            if 'alternate' in sheet1.getRel():
-                return False
-                # this part needs a test
+
         return True
 
     security.declarePrivate('finalizeResourceMerging')
@@ -295,6 +310,16 @@ class CSSRegistryTool(BaseRegistryTool):
     def getCompressionOptions(self):
         """Compression methods for use in ZMI forms."""
         return config.CSS_COMPRESSION_METHODS
+    
+    security.declareProtected(permissions.ManagePortal, 'getExternalRenderingOptions')
+    def getExternalRenderingOptions(self):
+        """Rendering methods for use in ZMI forms."""
+        return config.CSS_EXTERNAL_RENDER_METHODS
+
+    security.declareProtected(permissions.ManagePortal, 'getExternalCompressionOptions')
+    def getExternalCompressionOptions(self):
+        """Compression methods for use in ZMI forms."""
+        return config.CSS_EXTERNAL_COMPRESSION_METHODS
 
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):

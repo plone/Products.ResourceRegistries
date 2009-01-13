@@ -81,6 +81,15 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.assertEqual(self.tool.getResources()[0].getTitle(), None)
         self.assertEqual(self.tool.getResources()[0].getRendering(), 'import')
         self.failUnless(self.tool.getResources()[0].getEnabled())
+        
+    def testExternalDefaultStylesheetAttributes(self):
+        self.tool.registerStylesheet('http://example.com/foodefault')
+        self.assertEqual(self.tool.getResources()[0].getId(), 'http://example.com/foodefault')
+        self.failUnless(self.tool.getResources()[0].isExternalResource())
+        self.failIf(self.tool.getResources()[0].getCacheable())
+        self.assertEqual(self.tool.getResources()[0].getCompression(),'none')
+        self.failIf(self.tool.getResources()[0].getCookable())
+        self.failUnless(self.tool.getResources()[0].getEnabled())
 
     def testStylesheetAttributes(self):
         self.tool.registerStylesheet('foo', expression='python:1',

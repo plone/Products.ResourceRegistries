@@ -173,7 +173,7 @@ legend {
 
     <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
                  tal:repeat="script here/getResources">
-      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % script.getId());"
+      <fieldset tal:define="resourceExists python:script.isExternalResource() or path('exists:portal/%s' % script.getId());"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="scripts.sort:records:int"
@@ -214,7 +214,8 @@ legend {
 
             <label>Compression type</label>
             <select name="scripts.compression:records">
-                <option tal:repeat="r here/getCompressionOptions"
+                <option tal:define="options python:test(script.isExternalResource(),here.getExternalCompressionOptions(),here.getCompressionOptions())"
+                        tal:repeat="r options"
                         tal:attributes="value r;
                                         selected python:r == script.getCompression()"
                         tal:content="r">safe</option>
@@ -224,17 +225,20 @@ legend {
         <div class="scriptform">
             <label>Inline rendering</label>
             <input type="checkbox" name="scripts.inline:records:boolean"
-                   tal:attributes="checked script/getInline" />
+                   tal:attributes="checked script/getInline;
+                                   disabled script/isExternalResource" />
             <input type="hidden" name="scripts.inline:records:boolean:default" value="False" />
 
             <label>Merging allowed?</label>
             <input type="checkbox" name="scripts.cookable:records:boolean"
-                   tal:attributes="checked script/getCookable | default" />
+                   tal:attributes="checked script/getCookable | default;
+                                   disabled script/isExternalResource" />
             <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
 
             <label>Caching allowed?</label>
             <input type="checkbox" name="scripts.cacheable:records:boolean"
-                   tal:attributes="checked script/getCacheable | default" />
+                   tal:attributes="checked script/getCacheable | default;
+                                   disabled script/isExternalResource" />
             <input type="hidden" name="scripts.cacheable:records:boolean:default" value="False" />
         </div>
 

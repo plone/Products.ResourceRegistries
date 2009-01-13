@@ -173,7 +173,7 @@ legend {
     
     <tal:kineticstylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="kineticstylesheet here/getResources">
-      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % kineticstylesheet.getId());"
+      <fieldset tal:define="resourceExists python:kineticstylesheet.isExternalResource() or path('exists:portal/%s' % kineticstylesheet.getId());"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="kineticstylesheets.sort:records:int"
@@ -215,19 +215,22 @@ legend {
 
             <label>Merging allowed?</label>
             <input type="checkbox" name="kineticstylesheets.cookable:records:boolean"
-                   tal:attributes="checked kineticstylesheet/getCookable | default" />
+                   tal:attributes="checked kineticstylesheet/getCookable | default;
+                                   disabled kineticstylesheet/isExternalResource" />
             <input type="hidden" name="kineticstylesheets.cookable:records:boolean:default" value="False" />
 
             <label>Caching allowed?</label>
             <input type="checkbox" name="kineticstylesheets.cacheable:records:boolean"
-                   tal:attributes="checked kineticstylesheet/getCacheable | default" />
+                   tal:attributes="checked kineticstylesheet/getCacheable | default;
+                                   disabled kineticstylesheet/isExternalResource" />
             <input type="hidden" name="kineticstylesheets.cacheable:records:boolean:default" value="False" />
         </div>
 
         <div class="kineticstylesheetform">
             <label>Compression type</label>
             <select name="kineticstylesheets.compression:records">
-                <option tal:repeat="r here/getCompressionOptions"
+                <option tal:define="options python:test(kineticstylesheet.isExternalResource(),here.getExternalCompressionOptions(),here.getCompressionOptions())"
+                        tal:repeat="r options"
                         tal:attributes="value r;
                                         selected python:r == kineticstylesheet.getCompression()"
                         tal:content="r">safe</option>

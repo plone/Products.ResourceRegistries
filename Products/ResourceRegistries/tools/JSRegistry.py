@@ -24,6 +24,9 @@ class JavaScript(Resource):
         Resource.__init__(self, id, **kwargs)
         self._data['inline'] = kwargs.get('inline', False)
         self._data['compression'] = kwargs.get('compression', 'safe')
+        if self._data['external']:
+            self._data['inline'] = False #No inline rendering for External Resources
+            self._data['compression'] = 'none' #External Resources are not compressible
 
     security.declarePublic('getInline')
     def getInline(self):
@@ -31,6 +34,8 @@ class JavaScript(Resource):
 
     security.declareProtected(permissions.ManagePortal, 'setInline')
     def setInline(self, inline):
+        if self.isExternalResource() and inline:
+            raise ValueError, "Inline rendering is not supported for External Resources"
         self._data['inline'] = inline
 
     security.declarePublic('getCompression')
@@ -44,6 +49,8 @@ class JavaScript(Resource):
 
     security.declareProtected(permissions.ManagePortal, 'setCompression')
     def setCompression(self, compression):
+        if self.isExternalResource() and compression not in config.JS_EXTERNAL_COMPRESSION_METHODS:
+            raise ValueError, "Compression method '%s' must be one of: %s" % (compression, ', '.join(config.JS_EXTERNAL_COMPRESSION_METHODS))
         self._data['compression'] = compression
 
 InitializeClass(JavaScript)
@@ -218,6 +225,11 @@ class JSRegistryTool(BaseRegistryTool):
     def getCompressionOptions(self):
         """Compression methods for use in ZMI forms."""
         return config.JS_COMPRESSION_METHODS
+    
+    security.declareProtected(permissions.ManagePortal, 'getExternalCompressionOptions')
+    def getExternalCompressionOptions(self):
+        """Compression methods for use in ZMI forms."""
+        return config.JS_EXTERNAL_COMPRESSION_METHODS
 
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):

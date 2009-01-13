@@ -1,6 +1,12 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Resources beginning with "http://" or "https://" are now valid and may be
+    included as resources. Registries will automatically disable merging,
+    caching, compression, and inline rendering of external resources. This
+    closes http://dev.plone.org/plone/ticket/8312
+    [dunlapm, fschulze]
+
   * Added option to have a conditional comment attached to a given resource.
     Currently the UI only supports this behavior with the CSS Registry, but the
     underpinnings for the other two registries is in place. This closes

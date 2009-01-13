@@ -14,7 +14,8 @@
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getCookedResources()">
         <div>
-            <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${entry/getId}">
+            <a href="" tal:define="portalHref string:${portal_url}/portal_javascripts/${entry/getId}"
+                       tal:attributes="href python:test(entry.isExternalResource(),entry.getId(),portalHref)">
                 <b tal:content="entry/getId">plone_ecmascript.js</b>
             </a>
             <tal:block tal:condition="entry/getExpression | nothing">
@@ -24,9 +25,10 @@
         <ul tal:define="scripts here/concatenatedresources">
           <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
                        tal:repeat="subentry python:scripts.get(entry.getId())">
-            <li tal:define="resourceExists python:path('exists:portal/%s' % subentry);"
+            <li tal:define="resourceExists python:entry.isExternalResource() or path('exists:portal/%s' % subentry);"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
-                <a href="" tal:attributes="href string:${portal_url}/portal_javascripts/${subentry}"
+                <a href="" tal:define="subPortalHref string:${portal_url}/portal_javascripts/${subentry}"
+                           tal:attributes="href python:test(entry.isExternalResource(),subentry,subPortalHref)"
                            tal:content="subentry">
                     plone.js
                 </a>

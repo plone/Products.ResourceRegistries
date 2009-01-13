@@ -23,7 +23,10 @@ class KSSView(BrowserView):
         skinname = url_quote(self.skinname())
         result = []
         for kss in kineticstylesheets:
-            src = "%s/%s/%s" % (registry_url, skinname, kss.getId())
+            if kss.isExternalResource():
+                src = "%s" % (kss.getId(),)
+            else:
+                src = "%s/%s/%s" % (registry_url, skinname, kss.getId())
             data = {'src': src}
             result.append(data)
         return result

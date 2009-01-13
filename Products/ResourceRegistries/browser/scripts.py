@@ -28,7 +28,10 @@ class ScriptsView(BrowserView):
                 data = {'inline': inline,
                         'content': content}
             else:
-                src = "%s/%s/%s" % (registry_url, skinname, script.getId())
+                if script.isExternalResource():
+                    src = "%s" % (script.getId(),)
+                else:
+                    src = "%s/%s/%s" % (registry_url, skinname, script.getId())
                 data = {'inline': inline,
                         'src': src}
             result.append(data)

@@ -173,7 +173,7 @@ legend {
     
     <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="stylesheet here/getResources">
-      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % stylesheet.getId());"
+      <fieldset tal:define="resourceExists python:stylesheet.isExternalResource() or path('exists:portal/%s' % stylesheet.getId());"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="stylesheets.sort:records:int"
@@ -223,12 +223,14 @@ legend {
 
             <label>Merging allowed?</label>
             <input type="checkbox" name="stylesheets.cookable:records:boolean"
-                   tal:attributes="checked stylesheet/getCookable | default" />
+                   tal:attributes="checked stylesheet/getCookable | default;
+                                   disabled stylesheet/isExternalResource | nothing" />
             <input type="hidden" name="stylesheets.cookable:records:boolean:default" value="False" />
 
             <label>Caching allowed?</label>
             <input type="checkbox" name="stylesheets.cacheable:records:boolean"
-                   tal:attributes="checked stylesheet/getCacheable | default" />
+                   tal:attributes="checked stylesheet/getCacheable | default;
+                                   disabled stylesheet/isExternalResource | nothing" />
             <input type="hidden" name="stylesheets.cacheable:records:boolean:default" value="False" />
         </div>
 
@@ -243,7 +245,8 @@ legend {
 
             <label>Render type</label>
             <select name="stylesheets.rendering:records">
-                <option tal:repeat="r here/getRenderingOptions"
+                <option tal:define="options python:test(stylesheet.isExternalResource(),here.getExternalRenderingOptions(),here.getRenderingOptions())"
+                        tal:repeat="r options"
                         tal:attributes="value r;
                                         selected python:r == stylesheet.getRendering()"
                         tal:content="r">import</option>
@@ -251,7 +254,8 @@ legend {
 
             <label>Compression type</label>
             <select name="stylesheets.compression:records">
-                <option tal:repeat="r here/getCompressionOptions"
+                <option tal:define="options python:test(stylesheet.isExternalResource(),here.getExternalCompressionOptions(),here.getCompressionOptions())"
+                        tal:repeat="r options"
                         tal:attributes="value r;
                                         selected python:r == stylesheet.getCompression()"
                         tal:content="r">safe</option>

@@ -71,8 +71,9 @@ class Resource(Persistent):
 
     def __init__(self, id, **kwargs):
         self._data = PersistentMapping()
-        if id.startswith('/') or id.endswith('/') or '//' in id:
-            raise ValueError, "Invalid Resource ID: %s" %id
+        extres = id.startswith('http://') or id.startswith('https://')
+        if id.startswith('/') or id.endswith('/') or ('//' in id and not extres):
+            raise ValueError, "Invalid Resource ID: %s" % id
         self._data['id'] = id
         expression = kwargs.get('expression', '')
         self.setExpression(expression)
@@ -80,6 +81,10 @@ class Resource(Persistent):
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
         self._data['conditionalcomment'] = kwargs.get('conditionalcomment','')
+        self._data['external'] = extres
+        if extres:
+            self._data['cacheable'] = False #External resources are NOT cacheable
+            self._data['cookable'] = False #External resources are NOT mergable
 
     def copy(self):
         result = self.__class__(self.getId())
@@ -92,10 +97,15 @@ class Resource(Persistent):
     def getId(self):
         return self._data['id']
 
+    security.declarePublic('getQuotedId')
     def getQuotedId(self):
         return quote_plus(self._data['id'])
 
+    security.declareProtected(permissions.ManagePortal, '_setId')
     def _setId(self, id):
+        if id.startswith('/') or id.endswith('/') or (
+                ('//' in id) and not self.isExternalResource()):
+            raise ValueError, "Invalid Resource ID: %s" %id
         self._data['id'] = id
 
     security.declarePublic('getCookedExpression')
@@ -130,6 +140,8 @@ class Resource(Persistent):
 
     security.declareProtected(permissions.ManagePortal, 'setCookable')
     def setCookable(self, cookable):
+        if self.isExternalResource() and cookable:
+            raise ValueError, "External Resources cannot be merged"
         self._data['cookable'] = cookable
 
     security.declarePublic('getCacheable')
@@ -140,16 +152,22 @@ class Resource(Persistent):
 
     security.declareProtected(permissions.ManagePortal, 'setCacheable')
     def setCacheable(self, cacheable):
+        if self.isExternalResource() and cacheable:
+            raise ValueError, "External Resources are not cacheable"
         self._data['cacheable'] = cacheable
-    
+
     security.declarePublic('getConditionalcomment')
     def getConditionalcomment(self):
         # New property, return blank if the old instance doesn't have that value
         return self._data.get('conditionalcomment','')
-    
+
     security.declareProtected(permissions.ManagePortal, 'setConditionalcomment')
     def setConditionalcomment(self, conditionalcomment):
         self._data['conditionalcomment'] = conditionalcomment
+
+    security.declarePublic('isExternalResource')
+    def isExternalResource(self):
+        return self._data.get('external',False)
 
 InitializeClass(Resource)
 
@@ -364,6 +382,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declarePrivate('compareResources')
     def compareResources(self, s1, s2):
         """Check if two resources are compatible."""
+        if s1.isExternalResource() or s2.isExternalResource():
+            return False
         for attr in self.attributes_to_compare:
             if getattr(s1, attr)() != getattr(s2, attr)():
                 return False

@@ -217,6 +217,10 @@ legend {
             <input type="text" name="stylesheets.expression:records"
                    tal:attributes="value stylesheet/getExpression">
 
+            <label>Conditional Comment (IE Only)</label>
+            <input type="text" name="stylesheets.conditionalcomment:records"
+                   tal:attributes="value stylesheet/getConditionalcomment">
+
             <label>Merging allowed?</label>
             <input type="checkbox" name="stylesheets.cookable:records:boolean"
                    tal:attributes="checked stylesheet/getCookable | default" />
@@ -285,6 +289,11 @@ legend {
           <div>
               <label>Condition</label>
               <input type="text" name="expression" size="50" />
+          </div>
+
+          <div>
+              <label>Conditional Comment (IE Only)</label>
+              <input type="text" name="conditionalcomment" size="50" />
           </div>
 
           <div>

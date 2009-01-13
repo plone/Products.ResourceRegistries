@@ -1,6 +1,12 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Added option to have a conditional comment attached to a given resource.
+    Currently the UI only supports this behavior with the CSS Registry, but the
+    underpinnings for the other two registries is in place. This closes
+    http://dev.plone.org/plone/ticket/5521
+    [dunlapm, fschulze]
+
   * Do not try to export the `cooked_expression` into the GenericSetup
     profiles. It is only an internal optimization and the value is reflected
     in the `expression` value.

@@ -348,6 +348,14 @@ class TestStylesheetCooking(RegistryTestCase):
         self.failUnless('background-color' in all)
         self.failUnless('blue' in all)
 
+    def testConditionalComment(self):
+        self.tool.registerStylesheet('foo', conditionalcomment='IE7')
+        view = self.portal.restrictedTraverse('@@plone')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager.update()
+        all = viewletmanager.render()
+        self.assertTrue(all.index('<!--[if IE7]>') < all.index('<style') < all.index('<![endif]-->'))
+
     def testDifferentMediaAreCollapsed(self):
         self.tool.registerStylesheet('test_rr_1.css', media='print')
         self.tool.registerStylesheet('test_rr_2.css', media='all')

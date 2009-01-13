@@ -29,16 +29,19 @@ class StylesView(BrowserView):
                         'media': style.getMedia(),
                         'rel': style.getRel(),
                         'title': style.getTitle(),
+                        'conditionalcomment' : style.getConditionalcomment(),
                         'src': src}
             elif rendering == 'import':
                 src = "%s/%s/%s" % (registry_url, skinname, style.getId())
                 data = {'rendering': rendering,
                         'media': style.getMedia(),
+                        'conditionalcomment' : style.getConditionalcomment(),
                         'src': src}
             elif rendering == 'inline':
                 content = registry.getInlineResource(style.getId(), context)
                 data = {'rendering': rendering,
                         'media': style.getMedia(),
+                        'conditionalcomment' : style.getConditionalcomment(),
                         'content': content}
             else:
                 raise ValueError, "Unkown rendering method '%s' for style '%s'" % (rendering, style.getId())

@@ -1,8 +1,6 @@
 
 Things to do in the near future (not in order of priority): 
 
-  - Add support for IE-only-hack for stylesheets
-
   - Descriptions for the form elements in the ZMI. Some ZMI documentation
 
   - Write install instructions

@@ -1,6 +1,10 @@
 <tal:styles define="view context/@@resourceregistries_styles_view"
             repeat="style view/styles">
-  <tal:block define="rendering style/rendering">
+  <tal:block define="rendering style/rendering;
+                     condcomment style/conditionalcomment">
+    <tal:wcondcomment tal:condition="condcomment">
+        <tal:opencc tal:replace="structure string:<!--[if ${condcomment}]>" />    
+    </tal:wcondcomment>
     <tal:rendering-link condition="python: rendering == 'link'">
       <link rel="style"
             type="text/css"
@@ -21,5 +25,8 @@
              tal:content="structure style/content">
       </style>
     </tal:rendering-inline>
+    <tal:wcondcomment tal:condition="condcomment">
+        <tal:closecc tal:replace="structure string:<![endif]-->" />
+    </tal:wcondcomment>
   </tal:block>
 </tal:styles>

@@ -111,7 +111,8 @@ class CSSRegistryTool(BaseRegistryTool):
     ) + BaseRegistryTool.manage_options
 
     attributes_to_compare = ('getExpression', 'getCookable',
-                             'getCacheable', 'getRel', 'getRendering')
+                             'getCacheable', 'getRel', 'getRendering',
+                             'getConditionalcomment')
     filename_base = 'ploneStyles'
     filename_appendix = '.css'
     merged_output_prefix = u''
@@ -188,10 +189,11 @@ class CSSRegistryTool(BaseRegistryTool):
     def manage_addStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
                              enabled=False, cookable=True, compression='safe',
-                             cacheable=True, REQUEST=None):
+                             cacheable=True, REQUEST=None, conditionalcomment=''):
         """Register a stylesheet from a TTW request."""
         self.registerStylesheet(id, expression, media, rel, title,
-                                rendering, enabled, cookable, compression, cacheable)
+                                rendering, enabled, cookable, compression,
+                                cacheable, conditionalcomment)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -219,7 +221,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                     enabled=r.get('enabled', False),
                                     cookable=r.get('cookable', False),
                                     cacheable=r.get('cacheable', False),
-                                    compression=r.get('compression', 'safe'))
+                                    compression=r.get('compression', 'safe'),
+                                    conditionalcomment=r.get('conditionalcomment',''))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -241,7 +244,7 @@ class CSSRegistryTool(BaseRegistryTool):
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1,
                            cookable=True, compression='safe', cacheable=True,
-                           skipCooking=False):
+                           skipCooking=False, conditionalcomment=''):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,
@@ -252,7 +255,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                 enabled=enabled,
                                 cookable=cookable,
                                 compression=compression,
-                                cacheable=cacheable)
+                                cacheable=cacheable,
+                                conditionalcomment=conditionalcomment)
         self.storeResource(stylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateStylesheet')
@@ -279,6 +283,8 @@ class CSSRegistryTool(BaseRegistryTool):
             stylesheet.setCompression(data['compression'])
         if data.get('cacheable', None) is not None:
             stylesheet.setCacheable(data['cacheable'])
+        if data.get('conditionalcomment',None) is not None:
+            stylesheet.setConditionalcomment(data['conditionalcomment'])
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):

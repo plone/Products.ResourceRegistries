@@ -40,6 +40,12 @@ Usage
 
   expression -- A CMF expression to be evaluated to check if the stylesheet
   should be included in output or not.
+  
+  conditionalcomment -- A small string to be included in a conditional comment
+  around the resource. For example, entering simply 'IE' in the field will
+  result in a conditional comment of: <!--[if IE]>...<![endif]--> This behavior
+  is currently only enabled for the CSS Registry. For more information see:
+  http://msdn.microsoft.com/en-us/library/ms537512.aspx
 
   media -- The media for which the stylesheet should apply, normally empty or
   'all'. other possible values are 'screen', 'print' etc.

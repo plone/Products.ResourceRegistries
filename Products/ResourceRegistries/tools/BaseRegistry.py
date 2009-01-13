@@ -79,6 +79,7 @@ class Resource(Persistent):
         self._data['enabled'] = kwargs.get('enabled', True)
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
+        self._data['conditionalcomment'] = kwargs.get('conditionalcomment','')
 
     def copy(self):
         result = self.__class__(self.getId())
@@ -140,6 +141,15 @@ class Resource(Persistent):
     security.declareProtected(permissions.ManagePortal, 'setCacheable')
     def setCacheable(self, cacheable):
         self._data['cacheable'] = cacheable
+    
+    security.declarePublic('getConditionalcomment')
+    def getConditionalcomment(self):
+        # New property, return blank if the old instance doesn't have that value
+        return self._data.get('conditionalcomment','')
+    
+    security.declareProtected(permissions.ManagePortal, 'setConditionalcomment')
+    def setConditionalcomment(self, conditionalcomment):
+        self._data['conditionalcomment'] = conditionalcomment
 
 InitializeClass(Resource)
 
@@ -183,7 +193,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     implements(IResourceRegistry)
     manage_options = SimpleItem.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable')
+    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable',
+                             'getConditionalcomment')
     filename_base = 'ploneResources'
     filename_appendix = '.res'
     merged_output_prefix = u''
@@ -676,13 +687,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
     security.declareProtected(permissions.ManagePortal, 'registerResource')
     def registerResource(self, id, expression='', enabled=True,
-                         cookable=True, cacheable=True):
+                         cookable=True, cacheable=True, conditionalcomment=''):
         """Register a resource."""
         resource = Resource(id,
                             expression=expression,
                             enabled=enabled,
                             cookable=cookable,
-                            cacheable=cacheable)
+                            cacheable=cacheable,
+                            conditionalcomment=conditionalcomment)
         self.storeResource(resource)
 
     security.declareProtected(permissions.ManagePortal, 'unregisterResource')

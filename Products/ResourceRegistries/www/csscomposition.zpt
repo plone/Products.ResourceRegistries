@@ -20,6 +20,9 @@
             <tal:block tal:condition="entry/getExpression | nothing">
             - <span tal:replace="entry/getExpression" />
             </tal:block>
+            <tal:block tal:condition="entry/getConditionalcomment | nothing">
+            - <span tal:replace="string:<!--[if ${entry/getConditionalcomment}]>" />
+            </tal:block>
         </div>
         <ul tal:define="sheets here/concatenatedresources">
           <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"

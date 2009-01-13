@@ -338,7 +338,7 @@ class TestStylesheetCooking(RegistryTestCase):
         self.failUnless('/%s' % magic_ids[1] in all)
         self.failIf('/test_rr_1.css"' in all)
 
-    def testReenderingConcatenatesInline(self):
+    def testRenderingConcatenatesInline(self):
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
         self.tool.registerStylesheet('test_rr_2.css', rendering='inline')
         view = self.portal.restrictedTraverse('@@plone')

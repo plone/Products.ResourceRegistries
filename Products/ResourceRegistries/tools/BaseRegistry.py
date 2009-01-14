@@ -7,7 +7,9 @@ from urllib import quote_plus
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
-from Globals import InitializeClass, Persistent, PersistentMapping
+from App.class_init import InitializeClass
+from Persistence import Persistent
+from Persistence import PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized
 
 from zope.interface import implements
@@ -73,7 +75,7 @@ class Resource(Persistent):
         self._data = PersistentMapping()
         extres = id.startswith('http://') or id.startswith('https://')
         if id.startswith('/') or id.endswith('/') or ('//' in id and not extres):
-            raise ValueError, "Invalid Resource ID: %s" % id
+            raise ValueError("Invalid Resource ID: %s" % id)
         self._data['id'] = id
         expression = kwargs.get('expression', '')
         self.setExpression(expression)
@@ -105,7 +107,7 @@ class Resource(Persistent):
     def _setId(self, id):
         if id.startswith('/') or id.endswith('/') or (
                 ('//' in id) and not self.isExternalResource()):
-            raise ValueError, "Invalid Resource ID: %s" %id
+            raise ValueError("Invalid Resource ID: %s" %id)
         self._data['id'] = id
 
     security.declarePublic('getCookedExpression')
@@ -141,7 +143,7 @@ class Resource(Persistent):
     security.declareProtected(permissions.ManagePortal, 'setCookable')
     def setCookable(self, cookable):
         if self.isExternalResource() and cookable:
-            raise ValueError, "External Resources cannot be merged"
+            raise ValueError("External Resources cannot be merged")
         self._data['cookable'] = cookable
 
     security.declarePublic('getCacheable')
@@ -153,7 +155,7 @@ class Resource(Persistent):
     security.declareProtected(permissions.ManagePortal, 'setCacheable')
     def setCacheable(self, cacheable):
         if self.isExternalResource() and cacheable:
-            raise ValueError, "External Resources are not cacheable"
+            raise ValueError("External Resources are not cacheable")
         self._data['cacheable'] = cacheable
 
     security.declarePublic('getConditionalcomment')
@@ -345,7 +347,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """Safeguard against duplicate ids."""
         for sheet in existing:
             if sheet.getId() == id:
-                raise ValueError, 'Duplicate id %s' %(id)
+                raise ValueError('Duplicate id %s' %(id))
 
     security.declarePrivate('storeResource')
     def storeResource(self, resource, skipCooking=False):

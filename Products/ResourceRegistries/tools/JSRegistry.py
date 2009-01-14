@@ -1,4 +1,4 @@
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from zope.interface import implements
@@ -35,7 +35,7 @@ class JavaScript(Resource):
     security.declareProtected(permissions.ManagePortal, 'setInline')
     def setInline(self, inline):
         if self.isExternalResource() and inline:
-            raise ValueError, "Inline rendering is not supported for External Resources"
+            raise ValueError("Inline rendering is not supported for External Resources")
         self._data['inline'] = inline
 
     security.declarePublic('getCompression')
@@ -50,7 +50,8 @@ class JavaScript(Resource):
     security.declareProtected(permissions.ManagePortal, 'setCompression')
     def setCompression(self, compression):
         if self.isExternalResource() and compression not in config.JS_EXTERNAL_COMPRESSION_METHODS:
-            raise ValueError, "Compression method '%s' must be one of: %s" % (compression, ', '.join(config.JS_EXTERNAL_COMPRESSION_METHODS))
+            raise ValueError("Compression method '%s' must be one of: %s" % (
+                             compression, ', '.join(config.JS_EXTERNAL_COMPRESSION_METHODS)))
         self._data['compression'] = compression
 
 InitializeClass(JavaScript)
@@ -205,7 +206,7 @@ class JSRegistryTool(BaseRegistryTool):
     def updateScript(self, id, **data):
         script = self.getResourcesDict().get(id, None)
         if script is None:
-            raise ValueError, 'Invalid resource id %s' % (id)
+            raise ValueError('Invalid resource id %s' % (id))
         if data.get('expression', None) is not None:
             script.setExpression(data['expression'])
         if data.get('inline', None) is not None:

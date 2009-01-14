@@ -46,6 +46,6 @@ class StylesView(BrowserView):
                         'conditionalcomment' : style.getConditionalcomment(),
                         'content': content}
             else:
-                raise ValueError, "Unkown rendering method '%s' for style '%s'" % (rendering, style.getId())
+                raise ValueError("Unkown rendering method '%s' for style '%s'" % (rendering, style.getId()))
             result.append(data)
         return result

@@ -1,4 +1,4 @@
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from zope.interface import implements
@@ -37,8 +37,8 @@ class KineticStylesheet(Resource):
     security.declareProtected(permissions.ManagePortal, 'setCompression')
     def setCompression(self, compression):
         if self.isExternalResource() and compression not in config.KSS_EXTERNAL_COMPRESSION_METHODS:
-            raise ValueError, "Compression method %s must be one of: %s for External Resources" % (
-                    compression, ', '.join(config.KSS_EXTERNAL_COMPRESSION_METHODS))
+            raise ValueError("Compression method %s must be one of: %s for External Resources" % (
+                             compression, ', '.join(config.KSS_EXTERNAL_COMPRESSION_METHODS)))
         self._data['compression'] = compression
 
 InitializeClass(KineticStylesheet)
@@ -182,7 +182,7 @@ class KSSRegistryTool(BaseRegistryTool):
     def updateKineticStylesheet(self, id, **data):
         kineticstylesheet = self.getResourcesDict().get(id, None)
         if kineticstylesheet is None:
-            raise ValueError, 'Invalid resource id %s' % (id)
+            raise ValueError('Invalid resource id %s' % (id))
         
         if data.get('expression', None) is not None:
             kineticstylesheet.setExpression(data['expression'])

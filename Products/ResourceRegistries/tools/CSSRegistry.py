@@ -1,4 +1,4 @@
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from zope.interface import implements
@@ -29,10 +29,8 @@ class Stylesheet(Resource):
         if self._data['external']:
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
                 self._data['compression'] = 'none' #we have to assume none because of the default values
-                #raise ValueError, "Compression method %s not allowed for External Resource" % (self._data['compression'],)
             if self._data['rendering'] not in config.CSS_EXTERNAL_RENDER_METHODS:
-                raise ValueError, "Render method %s not allowed for External Resource" % (self._data['rendering'],)
-            
+                raise ValueError("Render method %s not allowed for External Resource" % (self._data['rendering'],))
 
     security.declarePublic('getMedia')
     def getMedia(self):
@@ -71,8 +69,8 @@ class Stylesheet(Resource):
     security.declareProtected(permissions.ManagePortal, 'setRendering')
     def setRendering(self, rendering):
         if self.isExternalResource() and rendering not in config.CSS_EXTERNAL_RENDER_METHODS:
-            raise ValueError, "Rendering method %s not valid, must be one of: %s" % (rendering,
-                                                                                     ', '.join(config.CSS_EXTERNAL_RENDER_METHODS))
+            raise ValueError("Rendering method %s not valid, must be one of: %s" % (
+                             rendering, ', '.join(config.CSS_EXTERNAL_RENDER_METHODS)))
         self._data['rendering'] = rendering
 
     security.declarePublic('getCompression')
@@ -87,7 +85,8 @@ class Stylesheet(Resource):
     security.declareProtected(permissions.ManagePortal, 'setCompression')
     def setCompression(self, compression):
         if self.isExternalResource() and compression not in config.CSS_COMPRESSION_METHODS:
-            raise ValueError, "Compression method %s not valid, must be one of: %s" % (compression, ', '.join(config.CSS_EXTERNAL_COMPRESSION_METHODS))
+            raise ValueError("Compression method %s not valid, must be one of: %s" % (
+                             compression, ', '.join(config.CSS_EXTERNAL_COMPRESSION_METHODS)))
         self._data['compression'] = compression
 
 InitializeClass(Stylesheet)
@@ -278,7 +277,7 @@ class CSSRegistryTool(BaseRegistryTool):
     def updateStylesheet(self, id, **data):
         stylesheet = self.getResourcesDict().get(id, None)
         if stylesheet is None:
-            raise ValueError, 'Invalid resource id %s' % (id)
+            raise ValueError('Invalid resource id %s' % (id))
         
         if data.get('expression', None) is not None:
             stylesheet.setExpression(data['expression'])

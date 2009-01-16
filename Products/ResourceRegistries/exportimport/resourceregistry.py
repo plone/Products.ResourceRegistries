@@ -1,9 +1,8 @@
-from zope.app import zapi
+from zope.component import queryMultiAdapter
 
 from Products.CMFCore.utils import getToolByName
 
 from Products.GenericSetup.interfaces import IBody
-#from Products.GenericSetup.utils import I18NURI
 from Products.GenericSetup.utils import XMLAdapterBase
 
 
@@ -21,7 +20,7 @@ def importResRegistry(context, reg_id, reg_title, filename):
 
     res_reg = getToolByName(site, reg_id)
 
-    importer = zapi.queryMultiAdapter((res_reg, context), IBody)
+    importer = queryMultiAdapter((res_reg, context), IBody)
     if importer is None:
         logger.warning("%s: Import adapter missing." % reg_title)
         return
@@ -40,7 +39,7 @@ def exportResRegistry(context, reg_id, reg_title, filename):
         logger.info("%s: Nothing to export." % reg_title)
         return
 
-    exporter = zapi.queryMultiAdapter((res_reg, context), IBody)
+    exporter = queryMultiAdapter((res_reg, context), IBody)
     if exporter is None:
         logger.warning("%s: Export adapter missing." % reg_title)
         return

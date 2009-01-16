@@ -1,6 +1,9 @@
 1.5.0 (SVN/unreleased)
 ======================
 
+  * Avoid dependency on the zope.app.zapi package.
+    [hannosch]
+
   * Declare package dependencies, fixed deprecation warnings for use of
     Globals and changed error raising to be forward compatible.
     [hannosch]

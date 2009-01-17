@@ -1,6 +1,10 @@
 1.5.0 (SVN/unreleased)
 ======================
 
+  * Added BBB imports to make sure the InitializeClass can be imported in
+    Zope versions before 2.12.
+    [hannosch]
+
   * Avoid dependency on the zope.app.zapi package.
     [hannosch]
 

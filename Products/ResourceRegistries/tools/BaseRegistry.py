@@ -5,9 +5,14 @@ import random
 from StringIO import StringIO
 from urllib import quote_plus
 
+# BBB Zope before 2.12
+try:
+    from App.class_init import InitializeClass
+except ImportError:
+    from Globals import InitializeClass
+
 from App.Common import rfc1123_date
 from DateTime import DateTime
-from App.class_init import InitializeClass
 from Persistence import Persistent
 from Persistence import PersistentMapping
 from AccessControl import ClassSecurityInfo, Unauthorized

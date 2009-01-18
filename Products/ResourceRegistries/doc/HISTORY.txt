@@ -1,6 +1,11 @@
 1.5.0 (SVN/unreleased)
 ======================
 
+  * Change the fix for #7522 made in 1.4.3. For inline resources we pass
+    Unicode down into the page templates. The TAL machinery expects to get
+    Unicode and not encoded strings.
+    [hannosch]
+
   * Added BBB imports to make sure the InitializeClass can be imported in
     Zope versions before 2.12.
     [hannosch]

@@ -29,7 +29,6 @@ from OFS.Cache import Cacheable
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFPlone.utils import getSiteEncoding
 
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
@@ -846,8 +845,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         headers = self.REQUEST.RESPONSE.headers.copy()
         # Save the RESPONSE headers
         output = self.getResourceContent(item, context)
-        if isinstance(output, unicode):
-            output = output.encode(getSiteEncoding(context))
         # File objects and other might manipulate the headers,
         # something we don't want. we set the saved headers back
         self.REQUEST.RESPONSE.headers = headers

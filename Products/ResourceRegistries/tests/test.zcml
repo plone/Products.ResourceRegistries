@@ -24,7 +24,7 @@
       directory="test_profile"
       description="Test Profile for ResourceRegistries"
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      for="Products.CMFCore.interfaces.ISiteRoot"
       />
 
 </configure>

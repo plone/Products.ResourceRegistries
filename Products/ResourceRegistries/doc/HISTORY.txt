@@ -1,4 +1,4 @@
-1.4.4 (SVN/unreleased)
+1.5.0 (SVN/unreleased)
 ======================
 
   * Resources beginning with "http://" or "https://" are now valid and may be

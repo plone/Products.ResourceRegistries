@@ -1,4 +1,4 @@
-1.5.0 (SVN/unreleased)
+1.6.0 (SVN/unreleased)
 ======================
 
   * Change the fix for #7522 made in 1.4.3. For inline resources we pass
@@ -16,6 +16,9 @@
   * Declare package dependencies, fixed deprecation warnings for use of
     Globals and changed error raising to be forward compatible.
     [hannosch]
+
+1.5.0 (SVN/unreleased)
+======================
 
   * Resources beginning with "http://" or "https://" are now valid and may be
     included as resources. Registries will automatically disable merging,

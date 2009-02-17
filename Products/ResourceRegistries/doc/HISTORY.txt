@@ -1,6 +1,10 @@
 1.6.0 (SVN/unreleased)
 ======================
 
+  * Handle a missing portal_kss tool gracefully in the kineticstylesheets
+    viewlet.
+    [hannosch]
+
   * Change the fix for #7522 made in 1.4.3. For inline resources we pass
     Unicode down into the page templates. The TAL machinery expects to get
     Unicode and not encoded strings.

@@ -1,6 +1,7 @@
 <div tal:replace="structure here/manage_page_header" />
 
 <script type="text/javascript">
+  <![CDATA[
 function getSortInput(node) {
     var iterNode = null;
     for (var i = 0; i<node.childNodes.length; i++) {
@@ -79,6 +80,8 @@ function shiftBlocks(fieldset, block) {
     fieldset.parentNode.insertBefore(fieldset, block);
     return true;
 }
+
+]]>
 </script>
 
 <style type="text/css">
@@ -183,11 +186,11 @@ legend {
             <label class="hiddenLabel">Enabled?</label>
             <input type="checkbox" name="stylesheets.enabled:records"
                    title="Enabled?"
-                   tal:attributes="checked stylesheet/getEnabled">
+                   tal:attributes="checked stylesheet/getEnabled" />
             <input type="hidden" name="stylesheets.enabled:records:boolean:default" value="False" />
 
             <input type="text" name="stylesheets.id:records" size="30"
-                   tal:attributes="value stylesheet/getId">
+                   tal:attributes="value stylesheet/getId" />
 
                 <a onclick="return moveUp(this);" href="#"
                    title="Move up"
@@ -211,11 +214,11 @@ legend {
         <div class="stylesheetform">
             <label>Title</label>
             <input type="text" name="stylesheets.title:records"
-                   tal:attributes="value stylesheet/getTitle|nothing">
+                   tal:attributes="value stylesheet/getTitle|nothing" />
 
             <label>Condition</label>
             <input type="text" name="stylesheets.expression:records"
-                   tal:attributes="value stylesheet/getExpression">
+                   tal:attributes="value stylesheet/getExpression" />
 
             <label>Merging allowed?</label>
             <input type="checkbox" name="stylesheets.cookable:records:boolean"
@@ -231,11 +234,11 @@ legend {
         <div class="stylesheetform">
             <label>CSS Media</label>
             <input type="text" name="stylesheets.media:records"
-                   tal:attributes="value stylesheet/getMedia|nothing">
+                   tal:attributes="value stylesheet/getMedia|nothing" />
 
             <label>rel</label>
             <input type="text" name="stylesheets.rel:records"
-                   tal:attributes="value stylesheet/getRel|nothing">
+                   tal:attributes="value stylesheet/getRel|nothing" />
 
             <label>Render type</label>
             <select name="stylesheets.rendering:records">

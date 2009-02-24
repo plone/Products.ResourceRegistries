@@ -1,6 +1,7 @@
 <div tal:replace="structure here/manage_page_header" />
 
 <script type="text/javascript">
+  <![CDATA[
 function getSortInput(node) {
     var iterNode = null;
     for (var i = 0; i<node.childNodes.length; i++) {
@@ -79,6 +80,7 @@ function shiftBlocks(fieldset, block) {
     fieldset.parentNode.insertBefore(fieldset, block);
     return true;
 }
+]]>
 </script>
 
 <style type="text/css">
@@ -171,9 +173,11 @@ legend {
     order in the header of the resulting HTML code.
     Use the up/down arrows to change the rendering order.</p>
 
+    
     <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
                  tal:repeat="script here/getResources">
-      <fieldset tal:define="resourceExists python:path('exists:portal/%s' % script.getId());"
+      <fieldset tal:define="id_ script/getId;
+                            resourceExists exists:portal/?id_"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="scripts.sort:records:int"
@@ -231,15 +235,15 @@ legend {
             <input type="checkbox" name="scripts.cookable:records:boolean"
                    tal:attributes="checked script/getCookable | default" />
             <input type="hidden" name="scripts.cookable:records:boolean:default" value="False" />
-
+            
             <label>Caching allowed?</label>
             <input type="checkbox" name="scripts.cacheable:records:boolean"
                    tal:attributes="checked script/getCacheable | default" />
             <input type="hidden" name="scripts.cacheable:records:boolean:default" value="False" />
         </div>
-
+        
         <div class="visualClear">&nbsp;</div>
-
+        
       </fieldset>
     </tal:scripts>
 

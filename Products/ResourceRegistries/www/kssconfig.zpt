@@ -185,11 +185,11 @@ legend {
             <label class="hiddenLabel">Enabled?</label>
             <input type="checkbox" name="kineticstylesheets.enabled:records"
                    title="Enabled?"
-                   tal:attributes="checked kineticstylesheet/getEnabled">
+                   tal:attributes="checked kineticstylesheet/getEnabled" />
             <input type="hidden" name="kineticstylesheets.enabled:records:boolean:default" value="False" />
 
             <input type="text" name="kineticstylesheets.id:records" size="30"
-                   tal:attributes="value kineticstylesheet/getId">
+                   tal:attributes="value kineticstylesheet/getId" />
 
                 <a onclick="return moveUp(this);" href="#"
                    title="Move up"
@@ -213,7 +213,7 @@ legend {
         <div class="kineticstylesheetform">
             <label>Condition</label>
             <input type="text" name="kineticstylesheets.expression:records"
-                   tal:attributes="value kineticstylesheet/getExpression">
+                   tal:attributes="value kineticstylesheet/getExpression" />
 
             <label>Merging allowed?</label>
             <input type="checkbox" name="kineticstylesheets.cookable:records:boolean"

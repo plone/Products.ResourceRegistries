@@ -1,6 +1,7 @@
 <div tal:replace="structure here/manage_page_header" />
 
 <script type="text/javascript">
+<![CDATA[
 function getSortInput(node) {
     var iterNode = null;
     for (var i = 0; i<node.childNodes.length; i++) {
@@ -79,6 +80,7 @@ function shiftBlocks(fieldset, block) {
     fieldset.parentNode.insertBefore(fieldset, block);
     return true;
 }
+]]>
 </script>
 
 <style type="text/css">

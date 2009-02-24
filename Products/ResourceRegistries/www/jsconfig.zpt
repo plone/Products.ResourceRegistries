@@ -225,7 +225,7 @@ legend {
             
             <label>Conditional Comment (IE Only)</label> 
             <input type="text" name="scripts.conditionalcomment:records:string"
-                   tal:attributes="value script/getConditionalcomment">
+                   tal:attributes="value script/getConditionalcomment" />
                 
             <label>Compression type</label>
             <select name="scripts.compression:records">

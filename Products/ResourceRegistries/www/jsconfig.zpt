@@ -165,11 +165,20 @@ legend {
         In automatic grouping mode, resources are first ordered into mergeable groups based on their settings and after that merged based on their position in the registry.
     </p>
 
-    <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
-
     <p>The order of the scripts in this form is the same as the
     order in the header of the resulting HTML code.
     Use the up/down arrows to change the rendering order.</p>
+    
+    <p>Defined scripts can exist as a browser resource, an item in a skin
+    layer, or as a complete URL. An IE-only
+    <a href="http://msdn.microsoft.com/en-us/library/ms537512.aspx">Conditional
+    Comment</a> may be specified and will be printed in the form of:
+    &lt;!--[if <em>Condition</em>]&gt;...&lt;![endif]--&gt;
+    </p>
+    
+    <p>Please use care as external resources defined without SSL may cause an
+    error to be displayed in a user's browser if they are visiting your site
+    using SSL.</p>
 
     <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
                  tal:repeat="script here/getResources">
@@ -211,7 +220,11 @@ legend {
             <label>Condition</label>
             <input type="text" name="scripts.expression:records:string" size="25"
                    tal:attributes="value script/getExpression" />
-
+            
+            <label>Conditional Comment (IE Only)</label> 
+            <input type="text" name="scripts.conditionalcomment:records:string"
+                   tal:attributes="value script/getConditionalcomment">
+                
             <label>Compression type</label>
             <select name="scripts.compression:records">
                 <option tal:define="options python:test(script.isExternalResource(),here.getExternalCompressionOptions(),here.getCompressionOptions())"
@@ -260,7 +273,7 @@ legend {
         <legend>Add a new script</legend>
 
         <div>
-            <label>ID</label>
+            <label for="id">ID/URL</label>
             <input type="text" name="id" size="50" />
         </div>
 
@@ -268,7 +281,12 @@ legend {
             <label>Condition</label>
             <input type="text" name="expression" size="50" />
         </div>
-
+        
+        <div>
+            <label>Conditional Comment (IE Only)</label> 
+            <input type="text" name="conditionalcomment" size="50" />
+        </div>
+          
         <div>
             <label>Inline rendering?</label>
             <input type="checkbox" name="inline" value="0" />

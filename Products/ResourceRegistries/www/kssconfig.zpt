@@ -164,12 +164,16 @@ legend {
         In automatic grouping mode, resources are first ordered into mergeable groups based on their settings and after that merged based on their position in the registry.
     </p>
 
-    <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
-
     <p>The order of the kineticstylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
+    
+    <p>Defined stylesheets can exist as a browser resource, an item in a skin
+    layer, or as a complete URL.</p>
 
+    <p>Please use care as external resources defined without SSL may cause an
+    error to be displayed in a user's browser if they are visiting your site
+    using SSL.</p>
     
     <tal:kineticstylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="kineticstylesheet here/getResources">
@@ -256,7 +260,7 @@ legend {
           <legend>Add a new kineticstylesheet</legend>
 
           <div>
-              <label>ID</label>
+              <label for="id">ID/URL</label>
               <input type="text" name="id" size="50" />
           </div>
 

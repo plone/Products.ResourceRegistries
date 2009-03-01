@@ -1,5 +1,5 @@
-1.5.0 (SVN/unreleased)
-======================
+1.5.0 - 2008-03-01
+==================
 
   * Removed the uppermost Save button from the ZMI pages for registries.
     Clicking this button before the registry page has finished loading could

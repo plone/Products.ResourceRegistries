@@ -1,14 +1,15 @@
 from setuptools import setup, find_packages
-import sys, os
+from os.path import join
 
-version = '1.5.0'
+
+version = open(join('Products', 'ResourceRegistries', 'version.txt')).read().strip()
+readme = open(join('Products', 'ResourceRegistries', "README.txt")).read()
+history = open(join('Products', 'ResourceRegistries', 'doc', 'HISTORY.txt')).read()
 
 setup(name='Products.ResourceRegistries',
       version=version,
       description="Registry for managing CSS and JS",
-      long_description="""\
-Registry for CSS and JS files which allows merging of several resources into one.
-Includes a packer for CSS and JS which can be used standalone.""",
+      long_description=readme[readme.find('\n\n'):] + '\n' + history,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Zope2",
@@ -26,7 +27,6 @@ Includes a packer for CSS and JS which can be used standalone.""",
       namespace_packages=['Products'],
       include_package_data=True,
       zip_safe=False,
-      download_url='http://plone.org/products/resourceregistries/releases',
       install_requires=[
         'setuptools',
       ],

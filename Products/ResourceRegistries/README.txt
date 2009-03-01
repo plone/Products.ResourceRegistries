@@ -40,7 +40,7 @@ Usage
 
   expression -- A CMF expression to be evaluated to check if the stylesheet
   should be included in output or not.
-  
+
   conditionalcomment -- A small string to be included in a conditional comment
   around the resource. For example, entering simply 'IE' in the field will
   result in a conditional comment of: <!--[if IE]>...<![endif]--> This behavior
@@ -110,15 +110,15 @@ Credits
     
     Laurence Rowe -- Independent
 
-    Geir Bækholt -- "Plone Solutions":http://www.plonesolutions.com
+    Geir Bækholt -- "Jarn":http://www.jarn.com (Previously Plone Solutions)
 
     Matt Hamilton -- "Netsight Internet Solutions":http://www.netsight.co.uk
 
-Plone Solutions AS
+Jarn, formerly Plone Solutions AS
 
-  "http://www.plonesolutions.com":http://www.plonesolutions.com
+  "http://www.jarn.com":http://www.jarn.com
 
-  "info@plonesolutions.com":mailto:info@plonesolutions.com
+  "info@plonesolutions.com":mailto:info@jarn.com
 
 Netsight Internet Solutions
 

@@ -210,6 +210,11 @@ legend {
         </legend>
 
         <div class="scriptform">
+            <label>Restrict to authenticated users?</label>
+            <input type="checkbox" name="scripts.authenticated:records:boolean"
+                   tal:attributes="checked script/getAuthenticated | default" />
+            <input type="hidden" name="scripts.authenticated:records:boolean:default" value="False" />
+
             <label>Condition</label>
             <input type="text" name="scripts.expression:records:string" size="25"
                    tal:attributes="value script/getExpression" />
@@ -264,6 +269,11 @@ legend {
         <div>
             <label>ID</label>
             <input type="text" name="id" size="50" />
+        </div>
+
+        <div>
+            <label>Restrict to authenticated users?</label>
+            <input type="checkbox" name="authenticated" value="0" />
         </div>
 
         <div>

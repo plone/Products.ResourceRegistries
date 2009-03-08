@@ -8,6 +8,7 @@ from urllib import quote_plus
 from zope.interface import implements
 
 from AccessControl import ClassSecurityInfo, Unauthorized
+from AccessControl.SecurityManagement import getSecurityManager
 import Acquisition
 from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
 from App.class_init import InitializeClass
@@ -46,6 +47,11 @@ def getCharsetFromContentType(contenttype, default='utf-8'):
     else:
         return default
 
+def is_anonymous():
+    user = getSecurityManager().getUser()
+    return bool(user.getUserName() == 'Anonymous User')
+
+
 class Resource(Persistent):
     security = ClassSecurityInfo()
 
@@ -57,6 +63,7 @@ class Resource(Persistent):
         self._data['id'] = id
         expression = kwargs.get('expression', '')
         self.setExpression(expression)
+        self._data['authenticated'] = kwargs.get('authenticated', True)
         self._data['enabled'] = kwargs.get('enabled', True)
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
@@ -105,6 +112,17 @@ class Resource(Persistent):
         # Update the cooked expression
         self._data['cooked_expression'] = Expression( expression )
         self._data['expression'] = expression
+
+    security.declarePublic('getAuthenticated')
+    def getAuthenticated(self):
+        # Automatic inline migration
+        if 'authenticated' not in self._data:
+            self._data['authenticated'] = False
+        return bool(self._data['authenticated'])
+
+    security.declareProtected(permissions.ManagePortal, 'setAuthenticated')
+    def setAuthenticated(self, authenticated):
+        self._data['authenticated'] = authenticated
 
     security.declarePublic('getEnabled')
     def getEnabled(self):
@@ -191,7 +209,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     implements(IResourceRegistry)
     manage_options = SimpleItem.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable',
+    attributes_to_compare = ('getAuthenticated', 'getExpression',
+                             'getCookable', 'getCacheable',
                              'getConditionalcomment')
     filename_base = 'ploneResources'
     filename_appendix = '.res'
@@ -459,6 +478,19 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             self.concatenatedresources[resource.getId()] = [resource.getId()]
         self.cookedresources = tuple(results)
 
+    security.declarePrivate('evaluate')
+    def evaluate(self, item, context):
+        """Evaluate an object to see if it should be displayed.
+        """
+        if item.getAuthenticated():
+            if is_anonymous():
+                return False
+            else:
+                return True
+        if not item.getExpression():
+            return True
+        return self.evaluateExpression(item.getCookedExpression(), context)
+
     security.declarePrivate('evaluateExpression')
     def evaluateExpression(self, expression, context):
         """Evaluate an object's TALES condition to see if it should be
@@ -488,9 +520,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 ec.setGlobal('context', context)
                 return expression(ec)
             else:
-                return 1
+                return True
         except AttributeError:
-            return 1
+            return True
 
     security.declareProtected(permissions.ManagePortal, 'getResource')
     def getResource(self, id):
@@ -687,14 +719,16 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
     security.declareProtected(permissions.ManagePortal, 'registerResource')
     def registerResource(self, id, expression='', enabled=True,
-                         cookable=True, cacheable=True, conditionalcomment=''):
+                         cookable=True, cacheable=True, conditionalcomment='',
+                         authenticated=False):
         """Register a resource."""
         resource = Resource(id,
                             expression=expression,
                             enabled=enabled,
                             cookable=cookable,
                             cacheable=cacheable,
-                            conditionalcomment=conditionalcomment)
+                            conditionalcomment=conditionalcomment,
+                            authenticated=authenticated)
         self.storeResource(resource)
 
     security.declareProtected(permissions.ManagePortal, 'unregisterResource')
@@ -804,9 +838,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """Return the filtered evaluated resources."""
         results = self.getCookedResources()
 
-        # filter results by expression
-        results = [item for item in results if
-                   self.evaluateExpression(item.getCookedExpression(), context)]
+        # filter results
+        results = [item for item in results if self.evaluate(item, context)]
 
         return results
 

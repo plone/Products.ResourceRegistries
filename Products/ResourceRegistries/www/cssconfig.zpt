@@ -215,6 +215,11 @@ legend {
             <input type="text" name="stylesheets.title:records"
                    tal:attributes="value stylesheet/getTitle|nothing" />
 
+            <label>Restrict to authenticated users?</label>
+            <input type="checkbox" name="stylesheets.authenticated:records:boolean"
+                   tal:attributes="checked stylesheet/getAuthenticated | default" />
+            <input type="hidden" name="stylesheets.authenticated:records:boolean:default" value="False" />
+
             <label>Condition</label>
             <input type="text" name="stylesheets.expression:records"
                    tal:attributes="value stylesheet/getExpression" />
@@ -290,6 +295,11 @@ legend {
           <div>
               <label>Title</label>
               <input type="text" name="title" />
+          </div>
+
+          <div>
+              <label>Restrict to authenticated users?</label>
+              <input type="checkbox" name="authenticated" value="0" />
           </div>
 
           <div>

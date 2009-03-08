@@ -85,7 +85,8 @@ class JSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable',
+    attributes_to_compare = ('getAuthenticated', 'getExpression',
+                             'getCookable', 'getCacheable',
                              'getInline', 'getConditionalcomment')
     filename_base = 'ploneScripts'
     filename_appendix = '.js'
@@ -140,9 +141,11 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'manage_addScript')
     def manage_addScript(self, id, expression='', inline=False,
                          enabled=False, cookable=True, compression='safe',
-                         cacheable=True, conditionalcomment='', REQUEST=None):
+                         cacheable=True, conditionalcomment='',
+                         authenticated=False, REQUEST=None):
         """Register a script from a TTW request."""
-        self.registerScript(id, expression, inline, enabled, cookable, compression, cacheable, conditionalcomment)
+        self.registerScript(id, expression, inline, enabled, cookable,
+            compression, cacheable, conditionalcomment, authenticated)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -168,7 +171,8 @@ class JSRegistryTool(BaseRegistryTool):
                                 cookable=r.get('cookable'),
                                 cacheable=r.get('cacheable'),
                                 compression=r.get('compression', 'safe'),
-                                conditionalcomment=r.get('conditionalcomment',''))
+                                conditionalcomment=r.get('conditionalcomment',''),
+                                authenticated=r.get('authenticated'),)
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()
@@ -189,7 +193,8 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', inline=False, enabled=True,
                        cookable=True, compression='safe', cacheable=True,
-                       skipCooking=False,conditionalcomment=''):
+                       skipCooking=False, conditionalcomment='',
+                       authenticated=False):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,
@@ -198,7 +203,8 @@ class JSRegistryTool(BaseRegistryTool):
                             cookable=cookable,
                             compression=compression,
                             cacheable=cacheable,
-                            conditionalcomment=conditionalcomment)
+                            conditionalcomment=conditionalcomment,
+                            authenticated=authenticated)
         self.storeResource(script, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateScript')
@@ -208,6 +214,8 @@ class JSRegistryTool(BaseRegistryTool):
             raise ValueError('Invalid resource id %s' % (id))
         if data.get('expression', None) is not None:
             script.setExpression(data['expression'])
+        if data.get('authenticated', None) is not None:
+            script.setExpression(data['authenticated'])
         if data.get('inline', None) is not None:
             script.setInline(data['inline'])
         if data.get('enabled', None) is not None:

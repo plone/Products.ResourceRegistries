@@ -2,5 +2,5 @@
 <object name="portal_javascripts" meta_type="JavaScripts Registry">
  <javascript cacheable="True" compression="safe" cookable="True"
     enabled="False" expression="" id="eXtreme.js" inline="False"
-    remove="True"/>
+    authenticated="False" remove="True"/>
 </object>

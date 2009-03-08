@@ -19,11 +19,16 @@
                tal:attributes="href python:test(entry.isExternalResource(),entry.getId(),portalHref)">
                 <b tal:content="entry/getId">ploneCustom.css</b>
             </a>
-            <tal:block tal:condition="entry/getExpression | nothing">
-            - <span tal:replace="entry/getExpression" />
+            <tal:block tal:condition="entry/getAuthenticated | nothing">
+            - <strong>restricted to authenticated users</strong>
+            </tal:block>
+            <tal:block tal:condition="not:entry/getAuthenticated">
+                <tal:block tal:condition="entry/getExpression | nothing">
+                - <span tal:replace="entry/getExpression" />
+                </tal:block>
             </tal:block>
             <tal:block tal:condition="entry/getConditionalcomment | nothing">
-            - <span tal:replace="string:<!--[if ${entry/getConditionalcomment}]>" />
+            - <span tal:replace="string:&lt;!--[if ${entry/getConditionalcomment}]&gt;" />
             </tal:block>
         </div>
         <ul tal:define="sheets here/concatenatedresources">

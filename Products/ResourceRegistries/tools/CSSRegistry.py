@@ -1,15 +1,9 @@
-# BBB Zope before 2.12
-try:
-    from App.class_init import InitializeClass
-except ImportError:
-    from Globals import InitializeClass
-
-from AccessControl import ClassSecurityInfo
-
 from zope.interface import implements
 
-from Products.CMFCore.utils import getToolByName
+from AccessControl import ClassSecurityInfo
+from App.class_init import InitializeClass
 
+from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.ResourceRegistries import config

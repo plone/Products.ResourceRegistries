@@ -1,6 +1,9 @@
 1.6.0 (SVN/unreleased)
 ======================
 
+  * Removed BBB imports and code. We require Zope 2.12 now.
+    [hannosch]
+
   * Handle a missing portal_kss tool gracefully in the kineticstylesheets
     viewlet.
     [hannosch]

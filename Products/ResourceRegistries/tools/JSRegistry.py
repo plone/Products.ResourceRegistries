@@ -1,15 +1,10 @@
-# BBB Zope before 2.12
-try:
-    from App.class_init import InitializeClass
-except ImportError:
-    from Globals import InitializeClass
-
-from AccessControl import ClassSecurityInfo
-
+import re
 from zope.interface import implements
 
-from Products.CMFCore.utils import getToolByName
+from AccessControl import ClassSecurityInfo
+from App.class_init import InitializeClass
 
+from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.ResourceRegistries import config
@@ -18,7 +13,6 @@ from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
 
-import re
 from packer import JavascriptPacker, JavascriptKeywordMapper
 
 

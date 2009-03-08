@@ -5,22 +5,16 @@ import random
 from StringIO import StringIO
 from urllib import quote_plus
 
-# BBB Zope before 2.12
-try:
-    from App.class_init import InitializeClass
-except ImportError:
-    from Globals import InitializeClass
+from zope.interface import implements
 
+from AccessControl import ClassSecurityInfo, Unauthorized
+import Acquisition
+from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
+from App.class_init import InitializeClass
 from App.Common import rfc1123_date
 from DateTime import DateTime
 from Persistence import Persistent
 from Persistence import PersistentMapping
-from AccessControl import ClassSecurityInfo, Unauthorized
-
-from zope.interface import implements
-
-from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
-
 from OFS.Image import File
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
@@ -29,30 +23,10 @@ from OFS.Cache import Cacheable
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
 from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.Five.browser.resource import Resource as z3_Resource
 
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
-
-import Acquisition
-
-
-# version agnostic import of z3_Resource
-try:
-    import Products.Five
-except ImportError:
-    __five__ = False
-    from zope.app.publisher.browser.resource import Resource as z3_Resource
-else:
-    __five__ = True
-    try:
-        # Zope 2.8 / Five 1.0.2
-        from Products.Five.resource import Resource as z3_Resource
-        __five_pre_1_3_ = True
-    except ImportError:
-        # Zope 2.9 / Five 1.3
-        from Products.Five.browser.resource import Resource as z3_Resource
-        __five_pre_1_3__ = False
-
 
 
 def getDummyFileForContent(name, ctype):

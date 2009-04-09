@@ -23,7 +23,7 @@ class Stylesheet(Resource):
         self._data['media'] = kwargs.get('media', '')
         self._data['rel'] = kwargs.get('rel', 'stylesheet')
         self._data['title'] = kwargs.get('title', '')
-        self._data['rendering'] = kwargs.get('rendering', 'import')
+        self._data['rendering'] = kwargs.get('rendering', 'link')
         self._data['compression'] = kwargs.get('compression', 'safe')
         if self._data['external']:
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
@@ -200,7 +200,7 @@ class CSSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'manage_addStylesheet')
     def manage_addStylesheet(self, id, expression='', media='',
-                             rel='stylesheet', title='', rendering='import',
+                             rel='stylesheet', title='', rendering='link',
                              enabled=False, cookable=True, compression='safe',
                              cacheable=True, REQUEST=None,
                              conditionalcomment='', authenticated=False):
@@ -231,10 +231,10 @@ class CSSRegistryTool(BaseRegistryTool):
                                     media=r.get('media', ''),
                                     rel=r.get('rel', 'stylesheet'),
                                     title=r.get('title', ''),
-                                    rendering=r.get('rendering', 'import'),
-                                    enabled=r.get('enabled', False),
+                                    rendering=r.get('rendering', 'link'),
+                                    enabled=r.get('enabled', True),
                                     cookable=r.get('cookable', False),
-                                    cacheable=r.get('cacheable', False),
+                                    cacheable=r.get('cacheable', True),
                                     compression=r.get('compression', 'safe'),
                                     conditionalcomment=r.get('conditionalcomment',''),
                                     authenticated=r.get('authenticated', False),)
@@ -257,7 +257,7 @@ class CSSRegistryTool(BaseRegistryTool):
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
-                           title='', rendering='import',  enabled=1,
+                           title='', rendering='link',  enabled=1,
                            cookable=True, compression='safe', cacheable=True,
                            skipCooking=False, conditionalcomment='',
                            authenticated=False):

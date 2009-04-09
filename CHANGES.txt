@@ -1,6 +1,9 @@
 1.6.0 - unreleased
 ==================
 
+* Changed default values for resources to more sensible values.
+  [hannosch]
+
 * Restructured documentation files.
   [hannosch]
 

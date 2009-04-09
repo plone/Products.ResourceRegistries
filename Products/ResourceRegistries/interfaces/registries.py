@@ -67,11 +67,11 @@ class ICSSRegistry(Interface):
                    """)
 
     def registerStylesheet(id, expression='', media='', rel='stylesheet',
-                           rendering='import', enabled=1):
+                           rendering='link', enabled=1):
         """Register a stylesheet."""
 
     def manage_addStylesheet(id, expression='', media='', rel='stylesheet',
-                             rendering='import', enabled=True , REQUEST=None):
+                             rendering='link', enabled=True , REQUEST=None):
         """Add stylesheet from a ZMI form."""
 
     def manage_removeStylesheet(id, REQUEST=None):

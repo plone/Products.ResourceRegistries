@@ -140,9 +140,9 @@ class KSSRegistryTool(BaseRegistryTool):
         for r in records:
             kss = KineticStylesheet(r.get('id'),
                                     expression=r.get('expression', ''),
-                                    enabled=r.get('enabled', False),
-                                    cookable=r.get('cookable', False),
-                                    cacheable=r.get('cacheable', False),
+                                    enabled=r.get('enabled', True),
+                                    cookable=r.get('cookable', True),
+                                    cacheable=r.get('cacheable', True),
                                     compression=r.get('compression', 'safe'),
                                     conditionalcomment=r.get('conditionalcomment',''))
             kineticstylesheets.append(kss)

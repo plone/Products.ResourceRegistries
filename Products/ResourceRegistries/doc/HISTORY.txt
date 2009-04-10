@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.5.1 - unreleased
+==================
+
+* Put CDATA start and end markers in a javascript comment. Fixes
+  http://dev.plone.org/old/plone/ticket/9128
+  [wichert]
+
+
 1.5.0 - 2009-03-01
 ==================
 

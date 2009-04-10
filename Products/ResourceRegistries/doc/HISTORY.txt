@@ -1,8 +1,8 @@
 Changelog
-=========
+---------
 
 1.5.1 - unreleased
-==================
+------------------
 
 * Put CDATA start and end markers in a javascript comment. Fixes
   http://dev.plone.org/old/plone/ticket/9128
@@ -10,7 +10,7 @@ Changelog
 
 
 1.5.0 - 2009-03-01
-==================
+------------------
 
 * Removed the uppermost Save button from the ZMI pages for registries.
   Clicking this button before the registry page has finished loading could
@@ -42,7 +42,7 @@ Changelog
   [davisagli, hannosch]
 
 1.4.3
-=====
+-----
 
 * Fixed error where non-traversable resources could be registered. This closes
   http://dev.plone.org/plone/ticket/8153
@@ -62,7 +62,7 @@ Changelog
   [hannosch]
 
 1.4.2
-=====
+-----
 
 * Properly encode the resource id. This fixes moving of resource without JS
   and removing recources which contain special chars like plus signs.
@@ -80,21 +80,21 @@ Changelog
   [mj]
 
 1.4.1
-=====
+-----
 
 * Added '/' to the strings that are filtered out in
   BaseRegistry.generateId(). This fixes #7048.
   [davconvent]
 
 1.4.0
-=====
+-----
 
 * Add support for automatic grouping mode to the GenericSetup export/import
   code.
   [wichert]
 
 1.4.0-rc1
-=========
+---------
 
 * Added a new automatic grouping mode feature. It is turned off by default.
  When enabled the resources will first be sorted into groups with the same
@@ -107,14 +107,14 @@ Changelog
  [hannosch]
 
 1.4.0-beta5
-===========
+-----------
 
 * Fixed setting of cache headers when the registry is associated with a
  RAMCache.
  [fschulze]
 
 1.4.0-beta4
-===========
+-----------
 
 * Switched back to getToolByName.
  [wichert]
@@ -126,19 +126,19 @@ Changelog
  [hannosch]
 
 1.4.0-beta3
-===========
+-----------
 
 * Replace usage of getToolByNames with getUtility.
  [wichert, hannosch]
 
 1.4.0-beta2
-===========
+-----------
 
 * Reverted fix of tests, because Zope was wrong.
  [fschulze]
 
 1.4.0-beta1
-===========
+-----------
 
 * Fixed test failures caused by changes in Zope 2.10.
  [fschulze]
@@ -147,7 +147,7 @@ Changelog
  [fschulze]
 
 1.4.0-alpha2
-============
+------------
 
 * Started to use views and viewlet managers.
  [fschulze]
@@ -156,7 +156,7 @@ Changelog
  [fschulze]
 
 1.3.8
-=====
+-----
 
 * Cook resources after GS profile import.
  [fschulze]
@@ -169,7 +169,7 @@ Changelog
  [fschulze]
 
 1.3.7
-=====
+-----
 
 * For compatibility with GenericSetup conventions, the import steps now
  support 'insert-before' and  'insert-after' as aliases for
@@ -179,7 +179,7 @@ Changelog
  [mj]
 
 1.3.6
-=====
+-----
 
 * Invalidate cache when cooking resources if the registry is assigned to a
  RAMCache or similar cache manager.
@@ -189,7 +189,7 @@ Changelog
  [fschulze]
 
 1.3.5
-=====
+-----
 
 * Fixed string protection for strings which mix single and double quotes.
  [fschulze]
@@ -207,7 +207,7 @@ Changelog
  [mj]
 
 1.3.4
-=====
+-----
 
 * Improved IE conditional compilation protection, it now works in "full"
  compression.
@@ -230,13 +230,13 @@ Changelog
  [fschulze, hannosch]
 
 1.3.3
-=====
+-----
 
 * Don't wrap None in aquisition wrapper if resource is not found.
  [tesdal]
 
 1.3.2
-=====
+-----
 
 * Made GenericSetup importer not fail on repeated imports.
  [alecm]
@@ -245,7 +245,7 @@ Changelog
  [fschulze]
 
 1.3.1
-=====
+-----
 
 * Enable use of z3 / Five resources.
  [ree]
@@ -263,44 +263,44 @@ Changelog
  [rocky]
 
 1.3
-===
+---
 
 * No changes since rc1.
 
 1.3-rc1
-=======
+-------
 
 * Add patch from jenner to handle updating and removal of resources
  from GenericSetup profiles.
  [wichert]
 
 1.3-beta2
-=========
+---------
 
 * Included fixes from the 1.2 line.
  [fschulze]
 
 1.3-beta1
-=========
+---------
 
 * Do not install default CSS and JS on upgrade, only on initial installation.
  [wichert]
 
 1.3-alpha1
-==========
+----------
 
 * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
  portal creation)
  [rafrombrc]
 
 1.2.4
-=====
+-----
 
 * Made enabled checkbox work again.
  [fschulze]
 
 1.2.3
-=====
+-----
 
 * Backported several fixes from 1.3.1:
  [fschulze]
@@ -321,13 +321,13 @@ Changelog
      [rocky]
 
 1.2.2
-=====
+-----
 
 * Added missing arguments in resource adding functions.
  [jenner, fschulze]
 
 1.2.1
-=====
+-----
 
 * Fixed traversal of security restricted resources.
  [jenner, alecm, fschulze]
@@ -343,7 +343,7 @@ Changelog
  [fschulze]
 
 1.2
-===
+---
 
 * Added compression for CSS and Javascript resources.
  [fschulze]
@@ -356,7 +356,7 @@ Changelog
  [elvix]
 
 1.1
-===
+---
 
 * Fixed cooking of resources to ensure that uncookable resources are not merged.
  [elro]
@@ -368,7 +368,7 @@ Changelog
  [elro]
 
 1.1b1
-=====
+-----
 
 * Added checkbox to configure cacheability of resources.
  [fschulze]
@@ -385,19 +385,19 @@ Changelog
  [elro]
 
 1.0.5
-=====
+-----
 
 * Fixed encoding of javascripts.
  [fschulze]
 
 1.0.4
-=====
+-----
 
 * Fixed reordering of resources with javascript.
  [fschulze]
 
 1.0.3
-=====
+-----
 
 * Fixed typo in the migration external method which lead to portal_javascripts
  not being migrated.
@@ -407,14 +407,14 @@ Changelog
  [limi]
 
 1.0.2
-=====
+-----
 
 * Fix for bug #4392, where merging FSfiles could mess up http-status headers
  and cause weird hanging in browsers.
  [plonista][fschulze][elvix] 
 
 1.0.1
-=====
+-----
 
 * Don't filter resources in merged overview in ZMI.
  [fschulze]
@@ -426,7 +426,7 @@ Changelog
  [alecm]
 
 1.0
-===
+---
 
 * Moved directory with skin layer for Plone 2.0.5 compatibility to product
  root, so it doesn't interfere with Plone 2.1. The version check on install
@@ -443,7 +443,7 @@ Changelog
  [fschulze]
 
 0.95
-====
+----
 
 * Added getResource function. This allows to change properties of each
  resource. After that, a call to cookResources is needed.
@@ -476,7 +476,7 @@ Changelog
  [dom]
 
 0.9
-===
+---
 
 * Fixed function of enabled checkbox when adding css/javascript from ZMI.
  Added title field to the 'add stylesheet' part in the ZMI.
@@ -556,7 +556,7 @@ Changelog
 
 
 0.8
-===
+---
 
 * Renamed to ResourceRegistries instead of the historical and wrong
  CSSRegistry.
@@ -578,7 +578,7 @@ Changelog
 
 
 0.7
-===
+---
 
 * Added to Plone 2.1 migrations, added installation of the default
  Plone javascripts and stylesheets.
@@ -600,7 +600,7 @@ Changelog
 
 
 0.6 and earlier
-===============
+---------------
 
 * Added a simple readme with basic documentation.
  [elvix]
@@ -619,7 +619,7 @@ Changelog
 
 
 Snowsprint 2005
-===============
+---------------
 
 * Designed and built first version of the CSSregistry.
  [HammerToe] [elvix]

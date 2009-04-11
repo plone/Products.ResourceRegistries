@@ -5,7 +5,7 @@ Changelog
 ------------------
 
 * Put CDATA start and end markers in a javascript comment. Fixes
-  http://dev.plone.org/old/plone/ticket/9128
+  http://dev.plone.org/plone/ticket/9128
   [wichert]
 
 

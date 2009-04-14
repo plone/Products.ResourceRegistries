@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.5.1 - unreleased
+1.5.1 - 2009-04-14
 ------------------
 
 * Put CDATA start and end markers in a javascript comment. Fixes

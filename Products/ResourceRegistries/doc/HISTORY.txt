@@ -4,6 +4,10 @@ Changelog
 1.5.2 - Unreleased
 ------------------
 
+* Fixed error with the conditional comment being lost when adding a new
+  Resource when adding a new entry to the JS or CSS registries.
+  [dunlapm]
+
 * Fixed error with GS Export/Import. Fixes 
   http://dev.plone.org/plone/ticket/9154
   [dunlapm]
@@ -105,170 +109,170 @@ Changelog
 ---------
 
 * Added a new automatic grouping mode feature. It is turned off by default.
- When enabled the resources will first be sorted into groups with the same
- merging-relevant settings and after that merged. In the groups the order of
- the resources in the registries will be preserved.
- [hannosch]
+  When enabled the resources will first be sorted into groups with the same
+  merging-relevant settings and after that merged. In the groups the order of
+  the resources in the registries will be preserved.
+  [hannosch]
 
 * Changed the exportimport handlers to only cook the resources once at the end
- and not after each new resource has been added.
- [hannosch]
+  and not after each new resource has been added.
+  [hannosch]
 
 1.4.0-beta5
 -----------
 
 * Fixed setting of cache headers when the registry is associated with a
- RAMCache.
- [fschulze]
+  RAMCache.
+  [fschulze]
 
 1.4.0-beta4
 -----------
 
 * Switched back to getToolByName.
- [wichert]
+  [wichert]
 
 * Added portal_kss as registry for kss files.
- [fschulze]
+  [fschulze]
 
 * Slightly optimized the viewlet manager templates.
- [hannosch]
+  [hannosch]
 
 1.4.0-beta3
 -----------
 
 * Replace usage of getToolByNames with getUtility.
- [wichert, hannosch]
+  [wichert, hannosch]
 
 1.4.0-beta2
 -----------
 
 * Reverted fix of tests, because Zope was wrong.
- [fschulze]
+  [fschulze]
 
 1.4.0-beta1
 -----------
 
 * Fixed test failures caused by changes in Zope 2.10.
- [fschulze]
+  [fschulze]
 
 * Ported bugfixes from 1.3 line.
- [fschulze]
+  [fschulze]
 
 1.4.0-alpha2
 ------------
 
 * Started to use views and viewlet managers.
- [fschulze]
+  [fschulze]
 
 * Removed compatibility stuff for Plone version lower than 3.0.
- [fschulze]
+  [fschulze]
 
 1.3.8
 -----
 
 * Cook resources after GS profile import.
- [fschulze]
+  [fschulze]
 
 * Added missing enabled property handling to updateScript.
- [fschulze]
+  [fschulze]
 
 * Fixed typo which prevented position-after/insert-after in GS profiles to
- work.
- [fschulze]
+  work.
+  [fschulze]
 
 1.3.7
 -----
 
 * For compatibility with GenericSetup conventions, the import steps now
- support 'insert-before' and  'insert-after' as aliases for
- 'position-before' and 'position-after', while 'insert-top' and
- 'insert-bottom' are aliases for 'position-top' and 'position-bottom',
- respectively.
- [mj]
+  support 'insert-before' and  'insert-after' as aliases for
+  'position-before' and 'position-after', while 'insert-top' and
+  'insert-bottom' are aliases for 'position-top' and 'position-bottom',
+  respectively.
+  [mj]
 
 1.3.6
 -----
 
 * Invalidate cache when cooking resources if the registry is assigned to a
- RAMCache or similar cache manager.
+  RAMCache or similar cache manager.
 
 * Fixed string replacement during packing when several resources got packed
- in different threads at once, which resulted in exchanged strings.
- [fschulze]
+  in different threads at once, which resulted in exchanged strings.
+  [fschulze]
 
 1.3.5
 -----
 
 * Fixed string protection for strings which mix single and double quotes.
- [fschulze]
+  [fschulze]
 
 * Made packer.py usable as a standalone commandline tool.
- [fschulze]
+  [fschulze]
 
 * Fixed several issues in 'full' compression.
- [fschulze]
+  [fschulze]
  
 * Extended the GenericSetup import step to support positioning of resources:
- the 'position-before' and 'position-after' attributes cause the resource
- to be positioned before or after resource named in the attribute. 
- 'position-top' and 'position-bottom' move a resource to the top or bottom.
- [mj]
+  the 'position-before' and 'position-after' attributes cause the resource
+  to be positioned before or after resource named in the attribute. 
+  'position-top' and 'position-bottom' move a resource to the top or bottom.
+  [mj]
 
 1.3.4
 -----
 
 * Improved IE conditional compilation protection, it now works in "full"
- compression.
- [fschulze]
+  compression.
+  [fschulze]
 
 * Improved regular expression for strings.
- [fschulze]
+  [fschulze]
 
 * Fixed order of oneline and multiline comment removal in javascript packer.
- [fschulze]
+  [fschulze]
 
 * Fixed validation warning about multiple comments when rendering resources
- inline.
- [fschulze]
+  inline.
+  [fschulze]
 
 * Made css "full" packing more aggressive.
- [fschulze]
+  [fschulze]
 
 * Cleaned up testing framework and made all tests run properly.
- [fschulze, hannosch]
+  [fschulze, hannosch]
 
 1.3.3
 -----
 
 * Don't wrap None in aquisition wrapper if resource is not found.
- [tesdal]
+  [tesdal]
 
 1.3.2
 -----
 
 * Made GenericSetup importer not fail on repeated imports.
- [alecm]
+  [alecm]
 
 * Made enabled checkbox work again.
- [fschulze]
+  [fschulze]
 
 1.3.1
 -----
 
 * Enable use of z3 / Five resources.
- [ree]
+  [ree]
 
 * Mark missing or unaccessible ressources in management screens.
- [fschulze]
+  [fschulze]
 
 * Moved 'enabled' checkbox into legend before 'id' textbox.
- [fschulze]
+  [fschulze]
 
 * Don't remove conditional compile instructions for IE from javascripts.
- [fschulze]
+  [fschulze]
 
 * Fixed error when content is unicode.
- [rocky]
+  [rocky]
 
 1.3
 ---
@@ -279,39 +283,39 @@ Changelog
 -------
 
 * Add patch from jenner to handle updating and removal of resources
- from GenericSetup profiles.
- [wichert]
+  from GenericSetup profiles.
+  [wichert]
 
 1.3-beta2
 ---------
 
 * Included fixes from the 1.2 line.
- [fschulze]
+  [fschulze]
 
 1.3-beta1
 ---------
 
 * Do not install default CSS and JS on upgrade, only on initial installation.
- [wichert]
+  [wichert]
 
 1.3-alpha1
 ----------
 
 * Added GenericSetup import/export handlers (to support GS-based Plone 2.5 
- portal creation)
- [rafrombrc]
+  portal creation)
+  [rafrombrc]
 
 1.2.4
 -----
 
 * Made enabled checkbox work again.
- [fschulze]
+  [fschulze]
 
 1.2.3
 -----
 
 * Backported several fixes from 1.3.1:
- [fschulze]
+  [fschulze]
 
    - Enable use of z3 / Five resources.
      [ree]
@@ -332,302 +336,302 @@ Changelog
 -----
 
 * Added missing arguments in resource adding functions.
- [jenner, fschulze]
+  [jenner, fschulze]
 
 1.2.1
 -----
 
 * Fixed traversal of security restricted resources.
- [jenner, alecm, fschulze]
+  [jenner, alecm, fschulze]
 
 * Added javascript "full" compression, which achieves higher compression ratios
- by doing variable name packing based on the rules from Dean Edwards packer:
- http://dean.edwards.name/packer/usage/
- [fschulze]
+  by doing variable name packing based on the rules from Dean Edwards packer:
+  http://dean.edwards.name/packer/usage/
+  [fschulze]
 
 * Added keyword encoding for javascript. This greatly reduces the file size of
- javascript files, but adds a small performance hit on the client for the
- decoding.
- [fschulze]
+  javascript files, but adds a small performance hit on the client for the
+  decoding.
+  [fschulze]
 
 1.2
 ---
 
 * Added compression for CSS and Javascript resources.
- [fschulze]
+  [fschulze]
 
 * Added better labels and a short explanation to the debugmode-checkbox in the forms. 
- [elvix]
+  [elvix]
 
 * Renamed 'TAL condition' to 'Condition' in the forms, as it has nothing to do with 
- TAL at all (it is a CMF/TALES expression) It should include a link to CMF Expressions help
- [elvix]
+  TAL at all (it is a CMF/TALES expression) It should include a link to CMF Expressions help
+  [elvix]
 
 1.1
 ---
 
 * Fixed cooking of resources to ensure that uncookable resources are not merged.
- [elro]
+  [elro]
 
 * Fixed tests for unauthorized to accept a 401 as an unauthorized error.
- [elro]
+  [elro]
 
 * Fixed setDebugMode to recook resources after being changed.
- [elro]
+  [elro]
 
 1.1b1
 -----
 
 * Added checkbox to configure cacheability of resources.
- [fschulze]
+  [fschulze]
 
 * Made registries cacheable. This is most useful with the RAMCacheManager.
- Just associate portal_css and portal_javascripts with the RAMCache.
- [fschulze]
+  Just associate portal_css and portal_javascripts with the RAMCache.
+  [fschulze]
 
 * Apply magic id to all resources when not in debug mode, so invalidation
- works.
- [fschulze]
+  works.
+  [fschulze]
 
 * Made skin aware. This now depends on getCurrentSkinName added in  CMF 1.5.5.
- [elro]
+  [elro]
 
 1.0.5
 -----
 
 * Fixed encoding of javascripts.
- [fschulze]
+  [fschulze]
 
 1.0.4
 -----
 
 * Fixed reordering of resources with javascript.
- [fschulze]
+  [fschulze]
 
 1.0.3
 -----
 
 * Fixed typo in the migration external method which lead to portal_javascripts
- not being migrated.
- [fschulze]
+  not being migrated.
+  [fschulze]
 
 * Small fixes to UI.
- [limi]
+  [limi]
 
 1.0.2
 -----
 
 * Fix for bug #4392, where merging FSfiles could mess up http-status headers
- and cause weird hanging in browsers.
- [plonista][fschulze][elvix] 
+  and cause weird hanging in browsers.
+  [plonista][fschulze][elvix] 
 
 1.0.1
 -----
 
 * Don't filter resources in merged overview in ZMI.
- [fschulze]
+  [fschulze]
 
 * Improved management UI.
- [limi, fschulze]
+  [limi, fschulze]
 
 * Fixed reinstall bug due to improper resource id lookup.
- [alecm]
+  [alecm]
 
 1.0
 ---
 
 * Moved directory with skin layer for Plone 2.0.5 compatibility to product
- root, so it doesn't interfere with Plone 2.1. The version check on install
- time didn't seem to be enough.
- [fschulze]
+  root, so it doesn't interfere with Plone 2.1. The version check on install
+  time didn't seem to be enough.
+  [fschulze]
 
 * getTitle and getMedia will return None now if they are empty, this removes
- empty title and media attributes from the generated HTML.
+  empty title and media attributes from the generated HTML.
 
 * Fixed reordering of resources in ZMI when javascript is enabled.
- [fschulze, jenner]
+  [fschulze, jenner]
 
 * Fixed submitting changes in ZMI for stylesheets on IE.
- [fschulze]
+  [fschulze]
 
 0.95
 ----
 
 * Added getResource function. This allows to change properties of each
- resource. After that, a call to cookResources is needed.
- [fschulze]
+  resource. After that, a call to cookResources is needed.
+  [fschulze]
 
 * Added getResourceIds function.
- [fschulze]
+  [fschulze]
 
 * Added test for context dependancy to inline css rendering.
- [dom]
+  [dom]
 
 * Now uses restrictedTraverse() rather than getattr() for returning resources,
- to provide support for resources held within the ZODB.
- [dom]
+  to provide support for resources held within the ZODB.
+  [dom]
 
 * Added a "is merging allowed?" option ("cookable" property) to determine where
- a resource can be merged (default True). This was added because objects in
- the ZODB may have variable permissions but be merged together. Whilst the
- objects are checked at each REQUEST, a new REQUEST won't actually be made
- each time because of the cache headers set on merged resources. If this
- worries you, the simplest solution is not to merge such resources, hence this
- option.
- [dom]
+  a resource can be merged (default True). This was added because objects in
+  the ZODB may have variable permissions but be merged together. Whilst the
+  objects are checked at each REQUEST, a new REQUEST won't actually be made
+  each time because of the cache headers set on merged resources. If this
+  worries you, the simplest solution is not to merge such resources, hence this
+  option.
+  [dom]
 
 * Added renameResource function with tests.
- [fschulze]
+  [fschulze]
 
 * In Plone 2.1 plone_javascripts.js was removed, fixed tests by using
- jstest.js from our own skin.
- [dom]
+  jstest.js from our own skin.
+  [dom]
 
 0.9
 ---
 
 * Fixed function of enabled checkbox when adding css/javascript from ZMI.
- Added title field to the 'add stylesheet' part in the ZMI.
- [fschulze]
+  Added title field to the 'add stylesheet' part in the ZMI.
+  [fschulze]
 
 * Added migration script for old instances. Just create a external method with
- id 'migrate_resourceregistries', Module Name 'ResourceRegistries.migrate' and
- Function Name 'migrate' and click on the 'Test' tab.
- [fschulze]
+  id 'migrate_resourceregistries', Module Name 'ResourceRegistries.migrate' and
+  Function Name 'migrate' and click on the 'Test' tab.
+  [fschulze]
 
 * Cleaned up imports and whitespaces. Code standardization and small
- improvements. Fixed ZMI templates XHTML markup.
- [deo]
+  improvements. Fixed ZMI templates XHTML markup.
+  [deo]
 
 * Refactored the two registries to use one common base class.
- [fschulze]
+  [fschulze]
 
 * Refactored moving functions, so we have more possibilities. The API reflects
- the IOrderedContainer one.
- [fschulze]
+  the IOrderedContainer one.
+  [fschulze]
 
 * Fix order of javascripts, the topmost in the management screen also needs
- to be the topmost in the resulting source.
- [fschulze]
+  to be the topmost in the resulting source.
+  [fschulze]
 
 * Added debugmode where scripts are not concatenated. This will let things
- like the javascript console point to the right line-number. And makes it
- easier to develop, because there is no caching of the scripts.
- [fschulze]
+  like the javascript console point to the right line-number. And makes it
+  easier to develop, because there is no caching of the scripts.
+  [fschulze]
 
 * Fixed cooking of stylesheets so that composite stylesheets get correct
- media settings. Thanks a lot to Denis Mishunoff[spliter] for discovery,
- investigation and suggested fix
- [elvix]
+  media settings. Thanks a lot to Denis Mishunoff[spliter] for discovery,
+  investigation and suggested fix
+  [elvix]
 
 * Fixed some security declarations.
- [fschulze]
+  [fschulze]
 
 * Made moving of stylesheets and javascripts in ZMI possible without javascript
- being enabled in the browser.
- [fschulze]
+  being enabled in the browser.
+  [fschulze]
 
 * Moved 2.0.5 header.pt to skins/ResourceRegistries_20compatibility and
- remove ResourceRegistries_20compatibility when Plone != 2.0.x
- [fschulze]
+  remove ResourceRegistries_20compatibility when Plone != 2.0.x
+  [fschulze]
 
 * Check existance of stylesheets and javascripts before registering. This
- fixes reinstallation.
- [fschulze]
+  fixes reinstallation.
+  [fschulze]
 
 * Removed duplicate getScripts function definition in tools/JSRegistry.py
- [fschulze]
+  [fschulze]
 
 * Fixed JSRegistry for Plone < 2.1 where plone_utils.getSiteEncoding is not
- available.
- [fschulze]
+  available.
+  [fschulze]
 
 * Renamed config.TOOLNAME to config.CSSTOOLNAME
- and config.TOOLTYPE to config.CSSTOOLTYPE
- [batlogg]
+  and config.TOOLTYPE to config.CSSTOOLTYPE
+  [batlogg]
 
 * Added tests for attributes on stylesheets. About time.
- [elvix]
+  [elvix]
 
 * Added title for alternate stylesheets.
- [fschulze]
+  [fschulze]
 
 * Removing superflous skins directories.
- [elvix]
+  [elvix]
 
 * Added new debugmode where stylesheets are not concatenated. This will let
- things like the DOM inspector in Mozilla point to the right line-number.
- [ldr] [elvix]
+  things like the DOM inspector in Mozilla point to the right line-number.
+  [ldr] [elvix]
 
 * Added bugfix for handling disabled items when cooking stylesheets.
- [fschulze]
+  [fschulze]
 
 
 0.8
 ---
 
 * Renamed to ResourceRegistries instead of the historical and wrong
- CSSRegistry.
- [elvix]
+  CSSRegistry.
+  [elvix]
 
 * Upgraded JSRegistry to have a more proper ZMI form, now with reordering
- support.
- [elvix]
+  support.
+  [elvix]
 
 * Changed the order elements are added to the JSRegistry.
- [elvix]
+  [elvix]
 
 * Added license/copyright notice to composite files (neccesary for including
- for third party stuff).
- [elvix]
+  for third party stuff).
+  [elvix]
 
 * Bugfix fixing ZMI form for CSSRegistry.
- [fschulze]
+  [fschulze]
 
 
 0.7
 ---
 
 * Added to Plone 2.1 migrations, added installation of the default
- Plone javascripts and stylesheets.
- [elvix]
+  Plone javascripts and stylesheets.
+  [elvix]
 
 * Make sure we intercept all requests for objects, even those already
- present in the acquisition chain. Override __bobo_traverse__.
- [elvix]
+  present in the acquisition chain. Override __bobo_traverse__.
+  [elvix]
 
 * Handle cache settings in http headers for served files.
- [elvix]
+  [elvix]
 
 * Handle http headers for inline scripts and stylesheets.
- [elvix]
+  [elvix]
 
 * Use explicit </script> tag since these pages are being served as
- text/html. Both IE and firefox will have problems otherwise.
- [bmh]
+  text/html. Both IE and firefox will have problems otherwise.
+  [bmh]
 
 
 0.6 and earlier
 ---------------
 
 * Added a simple readme with basic documentation.
- [elvix]
+  [elvix]
 
 * Started HISTORY.txt (somewhat late perhaps, but better than never).
- [elvix]
+  [elvix]
 
 * Cleaned up forms. Better alignment.
- [elvix]
+  [elvix]
 
 * Separate JSRegistry and CSSRegistry to two tools.
- [elvix]
+  [elvix]
 
 * Lots of changes, numerous fixes.
- [elvix]
+  [elvix]
 
 
 Snowsprint 2005
 ---------------
 
 * Designed and built first version of the CSSregistry.
- [HammerToe] [elvix]
+  [HammerToe] [elvix]

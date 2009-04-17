@@ -206,6 +206,7 @@ class CSSRegistryTool(BaseRegistryTool):
                              enabled=False, cookable=True, compression='safe',
                              cacheable=True, REQUEST=None, conditionalcomment=''):
         """Register a stylesheet from a TTW request."""
+
         self.registerStylesheet(id, expression, media, rel, title,
                                 rendering, enabled, cookable, compression,
                                 cacheable, conditionalcomment)
@@ -259,7 +260,7 @@ class CSSRegistryTool(BaseRegistryTool):
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1,
                            cookable=True, compression='safe', cacheable=True,
-                           skipCooking=False, conditionalcomment=''):
+                           conditionalcomment='', skipCooking=False):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,

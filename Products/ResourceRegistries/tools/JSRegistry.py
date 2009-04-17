@@ -189,7 +189,7 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', inline=False, enabled=True,
                        cookable=True, compression='safe', cacheable=True,
-                       skipCooking=False,conditionalcomment=''):
+                       conditionalcomment='', skipCooking=False):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,

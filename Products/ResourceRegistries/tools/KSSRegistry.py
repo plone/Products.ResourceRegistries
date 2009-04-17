@@ -22,7 +22,7 @@ class KineticStylesheet(Resource):
     def __init__(self, id, **kwargs):
         Resource.__init__(self, id, **kwargs)
         self._data['compression'] = kwargs.get('compression', 'safe')
-        if self._data['external']:
+        if self.isExternal:
             self._data['compression'] = 'none' #External resources are not compressable
 
     security.declarePublic('getCompression')

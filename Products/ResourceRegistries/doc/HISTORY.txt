@@ -4,6 +4,10 @@ Changelog
 1.5.2 - Unreleased
 ------------------
 
+* Fixed error with GS Export/Import. Fixes 
+  http://dev.plone.org/plone/ticket/9154
+  [dunlapm]
+
 
 1.5.1 - 2009-04-14
 ------------------

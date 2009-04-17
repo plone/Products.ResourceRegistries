@@ -26,7 +26,7 @@ class Stylesheet(Resource):
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'import')
         self._data['compression'] = kwargs.get('compression', 'safe')
-        if self._data['external']:
+        if self.isExternal:
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
                 self._data['compression'] = 'none' #we have to assume none because of the default values
                 #raise ValueError, "Compression method %s not allowed for External Resource" % (self._data['compression'],)

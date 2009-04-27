@@ -4,6 +4,10 @@ Changelog
 1.5.3 - Unreleased
 ------------------
 
+* Allow setting of debug mode in registries through Generic Setup
+  profiles. This closes http://dev.plone.org/plone/ticket/8712
+  [dunlapm]
+
 * Fixed error with inline z3resources not being able to handle a POST 
   request. This fixes http://dev.plone.org/plone/ticket/8998
   [dunlapm]

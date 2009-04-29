@@ -23,7 +23,7 @@ class JavaScript(Resource):
         Resource.__init__(self, id, **kwargs)
         self._data['inline'] = kwargs.get('inline', False)
         self._data['compression'] = kwargs.get('compression', 'safe')
-        if self._data['external']:
+        if self.isExternal:
             self._data['inline'] = False #No inline rendering for External Resources
             self._data['compression'] = 'none' #External Resources are not compressible
 
@@ -193,8 +193,8 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.ManagePortal, 'registerScript')
     def registerScript(self, id, expression='', inline=False, enabled=True,
                        cookable=True, compression='safe', cacheable=True,
-                       skipCooking=False, conditionalcomment='',
-                       authenticated=False):
+                       conditionalcomment='', authenticated=False,
+                       skipCooking=False):
         """Register a script."""
         script = JavaScript(id,
                             expression=expression,

@@ -25,7 +25,7 @@ class Stylesheet(Resource):
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'link')
         self._data['compression'] = kwargs.get('compression', 'safe')
-        if self._data['external']:
+        if self.isExternal:
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
                 self._data['compression'] = 'none' #we have to assume none because of the default values
             if self._data['rendering'] not in config.CSS_EXTERNAL_RENDER_METHODS:
@@ -259,8 +259,8 @@ class CSSRegistryTool(BaseRegistryTool):
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='link',  enabled=1,
                            cookable=True, compression='safe', cacheable=True,
-                           skipCooking=False, conditionalcomment='',
-                           authenticated=False):
+                           conditionalcomment='', authenticated=False,
+                           skipCooking=False):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,

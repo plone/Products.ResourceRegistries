@@ -36,8 +36,37 @@
 * Declare package dependencies, fixed deprecation warnings for use of
   Globals and changed error raising to be forward compatible.
   [hannosch]
+  
+1.5.3 - Unreleased
+------------------
 
-1.5.0 - unreleased
+* Allow setting of debug mode in registries through Generic Setup
+  profiles. This closes http://dev.plone.org/plone/ticket/8712
+  [dunlapm]
+
+* Fixed error with inline z3resources not being able to handle a POST
+  request. This fixes http://dev.plone.org/plone/ticket/8998
+  [dunlapm]
+
+1.5.2 - 2009-04-21
+------------------
+
+* Fixed error with the conditional comment being lost when adding a new
+  Resource when adding a new entry to the JS or CSS registries.
+  [dunlapm]
+
+* Fixed error with GS Export/Import. Fixes
+  http://dev.plone.org/plone/ticket/9154
+  [dunlapm]
+
+1.5.1 - 2009-04-14
+------------------
+
+* Put CDATA start and end markers in a javascript comment. Fixes
+  http://dev.plone.org/plone/ticket/9128
+  [wichert]
+
+1.5.0 - 2009-03-01
 ==================
 
 * Resources beginning with "http://" or "https://" are now valid and may be

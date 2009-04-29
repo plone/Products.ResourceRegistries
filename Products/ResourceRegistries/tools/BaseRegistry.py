@@ -68,7 +68,7 @@ class Resource(Persistent):
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
         self._data['conditionalcomment'] = kwargs.get('conditionalcomment','')
-        self._data['external'] = extres
+        self.isExternal = extres
         if extres:
             self._data['cacheable'] = False #External resources are NOT cacheable
             self._data['cookable'] = False #External resources are NOT mergable
@@ -165,7 +165,7 @@ class Resource(Persistent):
 
     security.declarePublic('isExternalResource')
     def isExternalResource(self):
-        return self._data.get('external',False)
+        return getattr(self, 'isExternal', False)
 
 InitializeClass(Resource)
 
@@ -603,7 +603,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         method = obj.__browser_default__(self.REQUEST)[1][0]
                     except AttributeError: # zope.app.publisher.browser.fileresource
                         method = obj.browserDefault(self.REQUEST)[1][0]
-                    method = method == 'HEAD' and 'GET' or method
+                    method = method in ('HEAD','POST') and 'GET' or method
                     content = getattr(obj, method)()
                     if not isinstance(content, unicode): 
                         contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')

@@ -1,4 +1,4 @@
-1.6.0 - unreleased
+1.7.0 - unreleased
 ==================
 
 * Changed default values for resources to more sensible values.

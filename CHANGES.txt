@@ -21,11 +21,6 @@
   viewlet.
   [hannosch]
 
-* Change the fix for #7522 made in 1.4.3. For inline resources we pass
-  Unicode down into the page templates. The TAL machinery expects to get
-  Unicode and not encoded strings.
-  [hannosch]
-
 * Added BBB imports to make sure the InitializeClass can be imported in
   Zope versions before 2.12.
   [hannosch]
@@ -36,8 +31,18 @@
 * Declare package dependencies, fixed deprecation warnings for use of
   Globals and changed error raising to be forward compatible.
   [hannosch]
-  
-1.5.3 - Unreleased
+
+
+1.5.4 - Unreleased
+------------------
+
+* Change the fix for #7522 made in 1.4.3. For inline resources we pass
+  Unicode down into the page templates. The TAL machinery expects to get
+  Unicode and not encoded strings.
+  [hannosch]
+
+
+1.5.3 - 2009-05-17
 ------------------
 
 * Allow setting of debug mode in registries through Generic Setup

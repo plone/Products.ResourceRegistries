@@ -205,6 +205,7 @@ class CSSRegistryTool(BaseRegistryTool):
                              cacheable=True, REQUEST=None,
                              conditionalcomment='', authenticated=False):
         """Register a stylesheet from a TTW request."""
+
         self.registerStylesheet(id, expression, media, rel, title,
                                 rendering, enabled, cookable, compression,
                                 cacheable, conditionalcomment, authenticated)

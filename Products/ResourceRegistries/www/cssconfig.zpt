@@ -166,12 +166,20 @@ legend {
         In automatic grouping mode, resources are first ordered into mergeable groups based on their settings and after that merged based on their position in the registry.
     </p>
 
-    <input type="submit" i18n:attributes="value" value="Save" style="float: none;" />
-
     <p>The order of the stylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
-
+    
+    <p>Defined stylesheets can exist as a browser resource, an item in a skin
+    layer, or as a complete URL. An IE-only
+    <a href="http://msdn.microsoft.com/en-us/library/ms537512.aspx">Conditional
+    Comment</a> may be specified and will be printed in the form of:
+    &lt;!--[if <em>Condition</em>]&gt;...&lt;![endif]--&gt;
+    </p>
+    
+    <p>Please use care as external resources defined without SSL may cause an
+    error to be displayed in a user's browser if they are visiting your site
+    using SSL.</p>
     
     <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="stylesheet here/getResources">
@@ -182,7 +190,7 @@ legend {
                tal:attributes="value repeat/stylesheet/index" />
 
         <legend>
-            <label class="hiddenLabel">Enabled?</label>
+            <label class="hiddenLabel" title="Enable/Disable this StyleSheet">Enabled?</label>
             <input type="checkbox" name="stylesheets.enabled:records"
                    title="Enabled?"
                    tal:attributes="checked stylesheet/getEnabled" />
@@ -220,11 +228,11 @@ legend {
                    tal:attributes="checked stylesheet/getAuthenticated | default" />
             <input type="hidden" name="stylesheets.authenticated:records:boolean:default" value="False" />
 
-            <label>Condition</label>
+            <label title="TAL Condition for inclusion">Condition</label>
             <input type="text" name="stylesheets.expression:records"
                    tal:attributes="value stylesheet/getExpression" />
 
-            <label>Conditional Comment (IE Only)</label>
+            <label title="">Conditional Comment (IE Only)</label>
             <input type="text" name="stylesheets.conditionalcomment:records"
                    tal:attributes="value stylesheet/getConditionalcomment" />
 
@@ -288,7 +296,7 @@ legend {
           <legend>Add a new stylesheet</legend>
 
           <div>
-              <label>ID</label>
+              <label for="id">ID/URL</label>
               <input type="text" name="id" size="50" />
           </div>
 
@@ -343,7 +351,7 @@ legend {
 
           <div>
               <label>Enabled?</label>
-              <input type="checkbox" name="enabled" checked="1" />
+              <input type="checkbox" name="enabled:boolean" checked="1" />
           </div>
 
           <div>

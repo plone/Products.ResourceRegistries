@@ -26,6 +26,7 @@ class ScriptsView(BrowserView):
             if inline:
                 content = registry.getInlineResource(script.getId(), context)
                 data = {'inline': inline,
+                        'conditionalcomment' : script.getConditionalcomment(),
                         'content': content}
             else:
                 if script.isExternalResource():
@@ -33,6 +34,7 @@ class ScriptsView(BrowserView):
                 else:
                     src = "%s/%s/%s" % (registry_url, skinname, script.getId())
                 data = {'inline': inline,
+                        'conditionalcomment' : script.getConditionalcomment(),
                         'src': src}
             result.append(data)
         return result

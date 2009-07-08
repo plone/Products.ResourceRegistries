@@ -14,8 +14,9 @@
 <ul tal:define="portal_url python:here.portal_url()">
     <li tal:repeat="entry python:here.getCookedResources()">
         <div>
-            <a href="" tal:define="portalHref string:${portal_url}/portal_javascripts/${entry/getId}"
-                       tal:attributes="href python:test(entry.isExternalResource(),entry.getId(),portalHref)">
+            <a href=""
+               tal:define="portalHref string:${portal_url}/portal_javascripts/${entry/getId}"
+               tal:attributes="href python:test(entry.isExternalResource(),entry.getId(),portalHref)">
                 <b tal:content="entry/getId">plone_ecmascript.js</b>
             </a>
             <tal:block tal:condition="entry/getAuthenticated | nothing">
@@ -25,6 +26,9 @@
                 <tal:block tal:condition="entry/getExpression | nothing">
                 - <span tal:replace="entry/getExpression" />
                 </tal:block>
+            </tal:block>
+            <tal:block tal:condition="entry/getConditionalcomment | nothing">
+            - <span tal:replace="string:<!--[if ${entry/getConditionalcomment}]>" />
             </tal:block>
         </div>
         <ul tal:define="scripts here/concatenatedresources">

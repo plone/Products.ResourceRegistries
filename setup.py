@@ -6,9 +6,8 @@ version = '1.7.0'
 setup(name='Products.ResourceRegistries',
       version=version,
       description="Registry for managing CSS and JS",
-      long_description="""\
-Registry for CSS and JS files which allows merging of several resources into one.
-Includes a packer for CSS and JS which can be used standalone.""",
+      long_description=open("README.txt").read() + "\n" +
+                             open("CHANGES.txt").read(),
       classifiers=[
         "Framework :: Zope2",
         "License :: OSI Approved :: GNU General Public License (GPL)",

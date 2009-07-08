@@ -109,22 +109,22 @@ Telesis in the Austrian Alps. Thanks, Jodok! :)
 Credits
 =======
 
-Florian Schulze -- Independent
+* Florian Schulze -- Independent
 
-Laurence Rowe -- Independent
+* Laurence Rowe -- Independent
 
-Geir Baekholt -- "Jarn AS":http://www.jarn.com
+* Geir Baekholt -- `Jarn AS <http://www.jarn.com>`__
 
-Matt Hamilton -- "Netsight Internet Solutions":http://www.netsight.co.uk
+* Matt Hamilton -- `Netsight Internet Solutions <http://www.netsight.co.uk>`__
 
 Jarn AS
 
-"http://www.jarn.com":http://www.jarn.com
+* http://www.jarn.com
 
-"info@jarn.com":mailto:info@jarn.com
+* info@jarn.com
 
 Netsight Internet Solutions
 
-"http://www.netsight.co.uk":http://www.netsight.co.uk/
+* http://www.netsight.co.uk
 
-"info@netsight.co.uk":mailto:info@netsight.co.uk
+* info@netsight.co.uk

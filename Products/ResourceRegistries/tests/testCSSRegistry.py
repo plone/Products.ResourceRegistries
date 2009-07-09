@@ -79,7 +79,7 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.assertEqual(self.tool.getResources()[0].getMedia(), None)
         self.assertEqual(self.tool.getResources()[0].getRel(), 'stylesheet')
         self.assertEqual(self.tool.getResources()[0].getTitle(), None)
-        self.assertEqual(self.tool.getResources()[0].getRendering(), 'import')
+        self.assertEqual(self.tool.getResources()[0].getRendering(), 'link')
         self.failUnless(self.tool.getResources()[0].getEnabled())
         
     def testExternalDefaultStylesheetAttributes(self):

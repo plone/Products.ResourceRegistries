@@ -602,7 +602,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     try:
                         method = obj.__browser_default__(self.REQUEST)[1][0]
                     except AttributeError: # zope.app.publisher.browser.fileresource
-                        method = obj.browserDefault(self.REQUEST)[1][0]
+                        method = obj.browserDefault(self.REQUEST)[0].__name__
                     method = method in ('HEAD','POST') and 'GET' or method
                     content = getattr(obj, method)()
                     if not isinstance(content, unicode): 

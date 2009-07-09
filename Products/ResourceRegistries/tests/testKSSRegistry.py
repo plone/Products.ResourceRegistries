@@ -12,7 +12,7 @@ from zope.interface.verify import verifyObject
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.utils import getToolByName
 
-from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
+from Products.PloneTestCase.PloneTestCase import portal_owner, default_password
 
 from Products.ResourceRegistries.config import KSSTOOLNAME
 from Products.ResourceRegistries.interfaces import IKSSRegistry
@@ -657,9 +657,6 @@ class TestFivePublishing(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         # Define some resource
-        from Products.Five.zcml import load_config
-        import Products.ResourceRegistries.tests
-        load_config('test.zcml', Products.ResourceRegistries.tests)
         self.tool = getattr(self.portal, KSSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('++resource++test_rr_1.kss')

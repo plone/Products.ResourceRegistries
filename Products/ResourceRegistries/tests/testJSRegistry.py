@@ -1,7 +1,7 @@
 #
 # JSRegistry Tests
 #
-from zope.component import getUtility, getMultiAdapter
+from zope.component import getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
@@ -12,13 +12,12 @@ from zope.interface.verify import verifyObject
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.utils import getToolByName
 
-from Products.PloneTestCase.PloneTestCase import PLONE21, portal_owner, default_password
+from Products.PloneTestCase.PloneTestCase import portal_owner, default_password
 
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
-from Products.ResourceRegistries.tools.packer import test_suite as packer_tests
 
 class TestJSImplementation(RegistryTestCase):
 
@@ -505,9 +504,6 @@ class TestFivePublishing(FunctionalRegistryTestCase):
 
     def afterSetUp(self):
         # Define some resource
-        from Products.Five.zcml import load_config
-        import Products.ResourceRegistries.tests
-        load_config('test.zcml', Products.ResourceRegistries.tests)
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerScript('++resource++test_rr_1.js')
@@ -877,9 +873,6 @@ class TestMergingDisabled(RegistryTestCase):
 class TestUnicodeAwareness(RegistryTestCase):
 
     def afterSetUp(self):
-        from Products.Five.zcml import load_config
-        import Products.ResourceRegistries.tests
-        load_config('test.zcml', Products.ResourceRegistries.tests)
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         body = "/* add a comment with unicode\n   \xc3\x9bercool! */\nwindow.alert('running')\n"

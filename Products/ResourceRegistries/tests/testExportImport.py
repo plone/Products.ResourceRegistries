@@ -6,9 +6,6 @@ class TestExportImport(RegistryTestCase):
     def test_removing(self):
         # Test that you can tell the resource registries to remove a
         # resource (a javascript here) using xml.
-        from Products.Five.zcml import load_config
-        import Products.ResourceRegistries.tests
-        load_config('test.zcml', Products.ResourceRegistries.tests)
         tool = self.portal.portal_setup
         profile_id = 'profile-Products.ResourceRegistries.tests:test'
         # The next line used to throw an UnboundLocalError:

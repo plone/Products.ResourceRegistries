@@ -1,7 +1,12 @@
 <configure xmlns="http://namespaces.zope.org/zope"
        xmlns:browser="http://namespaces.zope.org/browser"
        xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+       xmlns:cmf="http://namespaces.zope.org/cmf"
        i18n_domain="ResourceRegistries.tests">
+
+  <cmf:registerDirectory
+      name="ResourceRegistries"
+      />
 
   <browser:resource
       name="test_rr_1.css"

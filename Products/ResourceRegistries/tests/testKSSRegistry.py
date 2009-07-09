@@ -240,6 +240,7 @@ class TestKineticStylesheetCooking(RegistryTestCase):
     def testGetEvaluatedKineticStylesheetsWithFailingExpression(self):
         self.tool.registerKineticStylesheet('ham')
         self.tool.registerKineticStylesheet('spam', expression='python:0')
+        import pdb; pdb.set_trace( )
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
         self.tool.setAutoGroupingMode(True)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)

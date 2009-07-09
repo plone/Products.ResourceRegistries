@@ -4,6 +4,9 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Added missing InitializeClass call for BaseRegistryTool.
+  [davisagli]
+
 * Changed default values for resources to more sensible values.
   [hannosch]
 

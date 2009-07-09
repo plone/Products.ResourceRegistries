@@ -865,3 +865,4 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """
         return 'text/plain'
 
+InitializeClass(BaseRegistryTool)

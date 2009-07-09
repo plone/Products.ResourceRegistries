@@ -72,7 +72,8 @@ class KSSRegistryTool(BaseRegistryTool):
         },
     ) + BaseRegistryTool.manage_options
 
-    attributes_to_compare = ('getExpression', 'getCookable', 'getCacheable',
+    attributes_to_compare = ('getAuthenticated', 'getExpression',
+                             'getCookable', 'getCacheable',
                              'getConditionalcomment')
     filename_base = 'ploneStyles'
     filename_appendix = '.kss'
@@ -115,11 +116,12 @@ class KSSRegistryTool(BaseRegistryTool):
     def manage_addKineticStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
                              enabled=False, cookable=True, compression='safe',
-                             cacheable=True, conditionalcomment='', REQUEST=None):
+                             cacheable=True, conditionalcomment='', authenticated=False,
+                             REQUEST=None):
         """Register a kineticstylesheet from a TTW request."""
         self.registerKineticStylesheet(id, expression, enabled,
                                        cookable, compression, cacheable,
-                                       conditionalcomment)
+                                       conditionalcomment, authenticated)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -144,7 +146,8 @@ class KSSRegistryTool(BaseRegistryTool):
                                     cookable=r.get('cookable', True),
                                     cacheable=r.get('cacheable', True),
                                     compression=r.get('compression', 'safe'),
-                                    conditionalcomment=r.get('conditionalcomment',''))
+                                    conditionalcomment=r.get('conditionalcomment',''),
+                                    authenticated=r.get('authenticated', ''))
             kineticstylesheets.append(kss)
         self.resources = tuple(kineticstylesheets)
         self.cookResources()
@@ -166,7 +169,7 @@ class KSSRegistryTool(BaseRegistryTool):
     def registerKineticStylesheet(self, id, expression='', enabled=1,
                                   cookable=True, compression='safe',
                                   cacheable=True, conditionalcomment='',
-                                  skipCooking=False):
+                                  authenticated=False, skipCooking=False):
         """Register a kineticstylesheet."""
         kineticstylesheet = KineticStylesheet(id,
                                 expression=expression,
@@ -174,7 +177,8 @@ class KSSRegistryTool(BaseRegistryTool):
                                 cookable=cookable,
                                 compression=compression,
                                 cacheable=cacheable,
-                                conditionalcomment=conditionalcomment)
+                                conditionalcomment=conditionalcomment,
+                                authenticated=authenticated)
         self.storeResource(kineticstylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateKineticStylesheet')
@@ -185,6 +189,8 @@ class KSSRegistryTool(BaseRegistryTool):
         
         if data.get('expression', None) is not None:
             kineticstylesheet.setExpression(data['expression'])
+        if data.get('authenticated', None) is not None:
+            kineticstylesheet.setExpression(data['authenticated'])
         if data.get('enabled', None) is not None:
             kineticstylesheet.setEnabled(data['enabled'])
         if data.get('cookable', None) is not None:

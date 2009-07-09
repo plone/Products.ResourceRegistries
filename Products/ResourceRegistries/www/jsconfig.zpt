@@ -219,7 +219,7 @@ legend {
         </legend>
 
         <div class="scriptform">
-            <label>Restrict to authenticated users?</label>
+            <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
             <input type="checkbox" name="scripts.authenticated:records:boolean"
                    tal:attributes="checked script/getAuthenticated | default" />
             <input type="hidden" name="scripts.authenticated:records:boolean:default" value="False" />
@@ -285,7 +285,7 @@ legend {
         </div>
 
         <div>
-            <label>Restrict to authenticated users?</label>
+            <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
             <input type="checkbox" name="authenticated" value="0" />
         </div>
 

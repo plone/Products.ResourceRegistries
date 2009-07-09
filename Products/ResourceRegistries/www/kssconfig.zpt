@@ -215,6 +215,11 @@ legend {
         </legend>
         
         <div class="kineticstylesheetform">
+            <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
+            <input type="checkbox" name="stylesheets.authenticated:records:boolean"
+                   tal:attributes="checked stylesheet/getAuthenticated | default" />
+            <input type="hidden" name="stylesheets.authenticated:records:boolean:default" value="False" />
+        
             <label>Condition</label>
             <input type="text" name="kineticstylesheets.expression:records"
                    tal:attributes="value kineticstylesheet/getExpression" />
@@ -269,6 +274,11 @@ legend {
           <div>
               <label>Condition</label>
               <input type="text" name="expression" size="50" />
+          </div>
+          
+          <div>
+              <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
+              <input type="checkbox" name="authenticated" value="0" />
           </div>
 
           <div>

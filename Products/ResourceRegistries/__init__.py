@@ -1,10 +1,7 @@
 from Products.CMFCore.utils import ToolInit
-from Products.CMFCore.DirectoryView import registerDirectory
 
 from Products.ResourceRegistries.tools import CSSRegistry, KSSRegistry, JSRegistry
 from Products.ResourceRegistries import config
-
-registerDirectory(config.SKINS_DIR, config.GLOBALS)
 
 def initialize(context):
 

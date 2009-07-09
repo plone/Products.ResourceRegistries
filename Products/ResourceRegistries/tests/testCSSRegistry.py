@@ -363,7 +363,7 @@ class TestStylesheetCooking(RegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
         viewletmanager.update()
         all = viewletmanager.render()
-        self.assertTrue(all.index('<!--[if IE7]>') < all.index('<style') < all.index('<![endif]-->'))
+        self.assertTrue(all.index('<!--[if IE7]>') < all.index('<link') < all.index('<![endif]-->'))
 
     def testDifferentMediaAreCollapsed(self):
         self.tool.registerStylesheet('test_rr_1.css', media='print')

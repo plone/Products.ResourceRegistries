@@ -20,14 +20,33 @@ from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
 
-class TestImplementation(RegistryTestCase):
+class KSSRegistryTestCase(RegistryTestCase):
+
+    def afterSetUp(self):
+        tool = getattr(self.portal, KSSTOOLNAME, None)
+        if tool is None:
+            from Products.ResourceRegistries.tools import KSSRegistry
+            kss = KSSRegistry.KSSRegistryTool()
+            self.portal[KSSTOOLNAME] = kss
+        self.tool = getattr(self.portal, KSSTOOLNAME)
+
+
+class FunctionalKSSRegistryTestCase(
+        KSSRegistryTestCase,
+        FunctionalRegistryTestCase
+    ):
+    pass
+
+
+class TestImplementation(KSSRegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, KSSTOOLNAME)
         self.failUnless(IKSSRegistry.providedBy(tool))
         self.failUnless(verifyObject(IKSSRegistry, tool))
 
-class TestTool(RegistryTestCase):
+
+class TestTool(KSSRegistryTestCase):
 
     def testToolExists(self):
         self.failUnless(KSSTOOLNAME in self.portal.objectIds())
@@ -39,22 +58,19 @@ class TestTool(RegistryTestCase):
         self.failUnless(tool.manage_kssComposition())
 
 
-class testZMIMethods(RegistryTestCase):
-
-    def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
-        self.tool.clearResources()
+class testZMIMethods(KSSRegistryTestCase):
 
     def testAdd(self):
+        self.tool.clearResources()
         self.tool.manage_addKineticStylesheet(id='joe')
         self.assertEqual(len(self.tool.getResources()), 1)
         self.failUnless(self.tool.getResources())
 
 
-class TestKineticStylesheetRegistration(RegistryTestCase):
+class TestKineticStylesheetRegistration(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
 
     def testStoringKineticStylesheet(self):
@@ -97,10 +113,10 @@ class TestKineticStylesheetRegistration(RegistryTestCase):
         self.assertEqual(self.tool.getResourcesDict()['ham'].getId(), 'ham')
 
 
-class TestKineticStylesheetRenaming(RegistryTestCase):
+class TestKineticStylesheetRenaming(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
 
     def testRenaming(self):
@@ -129,13 +145,10 @@ class TestKineticStylesheetRenaming(RegistryTestCase):
         self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'bacon')
 
 
-class TestToolSecurity(RegistryTestCase):
-
-    def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
-        self.tool.clearResources()
+class TestToolSecurity(KSSRegistryTestCase):
 
     def testRegistrationSecurity(self):
+        self.tool.clearResources()
         self.assertRaises(Unauthorized, self.tool.restrictedTraverse,
                           'registerKineticStylesheet')
         self.assertRaises(Unauthorized, self.tool.restrictedTraverse,
@@ -148,10 +161,10 @@ class TestToolSecurity(RegistryTestCase):
             self.fail()
 
 
-class TestToolExpression(RegistryTestCase):
+class TestToolExpression(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
 
     def testSimplestExpression(self):
@@ -175,10 +188,10 @@ class TestToolExpression(RegistryTestCase):
             Expression('python:"eggs" in object.objectIds()'), context))
 
 
-class TestKineticStylesheetCooking(RegistryTestCase):
+class TestKineticStylesheetCooking(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
 
     def testKineticStylesheetCooking(self):
@@ -290,10 +303,10 @@ class TestKineticStylesheetCooking(RegistryTestCase):
         self.failUnless(results[2] == 'eggs')
 
 
-class TestKineticStylesheetMoving(RegistryTestCase):
+class TestKineticStylesheetMoving(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
 
     def testKineticStylesheetMoveDown(self):
@@ -407,10 +420,10 @@ class TestKineticStylesheetMoving(RegistryTestCase):
                          ('bacon', 'spam', 'eggs', 'ham'))
 
 
-class TestTraversal(RegistryTestCase):
+class TestTraversal(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('test_rr_1.kss')
 
@@ -441,10 +454,10 @@ class TestTraversal(RegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicId))
 
 
-class TestZODBTraversal(RegistryTestCase):
+class TestZODBTraversal(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
@@ -494,10 +507,10 @@ class TestZODBTraversal(RegistryTestCase):
         self.failUnless('blue' in content)
 
 
-class TestMergingDisabled(RegistryTestCase):
+class TestMergingDisabled(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('testroot.kss')
         self.tool.registerKineticStylesheet('test_rr_1.kss')
@@ -625,10 +638,10 @@ class TestMergingDisabled(RegistryTestCase):
         content = str(self.portal.restrictedTraverse('portal_kss/test_rr_2.kss'))
         self.failUnless('blue' in content)
 
-class TestPublishing(FunctionalRegistryTestCase):
+class TestPublishing(FunctionalKSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('plone_styles.kss')
         self.toolpath = '/' + self.tool.absolute_url(1)
@@ -652,12 +665,12 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
 
 
-class TestFivePublishing(FunctionalRegistryTestCase):
+class TestFivePublishing(FunctionalKSSRegistryTestCase):
     'Publishing with Five'
 
     def afterSetUp(self):
         # Define some resource
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('++resource++test_rr_1.kss')
         self.toolpath = '/' + self.tool.absolute_url(1)
@@ -673,10 +686,10 @@ class TestFivePublishing(FunctionalRegistryTestCase):
         self.assertEqual('body { background-color : red }' in response.getBody(), True)
 
 
-class TestResourcePermissions(FunctionalRegistryTestCase):
+class TestResourcePermissions(FunctionalKSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.toolpath = '/' + self.tool.absolute_url(1)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('testroot.kss', cookable=False)
@@ -757,10 +770,10 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
         response = self.publish(self.toolpath + '/testroot.kss', basic=authstr)
         self.failUnlessEqual(response.getStatus(), 200)
 
-class TestDebugMode(FunctionalRegistryTestCase):
+class TestDebugMode(FunctionalKSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.portalpath = '/' + getToolByName(self.portal, "portal_url")(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
@@ -794,10 +807,10 @@ class TestDebugMode(FunctionalRegistryTestCase):
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
-class TestResourceObjects(RegistryTestCase):
+class TestResourceObjects(KSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
 
     def testSetEnabled(self):
@@ -841,10 +854,10 @@ class TestResourceObjects(RegistryTestCase):
                          ['eggs'])
 
 
-class TestSkinAwareness(FunctionalRegistryTestCase):
+class TestSkinAwareness(FunctionalKSSRegistryTestCase):
 
     def afterSetUp(self):
-        self.tool = getattr(self.portal, KSSTOOLNAME)
+        KSSRegistryTestCase.afterSetUp(self)
         self.skinstool = getattr(self.portal, 'portal_skins')
         self.tool.clearResources()
         self.portalpath = '/' + getToolByName(self.portal, "portal_url")(1)

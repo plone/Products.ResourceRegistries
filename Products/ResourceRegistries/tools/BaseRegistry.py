@@ -302,7 +302,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         if name in skins:
             return Skin(name).__of__(self)
 
-        
         if REQUEST is not None and \
            self.concatenatedresources.get(name, None) is not None:
             # __bobo_traverse__ is called before the authentication has
@@ -602,7 +601,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     try:
                         method = obj.__browser_default__(self.REQUEST)[1][0]
                     except AttributeError: # zope.app.publisher.browser.fileresource
-                        method = obj.browserDefault(self.REQUEST)[0].__name__
+                        try:
+                            method = obj.browserDefault(self.REQUEST)[1][0]
+                        except AttributeError:
+                            method = obj.browserDefault(self.REQUEST)[0].__name__
                     method = method in ('HEAD','POST') and 'GET' or method
                     content = getattr(obj, method)()
                     if not isinstance(content, unicode): 

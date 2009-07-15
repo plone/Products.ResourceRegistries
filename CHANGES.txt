@@ -4,6 +4,10 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Get the tests working again under Plone 5 and make sure we handle
+  zope.app.publisher file resources correctly under repoze.zope2.
+  [hannosch]
+
 * Added missing InitializeClass call for BaseRegistryTool.
   [davisagli]
 

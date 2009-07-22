@@ -4,6 +4,10 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Automatically set the registries into development mode if Zope itself runs
+  in development mode.
+  [hannosch]
+
 * Get the tests working again under Plone 5 and make sure we handle
   zope.app.publisher file resources correctly under repoze.zope2.
   [hannosch]

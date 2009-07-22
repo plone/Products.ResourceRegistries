@@ -2,7 +2,7 @@
 <object name="portal_skins">
  <object name="ResourceRegistries" meta_type="Filesystem Directory View"
     directory="Products.ResourceRegistries.tests:skins/ResourceRegistries"/>
- <skin-path name="Plone Default">
+ <skin-path name="*">
   <layer name="ResourceRegistries" insert-after="custom"/>
  </skin-path>
 </object>

@@ -28,7 +28,7 @@
                 </tal:block>
             </tal:block>
             <tal:block tal:condition="entry/getConditionalcomment | nothing">
-            - <span tal:replace="string:<!--[if ${entry/getConditionalcomment}]>" />
+            - <span tal:replace="string:&lt;!--[if ${entry/getConditionalcomment}]&gt;" />
             </tal:block>
         </div>
         <ul tal:define="scripts here/concatenatedresources">

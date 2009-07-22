@@ -1,25 +1,26 @@
-import transaction
-from Testing import ZopeTestCase
 from Products.PloneTestCase import PloneTestCase
+from Products.PloneTestCase.PloneTestCase import FunctionalTestCase
 from Products.PloneTestCase.layer import onsetup
 from Products.Five.zcml import load_config
-
-PloneTestCase.setupPloneSite()
+from Products.Five import fiveconfigure
 
 @onsetup
-def load_zcml():
+def setupPackage():
+    fiveconfigure.debug_mode = True
     import Products.ResourceRegistries.tests
     load_config('test.zcml', Products.ResourceRegistries.tests)
-    
-    site = ZopeTestCase.app().plone
-    tool = site.portal_setup
-    profile_id = 'profile-Products.ResourceRegistries.tests:test'
-    result = tool.runImportStepFromProfile(profile_id, 'skins')
-    transaction.commit()
-load_zcml()
+    fiveconfigure.debug_mode = False
+
+setupPackage()
+
+PloneTestCase.setupPloneSite(extension_profiles=(
+    'Products.ATContentTypes:default',
+    'Products.ResourceRegistries.tests:test',
+))
+
 
 class RegistryTestCase(PloneTestCase.PloneTestCase):
     pass
 
-class FunctionalRegistryTestCase(PloneTestCase.FunctionalTestCase):
+class FunctionalRegistryTestCase(RegistryTestCase, FunctionalTestCase):
     pass

@@ -63,7 +63,7 @@ class Resource(Persistent):
         self._data['id'] = id
         expression = kwargs.get('expression', '')
         self.setExpression(expression)
-        self._data['authenticated'] = kwargs.get('authenticated', True)
+        self._data['authenticated'] = kwargs.get('authenticated', False)
         self._data['enabled'] = kwargs.get('enabled', True)
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
@@ -813,9 +813,17 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         resource_ids = list(self.getResourceIds())
         return resource_ids.index(id)
 
+    security.declareProtected(permissions.ManagePortal, 'getDevelMode')
+    def getDevelMode(self):
+        """Are we running in development mode?"""
+        import Globals
+        return bool(Globals.DevelopmentMode)
+
     security.declareProtected(permissions.ManagePortal, 'getDebugMode')
     def getDebugMode(self):
         """Is resource merging disabled?"""
+        if self.getDevelMode():
+            return True
         return self.debugmode
 
     security.declareProtected(permissions.ManagePortal, 'setDebugMode')

@@ -14,7 +14,6 @@ def setupPackage():
 setupPackage()
 
 PloneTestCase.setupPloneSite(extension_profiles=(
-    'Products.ATContentTypes:default',
     'Products.ResourceRegistries.tests:test',
 ))
 

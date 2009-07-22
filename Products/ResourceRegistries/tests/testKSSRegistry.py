@@ -201,10 +201,6 @@ class TestKineticStylesheetCooking(KSSRegistryTestCase):
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 1)
         self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getResources()), 3)
-        self.assertEqual(len(self.tool.cookedresources), 1)
-        self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
 
     def testKineticStylesheetCookingValues(self):
         self.tool.registerKineticStylesheet('ham')
@@ -234,43 +230,25 @@ class TestKineticStylesheetCooking(KSSRegistryTestCase):
         self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
         self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
-        magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-
     def testGetEvaluatedKineticStylesheetsWithExpression(self):
         self.tool.registerKineticStylesheet('ham')
         self.tool.registerKineticStylesheet('spam', expression='python:1')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
-        self.tool.setAutoGroupingMode(True)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testGetEvaluatedKineticStylesheetsWithFailingExpression(self):
         self.tool.registerKineticStylesheet('ham')
         self.tool.registerKineticStylesheet('spam', expression='python:0')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testGetEvaluatedKineticStylesheetsWithContextualExpression(self):
         self.folder.invokeFactory('Document', 'eggs')
         self.tool.registerKineticStylesheet('spam', expression='python:"eggs" in object.objectIds()')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
-        self.tool.setAutoGroupingMode(True)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testCollapsingKineticStylesheetsLookup(self):
         self.tool.registerKineticStylesheet('ham')
         self.tool.registerKineticStylesheet('spam', expression='string:ham')
         self.tool.registerKineticStylesheet('spam spam', expression='string:ham')
-        evaluated = self.tool.getEvaluatedResources(self.folder)
-        self.assertEqual(len(evaluated), 2)
-        self.tool.setAutoGroupingMode(True)
         evaluated = self.tool.getEvaluatedResources(self.folder)
         self.assertEqual(len(evaluated), 2)
 
@@ -290,12 +268,6 @@ class TestKineticStylesheetCooking(KSSRegistryTestCase):
         self.tool.registerKineticStylesheet('ham')
         self.tool.registerKineticStylesheet('spam')
         self.tool.registerKineticStylesheet('eggs')
-        evaluated = self.tool.getEvaluatedResources(self.folder)
-        results = self.tool.concatenatedresources[evaluated[0].getId()]
-        self.failUnless(results[0] == 'ham')
-        self.failUnless(results[1] == 'spam')
-        self.failUnless(results[2] == 'eggs')
-        self.tool.setAutoGroupingMode(True)
         evaluated = self.tool.getEvaluatedResources(self.folder)
         results = self.tool.concatenatedresources[evaluated[0].getId()]
         self.failUnless(results[0] == 'ham')

@@ -219,7 +219,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     resource_class = Resource
 
     debugmode = False
-    autogroupingmode = False
 
     #
     # Private Methods
@@ -231,7 +230,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         self.cookedresources = ()
         self.concatenatedresources = {}
         self.debugmode = False
-        self.autogroupingmode = False
 
     def __getitem__(self, item):
         """Return a resource from the registry."""
@@ -434,17 +432,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             results = [x for x in resources]
         else:
             results = []
-            if self.getAutoGroupingMode():
-                # Sort resources according to their sortkey first, so resources
-                # with compatible keys will be merged.
-                def _sort_position(r):
-                    key = self.sortResourceKey(r[0])
-                    key.append(r[1])
-                    return key
-                # We need to respect the resource position inside the sort groups
-                positioned_resources = [(r, resources.index(r)) for r in resources]
-                positioned_resources.sort(key=_sort_position)
-                resources = [r[0] for r in positioned_resources]
             for resource in resources:
                 if results:
                     previtem = results[-1]
@@ -830,17 +817,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def setDebugMode(self, value):
         """Set whether resource merging should be disabled."""
         self.debugmode = value
-        self.cookResources()
-
-    security.declareProtected(permissions.ManagePortal, 'getAutoGroupingMode')
-    def getAutoGroupingMode(self):
-        """Is resource merging disabled?"""
-        return self.autogroupingmode
-
-    security.declareProtected(permissions.ManagePortal, 'setAutoGroupingMode')
-    def setAutoGroupingMode(self, value):
-        """Set whether resource merging should be disabled."""
-        self.autogroupingmode = bool(value)
         self.cookResources()
 
     security.declareProtected(permissions.View, 'getEvaluatedResources')

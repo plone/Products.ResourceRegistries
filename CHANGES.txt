@@ -4,6 +4,10 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Removed the `autogroupingmode` feature. In practice it turned out to work
+  not so well and caused hard to debug problems.
+  [hannosch]
+
 * Automatically set the registries into development mode if Zope itself runs
   in development mode.
   [hannosch]

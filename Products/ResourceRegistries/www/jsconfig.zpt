@@ -125,7 +125,7 @@ legend {
 }
 
 
-#debugmodelabel, #autogroupingmodelabel {
+#debugmodelabel {
     font-weight : bold;
 }
 
@@ -171,12 +171,6 @@ legend {
         http-headers to prevent browsers from caching the scripts. Recommended
         during javascript-related development. Remember to turn it off again,
         as the debugmode affects performance.
-    </p>
-    <p>
-        <input type="checkbox" id="autogroupingmode" name="autogroupingmode:boolean"
-               tal:attributes="checked here/getAutoGroupingMode" />
-        <label for="autogroupingmode" id="autogroupingmodelabel">Automatic grouping mode</label>
-        In automatic grouping mode, resources are first ordered into mergeable groups based on their settings and after that merged based on their position in the registry.
     </p>
 
     <p>The order of the scripts in this form is the same as the

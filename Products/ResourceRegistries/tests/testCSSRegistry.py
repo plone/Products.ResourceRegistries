@@ -224,10 +224,6 @@ class TestStylesheetCooking(RegistryTestCase):
         self.assertEqual(len(self.tool.getResources()), 3)
         self.assertEqual(len(self.tool.cookedresources), 1)
         self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getResources()), 3)
-        self.assertEqual(len(self.tool.cookedresources), 1)
-        self.assertEqual(len(self.tool.concatenatedresources.keys()), 4)
 
     def testStylesheetCookingValues(self):
         self.tool.registerStylesheet('ham')
@@ -257,15 +253,6 @@ class TestStylesheetCooking(RegistryTestCase):
         self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
         self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
-        magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-
     def testConcatenatedStylesheetsHaveNoMedia(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam', media='print')
@@ -276,30 +263,21 @@ class TestStylesheetCooking(RegistryTestCase):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam', expression='python:1')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testGetEvaluatedStylesheetsWithFailingExpression(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam', expression='python:0')
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
-        self.tool.setAutoGroupingMode(True)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testGetEvaluatedStylesheetsWithContextualExpression(self):
         self.folder.invokeFactory('Document', 'eggs')
         self.tool.registerStylesheet('spam', expression='python:"eggs" in object.objectIds()')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
 
     def testCollapsingStylesheetsLookup(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam', expression='string:ham')
         self.tool.registerStylesheet('spam spam', expression='string:ham')
-        evaluated = self.tool.getEvaluatedResources(self.folder)
-        self.assertEqual(len(evaluated), 2)
-        self.tool.setAutoGroupingMode(True)
         evaluated = self.tool.getEvaluatedResources(self.folder)
         self.assertEqual(len(evaluated), 2)
 
@@ -319,12 +297,6 @@ class TestStylesheetCooking(RegistryTestCase):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
         self.tool.registerStylesheet('eggs')
-        evaluated = self.tool.getEvaluatedResources(self.folder)
-        results = self.tool.concatenatedresources[evaluated[0].getId()]
-        self.failUnless(results[0] == 'ham')
-        self.failUnless(results[1] == 'spam')
-        self.failUnless(results[2] == 'eggs')
-        self.tool.setAutoGroupingMode(True)
         evaluated = self.tool.getEvaluatedResources(self.folder)
         results = self.tool.concatenatedresources[evaluated[0].getId()]
         self.failUnless(results[0] == 'ham')
@@ -375,8 +347,6 @@ class TestStylesheetCooking(RegistryTestCase):
         self.tool.registerStylesheet('spam', rendering='link')
         self.tool.registerStylesheet('egg', rendering='inline')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
-        self.tool.setAutoGroupingMode(True)
-        self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testRenderingWorksInMainTemplate(self):
         renderedpage = getattr(self.portal, 'index_html')()

@@ -58,9 +58,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         """
         node = self._getObjectNode('object')
         registry = getToolByName(self.context, self.registry_id)
-        node.setAttribute('autogroup', str(registry.getAutoGroupingMode()))
         node.setAttribute('debugmode', str(registry.getDebugMode()))
-        #node.setAttribute('xmlns:i18n', I18NURI)
         child = self._extractResourceInfo()
         node.appendChild(child)
         return node
@@ -76,8 +74,6 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         for key, value in node.attributes.items():
             key = str(key)
             value = value.lower().strip()
-            if key == 'autogroup':
-                registry.setAutoGroupingMode(value in [ 'true', 'yes', '1'])
             if key == 'debugmode':
                 registry.setDebugMode(value in ('yes','true','1')) 
 

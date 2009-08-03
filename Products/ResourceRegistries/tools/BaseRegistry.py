@@ -590,7 +590,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     except AttributeError: # zope.app.publisher.browser.fileresource
                         try:
                             method = obj.browserDefault(self.REQUEST)[1][0]
-                        except AttributeError:
+                        except (AttributeError, IndexError):
                             method = obj.browserDefault(self.REQUEST)[0].__name__
                     method = method in ('HEAD','POST') and 'GET' or method
                     content = getattr(obj, method)()

@@ -187,11 +187,6 @@ class CSSRegistryTool(BaseRegistryTool):
             orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
             content = "/* %s */\n%s" % (orig_url,
                                      self._compressCSS(content, compression))
-
-        m = resource.getMedia()
-        if m:
-            content = '@media %s {\n%s\n}\n' % (m, content)
-
         return content
 
     #

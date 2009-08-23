@@ -506,6 +506,16 @@ class TestTraversal(RegistryTestCase):
         magicId = stylesheets[0].getId()
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
 
+    def testMediadescriptorsInConcatenatedStylesheets(self):
+        self.tool.registerStylesheet('test_rr_2.css', media='print')
+        styles = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(styles), 1)
+        magicId = styles[0].getId()
+        content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
+        self.failUnless('@media print' in content)
+        self.failUnless('background-color : red' in content)
+        self.failUnless('H1 { color: blue; }' in content)
+
 class TestZODBTraversal(RegistryTestCase):
 
     def afterSetUp(self):

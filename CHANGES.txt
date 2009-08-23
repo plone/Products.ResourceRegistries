@@ -4,12 +4,6 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
-* Earlier versions put an @media declaration inside the rendered style sheet.
-  We already specify a media selector on the rendered link tag in the HTML,
-  so adding it inside the CSS is redundant, and breaks if you have your own
-  media selectors (for example when using device-specific CSS3 media selectors).
-  We no longer do this.
-
 * Removed the `autogroupingmode` feature. In practice it turned out to work
   not so well and caused hard to debug problems.
   [hannosch]

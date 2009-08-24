@@ -4,6 +4,11 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Removed some whitespace in the rendering templates for JS, CSS and KSS to make 
+  the source rendering more readable. These are very small and understandable
+  templates, so we'd rather have some noise there than on the front end.
+  [limi]
+
 * Removed the `autogroupingmode` feature. In practice it turned out to work
   not so well and caused hard to debug problems.
   [hannosch]

@@ -6,12 +6,12 @@
         <tal:opencc tal:replace="structure string:&lt;!--[if ${condcomment}]&gt;" />    
     </tal:wcondcomment
     ><tal:rendering-link condition="python: rendering == 'link'">
-      <link rel="style"
-            type="text/css"
-            tal:attributes="href style/src;
-                            media style/media;
-                            rel style/rel;
-                            title style/title" /></tal:rendering-link
+    <link rel="style"
+          type="text/css"
+          tal:attributes="href style/src;
+                          media style/media;
+                          rel style/rel;
+                          title style/title" /></tal:rendering-link
     ><tal:rendering-import condition="python: rendering == 'import'">
     <style type="text/css"
            tal:attributes="media style/media"

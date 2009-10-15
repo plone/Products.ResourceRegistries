@@ -4,6 +4,11 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Changed the order of CSS/JS rendering, CSS now renders first to allow the
+  browser to get it as soon as possible, to avoid the "flash of unstyled
+  content"
+  [limi]
+
 * Removed some whitespace in the rendering templates for JS, CSS and KSS to make 
   the source rendering more readable. These are very small and understandable
   templates, so we'd rather have some noise there than on the front end.

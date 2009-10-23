@@ -570,6 +570,16 @@ js_compression_tests = (
             replace(/^\/\//i,"");"""
     ),
     (
+        'regularExpressionWithOneLineComment',
+        """\
+            function test () {
+                alert('test'.replace(/test/g, 'test'); // Comment
+            }
+        """,
+        """\
+            function test(){alert('test'.replace(/test/g, 'test');}"""
+    ),
+    (
         'whitspaceAroundPlus',
         """\
             var message = foo + bar;
@@ -784,6 +794,18 @@ js_compression_tests = (
             function dummy(_a,_0){_a.className=_0}""",
         'full'
     ),
+    (
+        'commentWithURL',
+        """\
+            /*
+             * http://www.example.com
+             *
+             */
+            alert('hello');
+        """,
+        """\
+            alert('hello');"""
+    )
 )
 
 

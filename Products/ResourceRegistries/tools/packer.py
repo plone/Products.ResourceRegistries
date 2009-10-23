@@ -290,7 +290,7 @@ class JavascriptPacker(Packer):
                      r""""(?:[^"\\\n]|\\0(?![0-9])|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|\\[^\n])*?")""")
 
         # protect regular expressions
-        self.protect(r"""\s+(\/[^\/\n\r\*](?:\\/|[^\n\r])*\/g?i?)""")
+        self.protect(r"""\s+(\/[^\/\n\r\*](?:\\/|[^\n\r])*?\/g?i?)""")
         self.protect(r"""([^\w\$\/'"*)\?:]\/[^\/\n\r\*](?:\\/|[^\n\r])*\/g?i?)""")
 
         # protect IE conditional compilation
@@ -572,12 +572,12 @@ js_compression_tests = (
     (
         'regularExpressionWithOneLineComment',
         """\
-            function test () {
-                alert('test'.replace(/test/g, 'test'); // Comment
-            }
-        """,
+            function test() {
+                alert('test'.replace( /test/g , 'test' ); // Comment
+            }"""
+        ,
         """\
-            function test(){alert('test'.replace(/test/g, 'test');}"""
+            function test(){alert('test'.replace(/test/g,'test')}"""
     ),
     (
         'whitspaceAroundPlus',

@@ -4,6 +4,10 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Fixed JS packer to be a little less greedy about protecting regular
+  expressions. This fixes #8790.
+  [dunlapm]
+
 * Changed the order of CSS/JS rendering, CSS now renders first to allow the
   browser to get it as soon as possible, to avoid the "flash of unstyled
   content"

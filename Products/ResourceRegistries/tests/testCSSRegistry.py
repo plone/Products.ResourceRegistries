@@ -76,6 +76,7 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.tool.registerStylesheet('foodefault')
         self.assertEqual(self.tool.getResources()[0].getId(), 'foodefault')
         self.assertEqual(self.tool.getResources()[0].getExpression(), '')
+        self.assertEqual(self.tool.getResources()[0].getAuthenticated(), False)
         self.assertEqual(self.tool.getResources()[0].getMedia(), None)
         self.assertEqual(self.tool.getResources()[0].getRel(), 'stylesheet')
         self.assertEqual(self.tool.getResources()[0].getTitle(), None)
@@ -92,11 +93,12 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.failUnless(self.tool.getResources()[0].getEnabled())
 
     def testStylesheetAttributes(self):
-        self.tool.registerStylesheet('foo', expression='python:1',
+        self.tool.registerStylesheet('foo', expression='python:1', authenticated=False,
                                      media='print', rel='alternate stylesheet',
                                      title='Foo', rendering='inline', enabled=0)
         self.assertEqual(self.tool.getResources()[0].getId(), 'foo')
         self.assertEqual(self.tool.getResources()[0].getExpression(), 'python:1')
+        self.assertEqual(self.tool.getResources()[0].getAuthenticated(), False)
         self.assertEqual(self.tool.getResources()[0].getMedia(), 'print')
         self.assertEqual(self.tool.getResources()[0].getRel(), 'alternate stylesheet')
         self.assertEqual(self.tool.getResources()[0].getTitle(), 'Foo')

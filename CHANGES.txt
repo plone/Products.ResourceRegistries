@@ -4,6 +4,9 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Fixed typo in update process of authenticated resources. Fixes #9599
+  [naro]
+
 * Fixed JS packer to be a little less greedy about protecting regular
   expressions. This fixes #8790.
   [dunlapm]

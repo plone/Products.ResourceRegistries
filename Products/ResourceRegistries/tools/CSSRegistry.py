@@ -284,7 +284,7 @@ class CSSRegistryTool(BaseRegistryTool):
         if data.get('expression', None) is not None:
             stylesheet.setExpression(data['expression'])
         if data.get('authenticated', None) is not None:
-            stylesheet.setExpression(data['authenticated'])
+            stylesheet.setAuthenticated(data['authenticated'])
         if data.get('media', None) is not None:
             stylesheet.setMedia(data['media'])
         if data.get('rel', None) is not None:

@@ -213,7 +213,7 @@ class JSRegistryTool(BaseRegistryTool):
         if data.get('expression', None) is not None:
             script.setExpression(data['expression'])
         if data.get('authenticated', None) is not None:
-            script.setExpression(data['authenticated'])
+            script.setAuthenticated(data['authenticated'])
         if data.get('inline', None) is not None:
             script.setInline(data['inline'])
         if data.get('enabled', None) is not None:

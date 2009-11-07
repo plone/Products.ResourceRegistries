@@ -188,7 +188,7 @@ class KSSRegistryTool(BaseRegistryTool):
         if data.get('expression', None) is not None:
             kineticstylesheet.setExpression(data['expression'])
         if data.get('authenticated', None) is not None:
-            kineticstylesheet.setExpression(data['authenticated'])
+            kineticstylesheet.setAuthenticated(data['authenticated'])
         if data.get('enabled', None) is not None:
             kineticstylesheet.setEnabled(data['enabled'])
         if data.get('cookable', None) is not None:

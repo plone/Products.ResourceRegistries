@@ -77,7 +77,7 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.assertEqual(self.tool.getResources()[0].getId(), 'foodefault')
         self.assertEqual(self.tool.getResources()[0].getExpression(), '')
         self.assertEqual(self.tool.getResources()[0].getAuthenticated(), False)
-        self.assertEqual(self.tool.getResources()[0].getMedia(), None)
+        self.assertEqual(self.tool.getResources()[0].getMedia(), 'screen')
         self.assertEqual(self.tool.getResources()[0].getRel(), 'stylesheet')
         self.assertEqual(self.tool.getResources()[0].getTitle(), None)
         self.assertEqual(self.tool.getResources()[0].getRendering(), 'link')

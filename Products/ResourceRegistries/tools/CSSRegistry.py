@@ -20,7 +20,7 @@ class Stylesheet(Resource):
 
     def __init__(self, id, **kwargs):
         Resource.__init__(self, id, **kwargs)
-        self._data['media'] = kwargs.get('media', '')
+        self._data['media'] = kwargs.get('media', 'screen')
         self._data['rel'] = kwargs.get('rel', 'stylesheet')
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'link')
@@ -199,7 +199,7 @@ class CSSRegistryTool(BaseRegistryTool):
     #
 
     security.declareProtected(permissions.ManagePortal, 'manage_addStylesheet')
-    def manage_addStylesheet(self, id, expression='', media='',
+    def manage_addStylesheet(self, id, expression='', media='screen',
                              rel='stylesheet', title='', rendering='link',
                              enabled=False, cookable=True, compression='safe',
                              cacheable=True, REQUEST=None,
@@ -227,7 +227,7 @@ class CSSRegistryTool(BaseRegistryTool):
         for r in records:
             stylesheet = Stylesheet(r.get('id'),
                                     expression=r.get('expression', ''),
-                                    media=r.get('media', ''),
+                                    media=r.get('media', 'screen'),
                                     rel=r.get('rel', 'stylesheet'),
                                     title=r.get('title', ''),
                                     rendering=r.get('rendering', 'link'),
@@ -255,11 +255,11 @@ class CSSRegistryTool(BaseRegistryTool):
     #
 
     security.declareProtected(permissions.ManagePortal, 'registerStylesheet')
-    def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
-                           title='', rendering='link',  enabled=1,
-                           cookable=True, compression='safe', cacheable=True,
-                           conditionalcomment='', authenticated=False,
-                           skipCooking=False):
+    def registerStylesheet(self, id, expression='', media='screen',
+                           rel='stylesheet', title='', rendering='link',
+                           enabled=1, cookable=True, compression='safe',
+                           cacheable=True, conditionalcomment='',
+                           authenticated=False, skipCooking=False):
         """Register a stylesheet."""
         stylesheet = Stylesheet(id,
                                 expression=expression,

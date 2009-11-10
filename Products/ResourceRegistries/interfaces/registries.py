@@ -66,11 +66,11 @@ class ICSSRegistry(Interface):
                    o Must be set to 'portal_css'.
                    """)
 
-    def registerStylesheet(id, expression='', media='', rel='stylesheet',
+    def registerStylesheet(id, expression='', media='screen', rel='stylesheet',
                            rendering='link', enabled=1):
         """Register a stylesheet."""
 
-    def manage_addStylesheet(id, expression='', media='', rel='stylesheet',
+    def manage_addStylesheet(id, expression='', media='screen', rel='stylesheet',
                              rendering='link', enabled=True , REQUEST=None):
         """Add stylesheet from a ZMI form."""
 

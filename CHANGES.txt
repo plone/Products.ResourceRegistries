@@ -4,6 +4,10 @@ Changelog
 1.7.0 - unreleased
 ------------------
 
+* Declare 'screen' to be the default for the media attribute instead of None.
+  It is the most commonly used one in Plone's own themes.
+  [hannosch]
+
 * Fixed typo in update process of authenticated resources. Fixes #9599
   [naro]
 

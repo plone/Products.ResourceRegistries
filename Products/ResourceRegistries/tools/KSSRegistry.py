@@ -113,7 +113,7 @@ class KSSRegistryTool(BaseRegistryTool):
     #
 
     security.declareProtected(permissions.ManagePortal, 'manage_addKineticStylesheet')
-    def manage_addKineticStylesheet(self, id, expression='', media='',
+    def manage_addKineticStylesheet(self, id, expression='', media='screen',
                              rel='stylesheet', title='', rendering='import',
                              enabled=False, cookable=True, compression='safe',
                              cacheable=True, conditionalcomment='', authenticated=False,

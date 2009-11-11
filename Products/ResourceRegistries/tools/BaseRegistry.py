@@ -615,7 +615,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     content = obj._readFile(0)
                     contenttype = getCharsetFromContentType(obj.content_type, default_charset)
                     content = unicode(content, contenttype)
-                elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'ATFile':
+                elif hasattr(aq_base(obj),'meta_type') and obj.meta_type in ('ATFile', 'ATBlob'):
                     f = obj.getFile()
                     contenttype = getCharsetFromContentType(f.getContentType(), default_charset)
                     content = unicode(str(f), contenttype)

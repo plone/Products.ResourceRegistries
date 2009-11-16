@@ -1,13 +1,12 @@
 from setuptools import setup, find_packages
-import sys, os
 
-version = '1.7.0'
+version = '2.0a1'
 
 setup(name='Products.ResourceRegistries',
       version=version,
       description="Registry for managing CSS and JS",
       long_description=open("README.txt").read() + "\n" +
-                             open("CHANGES.txt").read(),
+                       open("CHANGES.txt").read(),
       classifiers=[
         "Framework :: Zope2",
         "License :: OSI Approved :: GNU General Public License (GPL)",

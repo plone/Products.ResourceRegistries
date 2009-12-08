@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.5.4 - Unreleased
+1.5.4 - 2009-12-08
 ------------------
 
 * Include CSS before JavaScript.

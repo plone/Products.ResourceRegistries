@@ -508,9 +508,9 @@ class TestDebugMode(FunctionalRegistryTestCase):
     def testDebugModeSplitting(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')
+        self.tool.setDebugMode(False)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
         self.tool.setDebugMode(True)
-        self.tool.cookResources()
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testDebugModeSplitting2(self):
@@ -520,13 +520,7 @@ class TestDebugMode(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
-        self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
-
-        # Set debug mode
         self.tool.setDebugMode(True)
-        self.tool.cookResources()
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
@@ -555,6 +549,7 @@ class TestZODBTraversal(RegistryTestCase):
         self.tool.registerScript('testroot.js')
         self.tool.registerScript('subfolder/testsubfolder.js')
         self.setRoles(['Member'])
+        self.tool.setDebugMode(False)
 
     def testGetItemTraversal(self):
         self.failUnless(self.tool['testroot.js'])
@@ -635,6 +630,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
         script.manage_permission('View',['Manager'], acquire=0)
         script.manage_permission('Access contents information',['Manager'], acquire=0)
         self.setRoles(['Member'])
+        self.tool.setDebugMode(False)
 
     def testUnauthorizedGetItem(self):
         try:
@@ -731,6 +727,7 @@ class TestMergingDisabled(RegistryTestCase):
                                    content_type='application/x-javascript',
                                    file="window.alert('blue')")
         self.setRoles(['Member'])
+        self.tool.setDebugMode(False)
 
     def testDefaultStylesheetCookableAttribute(self):
         self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.js')].getCookable())
@@ -862,6 +859,7 @@ class TestUnicodeAwareness(RegistryTestCase):
                                    content_type='application/x-javascript;charset=utf-8',
                                    file=body)
         self.setRoles(['Member'])
+        self.tool.setDebugMode(False)
 
     def testGetOriginal(self):
         # this needs to be first because it's a zpt returning unicode
@@ -882,12 +880,14 @@ class TestUnicodeAwareness(RegistryTestCase):
 
 
 class TestCachingHeaders(FunctionalRegistryTestCase):
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.skins_tool = getToolByName(self.portal, 'portal_skins')
         self.tool.clearResources()
         self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
+        self.tool.setDebugMode(False)
 
     def testCachingHeadersFromTool(self):
         self.tool.registerScript('ham')

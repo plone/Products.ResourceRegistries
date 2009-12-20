@@ -1,9 +1,16 @@
 Changelog
 =========
 
-2.0b1 - Unreleased
+2.0a2 - Unreleased
 ------------------
 
+- Cleaned up some old charset related fallback code.
+  [hannosch]
+
+- Changed the development mode to be a non-persistent setting. By default it
+  follows the Zope development mode (bin/instance fg vs. bin/instance console).
+  The setting can be changed during process runtime.
+  [hannosch]
 
 2.0a1 - 2009-11-16
 ------------------

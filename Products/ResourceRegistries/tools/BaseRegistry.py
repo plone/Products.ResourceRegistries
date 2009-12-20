@@ -30,6 +30,8 @@ from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
 
 
+DEVEL_MODE = dict()
+
 def getDummyFileForContent(name, ctype):
     # make output file like and add an headers dict, so the contenttype
     # is properly set in the headers
@@ -218,8 +220,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     cache_duration = 3600
     resource_class = Resource
 
-    debugmode = False
-
     #
     # Private Methods
     #
@@ -229,7 +229,6 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         self.resources = ()
         self.cookedresources = ()
         self.concatenatedresources = {}
-        self.debugmode = False
 
     def __getitem__(self, item):
         """Return a resource from the registry."""
@@ -277,13 +276,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
 
         if isinstance(output, unicode):
-            portal_props = getToolByName(self, 'portal_properties')
-            site_props = portal_props.site_properties
-            charset = site_props.getProperty('default_charset', 'utf-8')
-            output = output.encode(charset)
+            output = output.encode('utf-8')
             if 'charset=' not in contenttype:
-                contenttype += ';charset=' + charset
-        
+                contenttype += ';charset=utf-8'
+
         out = StringIO(output)
         out.headers = {'content-type': contenttype}
         # At this point we are ready to provide some content
@@ -428,36 +424,33 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         resources = [r.copy() for r in self.getResources() if r.getEnabled()]
         self.concatenatedresources = {}
         self.cookedresources = ()
-        if self.getDebugMode():
-            results = [x for x in resources]
-        else:
-            results = []
-            for resource in resources:
-                if results:
-                    previtem = results[-1]
-                    if resource.getCookable() and previtem.getCookable() \
-                           and self.compareResources(resource, previtem):
-                        res_id = resource.getId()
-                        prev_id = previtem.getId()
-                        self.finalizeResourceMerging(resource, previtem)
-                        if self.concatenatedresources.has_key(prev_id):
-                            self.concatenatedresources[prev_id].append(res_id)
-                        else:
-                            magic_id = self.generateId(res_id, prev_id)
-                            self.concatenatedresources[magic_id] = [prev_id, res_id]
-                            previtem._setId(magic_id)
+        results = []
+        for resource in resources:
+            if results:
+                previtem = results[-1]
+                if resource.getCookable() and previtem.getCookable() \
+                       and self.compareResources(resource, previtem):
+                    res_id = resource.getId()
+                    prev_id = previtem.getId()
+                    self.finalizeResourceMerging(resource, previtem)
+                    if self.concatenatedresources.has_key(prev_id):
+                        self.concatenatedresources[prev_id].append(res_id)
                     else:
-                        if resource.getCookable() or resource.getCacheable():
-                            magic_id = self.generateId(resource.getId())
-                            self.concatenatedresources[magic_id] = [resource.getId()]
-                            resource._setId(magic_id)
-                        results.append(resource)
+                        magic_id = self.generateId(res_id, prev_id)
+                        self.concatenatedresources[magic_id] = [prev_id, res_id]
+                        previtem._setId(magic_id)
                 else:
                     if resource.getCookable() or resource.getCacheable():
                         magic_id = self.generateId(resource.getId())
                         self.concatenatedresources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)
                     results.append(resource)
+            else:
+                if resource.getCookable() or resource.getCacheable():
+                    magic_id = self.generateId(resource.getId())
+                    self.concatenatedresources[magic_id] = [resource.getId()]
+                    resource._setId(magic_id)
+                results.append(resource)
 
         resources = self.getResources()
         for resource in resources:
@@ -538,9 +531,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         if context == self and portal is not None:
             context = portal
 
-        portal_props = getToolByName(self, 'portal_properties')
-        site_props = portal_props.site_properties
-        default_charset = site_props.getProperty('default_charset', 'utf-8')
+        default_charset = 'utf-8'
 
         for id in ids:
             try:
@@ -768,16 +759,11 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def getCookedResources(self):
         """Get the cooked resource data."""
         result = []
-        for item in self.cookedresources:
-            if isinstance(item, dict):
-                # BBB we used dicts before
-                item = item.copy()
-                item_id = item['id']
-                del item['id']
-                obj = self.resource_class(item_id, **item)
-                result.append(obj)
-            else:
-                result.append(item)
+        if self.getDebugMode():
+            resources = [r.copy() for r in self.getResources() if r.getEnabled()]
+            result = [x for x in resources]
+        else:
+            result = [x for x in self.cookedresources]
         return tuple(result)
 
     security.declareProtected(permissions.ManagePortal, 'moveResource')
@@ -809,25 +795,21 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'getDebugMode')
     def getDebugMode(self):
         """Is resource merging disabled?"""
-        if self.getDevelMode():
-            return True
-        return self.debugmode
+        devel = DEVEL_MODE.get(self.id, None)
+        if devel is None:
+            devel = DEVEL_MODE[self.id] = self.getDevelMode()
+        return devel
 
     security.declareProtected(permissions.ManagePortal, 'setDebugMode')
     def setDebugMode(self, value):
         """Set whether resource merging should be disabled."""
-        self.debugmode = value
-        self.cookResources()
+        DEVEL_MODE[self.id] = bool(value)
 
     security.declareProtected(permissions.View, 'getEvaluatedResources')
     def getEvaluatedResources(self, context):
         """Return the filtered evaluated resources."""
         results = self.getCookedResources()
-
-        # filter results
-        results = [item for item in results if self.evaluate(item, context)]
-
-        return results
+        return [item for item in results if self.evaluate(item, context)]
 
     security.declareProtected(permissions.View, 'getInlineResource')
     def getInlineResource(self, item, context):

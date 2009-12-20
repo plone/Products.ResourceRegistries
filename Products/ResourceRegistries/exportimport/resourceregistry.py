@@ -57,8 +57,6 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         Export the object as a DOM node.
         """
         node = self._getObjectNode('object')
-        registry = getToolByName(self.context, self.registry_id)
-        node.setAttribute('debugmode', str(registry.getDebugMode()))
         child = self._extractResourceInfo()
         node.appendChild(child)
         return node
@@ -70,13 +68,6 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         registry = getToolByName(self.context, self.registry_id)
         if self.environ.shouldPurge():
             registry.clearResources()
-        
-        for key, value in node.attributes.items():
-            key = str(key)
-            value = value.lower().strip()
-            if key == 'debugmode':
-                registry.setDebugMode(value in ('yes','true','1')) 
-
         self._initResources(node)
 
     def _extractResourceInfo(self):

@@ -4,7 +4,6 @@ from zope.interface import implements
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
 
-from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.ResourceRegistries import config
@@ -240,18 +239,7 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""
-        plone_utils = getToolByName(self, 'plone_utils')
-        try:
-            encoding = plone_utils.getSiteEncoding()
-        except AttributeError:
-            # For Plone < 2.1
-            pprop = getToolByName(self, 'portal_properties')
-            default = 'utf-8'
-            try:
-                encoding = pprop.site_properties.getProperty('default_charset', default)
-            except AttributeError:
-                encoding = default
-        return 'application/x-javascript;charset=%s' % encoding
+        return 'application/x-javascript;charset=utf-8'
 
     security.declarePrivate('getResourceContent')
     def getResourceContent(self, item, context, original=False):

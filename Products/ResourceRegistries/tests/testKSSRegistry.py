@@ -753,25 +753,17 @@ class TestDebugMode(FunctionalKSSRegistryTestCase):
     def testDebugModeSplitting(self):
         self.tool.registerKineticStylesheet('ham')
         self.tool.registerKineticStylesheet('spam')
+        self.tool.setDebugMode(False)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
         self.tool.setDebugMode(True)
-        self.tool.cookResources()
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testDebugModeSplitting2(self):
         self.tool.registerKineticStylesheet('ham')
-        # Publish in normal mode
-        response = self.publish(self.toolpath+'/ham')
         now = DateTime()
         days = 7
         soon = now + days
-        self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
-
-        # Set debug mode
         self.tool.setDebugMode(True)
-        self.tool.cookResources()
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))

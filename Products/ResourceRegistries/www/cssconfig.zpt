@@ -154,22 +154,14 @@ legend {
       method="post">
 
     <p>
-        <tal:block tal:condition="not:here/getDevelMode">
-            <input type="checkbox" id="debugmode" name="debugmode:boolean"
-                   tal:attributes="checked here/getDebugMode" />
-            <label for="debugmode" id="debugmodelabel">Debug/development mode</label>
-        </tal:block>
-        <tal:block tal:condition="here/getDevelMode">
-            <input type="hidden" id="debugmode" name="debugmode:boolean"
-                   tal:attributes="checked here/getDebugMode" />
-            NOTE: The Zope instance is running in global development mode. The
-            CSS registry is automatically switched into development mode.<hr />
-        </tal:block>
-        In debug-/development mode, stylesheets are not merged to composites,
-        and caching and compression of css is disabled. The registry also sends
+        <input type="checkbox" id="debugmode" name="debugmode:boolean"
+               tal:attributes="checked here/getDebugMode" />
+        <label for="debugmode" id="debugmodelabel">Development mode</label>
+        In development mode, stylesheets are not merged to composites, and
+        caching and compression of css is disabled. The registry also sends
         http-headers to prevent browsers from caching the stylesheets.
-        Recommended during css-related development. Remember to turn it off
-        again, as the debugmode affects performance.
+        Recommended during css-related development. The development is process
+        global and follows the Zope development mode by default.
     </p>
 
     <p>The order of the stylesheets in this form is the same as the

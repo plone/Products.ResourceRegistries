@@ -890,9 +890,9 @@ class TestDebugMode(FunctionalRegistryTestCase):
     def testDebugModeSplitting(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam')
+        self.tool.setDebugMode(False)
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
         self.tool.setDebugMode(True)
-        self.tool.cookResources()
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 2)
 
     def testDebugModeSplitting2(self):
@@ -902,13 +902,7 @@ class TestDebugMode(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
-        self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
-
-        # Set debug mode
         self.tool.setDebugMode(True)
-        self.tool.cookResources()
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
@@ -1011,12 +1005,14 @@ class TestSkinAwareness(FunctionalRegistryTestCase):
 
 
 class TestCachingHeaders(FunctionalRegistryTestCase):
+
     def afterSetUp(self):
         self.tool = getattr(self.portal, CSSTOOLNAME)
         self.skins_tool = getToolByName(self.portal, 'portal_skins')
         self.tool.clearResources()
         self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
         self.toolpath = '/' + self.tool.absolute_url(1)
+        self.tool.setDebugMode(False)
 
     def testCachingHeadersFromTool(self):
         self.tool.registerStylesheet('ham')

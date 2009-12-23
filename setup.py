@@ -24,13 +24,13 @@ setup(name='Products.ResourceRegistries',
       zip_safe=False,
       extras_require=dict(
         test=[
-            'zope.component',
             'zope.contentprovider',
             'Products.PloneTestCase',
         ]
       ),
       install_requires=[
         'setuptools',
+        'zope.component',
         'zope.interface',
         'zope.viewlet',
         'Products.CMFCore',

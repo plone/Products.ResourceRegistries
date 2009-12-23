@@ -4,6 +4,8 @@ Changelog
 2.0a3 - unreleased
 ------------------
 
+- Marked zope.component as a real dependency of this package.
+  [hannosch]
 
 2.0a2 - 2009-12-20
 ------------------

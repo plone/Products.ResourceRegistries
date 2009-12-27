@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0a3 - unreleased
+2.0b1 - 2009-12-27
 ------------------
 
 - Marked zope.component as a real dependency of this package.

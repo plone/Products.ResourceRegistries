@@ -144,7 +144,11 @@ legend {
     background-color: #ffce7b;
     border: 1px solid #ffa500;
 }
-
+ul {
+    font-family: Verdana,sans-serif;
+    color: #333;
+    font-size: 85%;
+}
 </style>
 
 <div tal:replace="structure here/manage_tabs" />
@@ -158,11 +162,16 @@ legend {
                tal:attributes="checked here/getDebugMode" />
         <label for="debugmode" id="debugmodelabel">Development mode</label>
         In development mode, stylesheets are not merged to composites, and
-        caching and compression of css is disabled. The registry also sends
-        http-headers to prevent browsers from caching the stylesheets.
-        Recommended during css-related development. The development is process
-        global and follows the Zope development mode by default.
+        caching and compression of CSS is disabled. The registry also sends
+        HTTP headers to prevent browsers from caching the stylesheets.
+        Useful for testing CSS modifications. 
     </p>
+    <ul>
+    <li>Will affect all Plone instances, not just the one you change the setting in, so be careful.</li>
+    <li>The setting will not be saved between restarts to avoid accidental performance degradation.</li>
+    </ul>
+    
+    <hr/>
 
     <p>The order of the stylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows

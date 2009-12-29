@@ -160,10 +160,15 @@ legend {
         <label for="debugmode" id="debugmodelabel">Development mode</label>
         In development mode, scripts are not merged to composites, and
         caching and compression of JS is disabled. The registry also sends
-        http-headers to prevent browsers from caching the scrips.
-        Recommended during JS-related development. The development is process
-        global and follows the Zope development mode by default.
+        HTTP headers to prevent browsers from caching the stylesheets.
+        Useful for testing JS modifications. 
     </p>
+    <ul>
+    <li>Will affect all Plone instances, not just the one you change the setting in, so be careful.</li>
+    <li>The setting will not be saved between restarts to avoid accidental performance degradation.</li>
+    </ul>
+    
+    <hr/>
 
     <p>The order of the scripts in this form is the same as the
     order in the header of the resulting HTML code.

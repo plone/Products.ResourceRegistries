@@ -5,7 +5,7 @@ import random
 from StringIO import StringIO
 from urllib import quote_plus
 
-from zope.interface import implements
+from zope.interface import implements, alsoProvides
 
 from AccessControl import ClassSecurityInfo, Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager
@@ -28,7 +28,7 @@ from Products.Five.browser.resource import Resource as z3_Resource
 
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IResourceRegistry
-
+from Products.ResourceRegistries.interfaces import ICookedFile
 
 DEVEL_MODE = dict()
 
@@ -37,7 +37,9 @@ def getDummyFileForContent(name, ctype):
     # is properly set in the headers
     output = StringIO()
     output.headers = {'content-type': ctype}
-    return File(name, name, output)
+    file_ = File(name, name, output)
+    alsoProvides(file_, ICookedFile)
+    return file_
 
 def getCharsetFromContentType(contenttype, default='utf-8'):
     contenttype = contenttype.lower()

@@ -16,6 +16,7 @@ from Products.PloneTestCase.PloneTestCase import portal_owner, default_password
 
 from Products.ResourceRegistries.config import CSSTOOLNAME
 from Products.ResourceRegistries.interfaces import ICSSRegistry
+from Products.ResourceRegistries.interfaces import ICookedFile
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
@@ -484,7 +485,18 @@ class TestTraversal(RegistryTestCase):
 
     def testGetItemTraversal(self):
         self.failUnless(self.tool['test_rr_1.css'])
-
+    
+    def testMarker(self):
+        traversed = self.portal.restrictedTraverse('portal_css/test_rr_1.css')
+        self.failUnless(ICookedFile.providedBy(traversed))
+    
+    def testMarkerComposite(self):
+        self.tool.registerStylesheet('test_rr_2.css')
+        styles = self.tool.getEvaluatedResources(self.portal)
+        magicId = styles[0].getId()
+        traversed = self.portal.restrictedTraverse('portal_css/%s' % magicId)
+        self.failUnless(ICookedFile.providedBy(traversed))
+    
     def testGetItemTraversalContent(self):
         self.failUnless('background-color' in str(self.tool['test_rr_1.css']))
 

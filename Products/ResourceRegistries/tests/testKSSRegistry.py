@@ -16,6 +16,7 @@ from Products.PloneTestCase.PloneTestCase import portal_owner, default_password
 
 from Products.ResourceRegistries.config import KSSTOOLNAME
 from Products.ResourceRegistries.interfaces import IKSSRegistry
+from Products.ResourceRegistries.interfaces import ICookedFile
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
@@ -398,6 +399,18 @@ class TestTraversal(KSSRegistryTestCase):
         KSSRegistryTestCase.afterSetUp(self)
         self.tool.clearResources()
         self.tool.registerKineticStylesheet('test_rr_1.kss')
+
+    def testMarker(self):
+        traversed = self.portal.restrictedTraverse('portal_kss/test_rr_1.kss')
+        self.failUnless(ICookedFile.providedBy(traversed))
+    
+    def testMarkerComposite(self):
+        self.tool.registerKineticStylesheet('test_rr_2.kss')
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), 1)
+        magicId = scripts[0].getId()
+        traversed = self.portal.restrictedTraverse('portal_kss/%s' % magicId)
+        self.failUnless(ICookedFile.providedBy(traversed))
 
     def testGetItemTraversal(self):
         self.failUnless(self.tool['test_rr_1.kss'])

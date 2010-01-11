@@ -1,6 +1,11 @@
 from zope.interface import Interface
 from zope.interface import Attribute
 
+class ICookedFile(Interface):
+    """Marker interface for file objects created on the fly for
+    concatenated resources.
+    """
+
 class IResourceRegistry(Interface):
     """A tool for registering and evaluating resource linkage."""
 

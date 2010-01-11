@@ -16,6 +16,7 @@ from Products.PloneTestCase.PloneTestCase import portal_owner, default_password
 
 from Products.ResourceRegistries.config import JSTOOLNAME
 from Products.ResourceRegistries.interfaces import IJSRegistry
+from Products.ResourceRegistries.interfaces import ICookedFile
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
@@ -391,6 +392,18 @@ class TestJSTraversal(RegistryTestCase):
         self.tool = getattr(self.portal, JSTOOLNAME)
         self.tool.clearResources()
         self.tool.registerScript('test_rr_1.js')
+
+    def testMarker(self):
+        traversed = self.portal.restrictedTraverse('portal_javascripts/test_rr_1.js')
+        self.failUnless(ICookedFile.providedBy(traversed))
+    
+    def testMarkerComposite(self):
+        self.tool.registerScript('test_rr_2.css')
+        scripts = self.tool.getEvaluatedResources(self.portal)
+        self.assertEqual(len(scripts), 1)
+        magicId = scripts[0].getId()
+        traversed = self.portal.restrictedTraverse('portal_javascripts/%s' % magicId)
+        self.failUnless(ICookedFile.providedBy(traversed))
 
     def testGetItemTraversal(self):
         self.failUnless(self.tool['test_rr_1.js'])

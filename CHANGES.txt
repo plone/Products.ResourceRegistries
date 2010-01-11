@@ -4,6 +4,11 @@ Changelog
 2.0b2 - unreleased
 ------------------
 
+- Apply a marker interface ICookedFile to the files created on the fly for
+  cooked/concatenated resources returned by ResourceRegistries. This makes
+  it easier to detect these for caching purposes and treat them differently
+  to in-ZODB files, which may also be instances of OFS.Image.File.
+  [optilude]
 
 2.0b1 - 2009-12-27
 ------------------

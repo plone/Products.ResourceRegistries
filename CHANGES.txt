@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0b2 - unreleased
+2.0b2 - 2010-01-24
 ------------------
 
 - Apply a marker interface ICookedFile to the files created on the fly for

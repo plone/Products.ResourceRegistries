@@ -358,7 +358,46 @@ class TestStylesheetCooking(RegistryTestCase):
         renderedpage = getattr(self.portal, 'index_html')()
         self.failUnless('background-color' in renderedpage)
 
+class TestStylesheetAbsolutePrefix(RegistryTestCase):
 
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, CSSTOOLNAME)
+        self.tool.clearResources()
+
+    def testURLReplace(self):
+        self.tool.registerStylesheet('++resource++test_rr/test_1.css', applyPrefix=True, cookable=True)
+        self.tool.registerStylesheet('++resource++test_rr/test_2.css', applyPrefix=False, cookable=True)
+        
+        self.tool.setDebugMode(False)
+        
+        styles = self.tool.getEvaluatedResources(self.portal)
+        magicId = styles[0].getId()
+        traversed = self.portal.restrictedTraverse('portal_css/%s' % magicId)
+        
+        rendered = traversed.data
+        
+        self.assertEquals(1, rendered.count("url(/plone/++resource++test_rr/common.css)"))
+        self.assertEquals(1, rendered.count("url(common.css)"))
+        
+        self.assertEquals(1, rendered.count("url ( '/plone/++resource++test_rr/spacer.jpg' )"))
+        self.assertEquals(1, rendered.count("url ( 'spacer.jpg' )"))
+        
+        self.assertEquals(2, rendered.count('url("http://example.org/absolute.jpg")'))
+
+    def testURLReplaceDebugMode(self):
+        self.tool.registerStylesheet('++resource++test_rr/test_1.css', applyPrefix=True, cookable=True)
+        
+        self.tool.setDebugMode(True)
+        
+        traversed = self.portal.restrictedTraverse('portal_css/++resource++test_rr/test_1.css')
+        rendered = traversed.GET()
+        
+        self.assertEquals(1, rendered.count("url(common.css)"))
+        self.assertEquals(1, rendered.count("url ( 'spacer.jpg' )"))
+        self.assertEquals(1, rendered.count('url("http://example.org/absolute.jpg")'))
+        
+        self.tool.setDebugMode(False) # This is a global dict, so you have to tear down!
+        
 class TestStylesheetMoving(RegistryTestCase):
 
     def afterSetUp(self):
@@ -968,6 +1007,12 @@ class TestResourceObjects(RegistryTestCase):
                          self.tool.cookedresources[2].getId()],
                          ['eggs'])
 
+    def testSetApplyPrefix(self):
+        self.tool.registerStylesheet('ham', applyPrefix=True)
+        ham = self.tool.getResource('ham')
+        self.assertEquals(True, ham.getApplyPrefix())
+        ham.setApplyPrefix(False)
+        self.assertEquals(False, ham.getApplyPrefix())
 
 class TestSkinAwareness(FunctionalRegistryTestCase):
 
@@ -1140,5 +1185,5 @@ def test_suite():
     suite.addTest(makeSuite(TestResourceObjects))
     suite.addTest(makeSuite(TestSkinAwareness))
     suite.addTest(makeSuite(TestCachingHeaders))
-
+    suite.addTest(makeSuite(TestStylesheetAbsolutePrefix))
     return suite

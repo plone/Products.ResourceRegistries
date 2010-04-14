@@ -3,6 +3,8 @@ from zope.interface import implements
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
 
+from Acquisition import aq_parent
+
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
@@ -11,6 +13,8 @@ from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
+
+from Products.ResourceRegistries.utils import applyPrefix
 
 from packer import CSSPacker
 
@@ -25,6 +29,7 @@ class Stylesheet(Resource):
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'link')
         self._data['compression'] = kwargs.get('compression', 'safe')
+        self._data['applyPrefix'] = kwargs.get('applyPrefix', False)
         if self.isExternal:
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
                 self._data['compression'] = 'none' #we have to assume none because of the default values
@@ -87,6 +92,14 @@ class Stylesheet(Resource):
             raise ValueError("Compression method %s not valid, must be one of: %s" % (
                              compression, ', '.join(config.CSS_EXTERNAL_COMPRESSION_METHODS)))
         self._data['compression'] = compression
+
+    security.declareProtected(permissions.ManagePortal, 'setApplyPrefix')
+    def setApplyPrefix(self, applyPrefix):
+        self._data['applyPrefix'] = applyPrefix
+
+    security.declarePublic('getApplyPrefix')
+    def getApplyPrefix(self):
+        return self._data['applyPrefix']
 
 InitializeClass(Stylesheet)
 
@@ -182,6 +195,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):
         """Finalize the resource content."""
+        
         compression = resource.getCompression()
         if compression != 'none' and not self.getDebugMode():
             orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
@@ -191,7 +205,19 @@ class CSSRegistryTool(BaseRegistryTool):
         m = resource.getMedia()
         if m:
             content = '@media %s {\n%s\n}\n' % (m, content)
-
+        
+        if resource.getApplyPrefix() and not self.getDebugMode():
+            prefix = aq_parent(self).absolute_url_path()
+            if prefix.endswith('/'):
+                prefix = prefix[:-1]
+            
+            resourceName = resource.getId()
+            
+            if '/' in resourceName:
+                prefix += '/' + '/'.join(resourceName.split('/')[:-1])
+            
+            content = applyPrefix(content, prefix)
+        
         return content
 
     #
@@ -203,12 +229,13 @@ class CSSRegistryTool(BaseRegistryTool):
                              rel='stylesheet', title='', rendering='link',
                              enabled=False, cookable=True, compression='safe',
                              cacheable=True, REQUEST=None,
-                             conditionalcomment='', authenticated=False):
+                             conditionalcomment='', authenticated=False,
+                             applyPrefix=False):
         """Register a stylesheet from a TTW request."""
-
         self.registerStylesheet(id, expression, media, rel, title,
                                 rendering, enabled, cookable, compression,
-                                cacheable, conditionalcomment, authenticated)
+                                cacheable, conditionalcomment, authenticated,
+                                applyPrefix=applyPrefix)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -236,7 +263,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                     cacheable=r.get('cacheable', True),
                                     compression=r.get('compression', 'safe'),
                                     conditionalcomment=r.get('conditionalcomment',''),
-                                    authenticated=r.get('authenticated', False),)
+                                    authenticated=r.get('authenticated', False),
+                                    applyPrefix=r.get('applyPrefix', False))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -259,8 +287,13 @@ class CSSRegistryTool(BaseRegistryTool):
                            rel='stylesheet', title='', rendering='link',
                            enabled=1, cookable=True, compression='safe',
                            cacheable=True, conditionalcomment='',
-                           authenticated=False, skipCooking=False):
+                           authenticated=False, skipCooking=False,
+                           applyPrefix=False):
         """Register a stylesheet."""
+        
+        if not id:
+            raise ValueError("id is required")
+        
         stylesheet = Stylesheet(id,
                                 expression=expression,
                                 media=media,
@@ -272,7 +305,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                 compression=compression,
                                 cacheable=cacheable,
                                 conditionalcomment=conditionalcomment,
-                                authenticated=authenticated)
+                                authenticated=authenticated,
+                                applyPrefix=applyPrefix)
         self.storeResource(stylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateStylesheet')
@@ -303,6 +337,8 @@ class CSSRegistryTool(BaseRegistryTool):
             stylesheet.setCacheable(data['cacheable'])
         if data.get('conditionalcomment',None) is not None:
             stylesheet.setConditionalcomment(data['conditionalcomment'])
+        if data.get('applyPrefix',None) is not None:
+            stylesheet.setApplyPrefix(data['applyPrefix'])
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):

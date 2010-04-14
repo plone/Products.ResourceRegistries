@@ -1,0 +1,21 @@
+@import url(common.css);
+
+#foo {
+    background-image: url ( 'spacer.jpg' );
+}
+
+.bar {
+    background-image: url('../images/test.jpg' );
+}
+
+p {
+    background: url("./test.jpg") repeat-x;
+}
+
+table {
+    background: url("/absolute.jpg") repeat-x;
+}
+
+table p {
+    background: url("http://example.org/absolute.jpg") repeat-x;
+}

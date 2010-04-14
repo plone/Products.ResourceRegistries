@@ -60,7 +60,7 @@ class TestHTTPHeaders(FunctionalRegistryTestCase):
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type
         self.setRoles(['Manager'])
-
+        
         request = self.portal.REQUEST
         request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # if modified in the last minute
         #print self.portal.REQUEST.get_header('If-Modified-Since')

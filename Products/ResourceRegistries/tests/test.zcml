@@ -23,6 +23,11 @@
       file="test_rr_1.js"
       />
 
+  <browser:resourceDirectory
+      name="test_rr"
+      directory="test_resources"
+      />
+
   <genericsetup:registerProfile
       name="test"
       title="ResourceRegistries"

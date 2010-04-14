@@ -292,6 +292,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
+        
         # First see if it is a skin
         skintool = getToolByName(self, 'portal_skins')
         skins = skintool.getSkinSelections()

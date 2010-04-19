@@ -99,7 +99,7 @@ class Stylesheet(Resource):
 
     security.declarePublic('getApplyPrefix')
     def getApplyPrefix(self):
-        return self._data['applyPrefix']
+        return self._data.get('applyPrefix', False)
 
 InitializeClass(Stylesheet)
 

@@ -14,7 +14,11 @@ def makeAbsolute(path, prefix):
     absolute = "%s/%s" % (prefix, path)
     if '://' in absolute:
         return absolute
-    return os.path.normpath(absolute)
+    
+    normalized = os.path.normpath(absolute)
+    if os.path.sep != '/':
+        normalized = normalized.replace(os.path.sep, '/')
+    return normalized
 
 def applyPrefix(cssSource, prefix):
     """Return a copy of the string cssSource with each url() expression that

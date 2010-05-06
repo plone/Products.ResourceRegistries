@@ -4,6 +4,9 @@ Changelog
 2.0b4 - Unreleased
 ------------------
 
+- Add purge support to export/import handlers.
+  [elro]
+
 - Fix the authenticated checkbox on the kss form.
   [elro]
 

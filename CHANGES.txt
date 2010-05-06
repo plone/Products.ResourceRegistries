@@ -4,6 +4,9 @@ Changelog
 2.0b4 - Unreleased
 ------------------
 
+- Fix the authenticated checkbox on the kss form.
+  [elro]
+
 2.0b3 - 2010-05-01
 ------------------
 

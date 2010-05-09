@@ -135,7 +135,7 @@ class CSSRegistryTool(BaseRegistryTool):
 
     attributes_to_compare = ('getAuthenticated', 'getExpression',
                              'getCookable', 'getCacheable', 'getRel',
-                             'getRendering', 'getConditionalcomment', 'getMedia')
+                             'getRendering', 'getConditionalcomment')
     filename_base = 'ploneStyles'
     filename_appendix = '.css'
     merged_output_prefix = u''

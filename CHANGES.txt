@@ -4,9 +4,6 @@ Changelog
 2.0b4 - Unreleased
 ------------------
 
-- CSS media type should be compared for merging.
-  [elro]
-
 - Add purge support to export/import handlers.
   [elro]
 

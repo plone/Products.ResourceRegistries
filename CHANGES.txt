@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0b4 - Unreleased
+2.0b4 - 2010-06-03
 ------------------
 
 - Add purge support to export/import handlers.

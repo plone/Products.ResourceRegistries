@@ -4,6 +4,9 @@ Changelog
 2.0b5 - Unreleased
 ------------------
 
+- Avoid deprecation warnings under Zope 2.13.
+  [hannosch]
+
 - Adjusted tests to match new content-type for JavaScript in Zope 2.12.7+.
   [hannosch]
 

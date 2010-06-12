@@ -4,6 +4,9 @@ Changelog
 2.0b5 - Unreleased
 ------------------
 
+- Adjusted tests to match new content-type for JavaScript in Zope 2.12.7+.
+  [hannosch]
+
 2.0b4 - 2010-06-03
 ------------------
 

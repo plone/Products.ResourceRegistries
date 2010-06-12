@@ -507,7 +507,7 @@ class TestFivePublishing(FunctionalRegistryTestCase):
     def testPublishFiveResource(self):
         response = self.publish(self.toolpath + '/++resource++test_rr_1.js')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type')[:24], 'application/x-javascript')
+        self.failUnless(response.getHeader('Content-Type').endswith('javascript'))
         self.assertEqual("window.alert('running')" in response.getBody(), True)
 
 class TestDebugMode(FunctionalRegistryTestCase):

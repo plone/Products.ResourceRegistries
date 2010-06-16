@@ -1,10 +1,22 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-           xmlns:five="http://namespaces.zope.org/five">
+           xmlns:five="http://namespaces.zope.org/five"
+           xmlns:monkey="http://namespaces.plone.org/monkey">
 
   <include package=".browser" />
   <include package=".exportimport" />
   <five:registerPackage
       package="."
       initialize=".initialize" />
+      
+  <include package="collective.monkeypatcher"  />
+  
+  
+  <monkey:patch
+      description="DirectoryResource Traversal; gets around http://dev.plone.org/plone/ticket/10655"
+      class="Products.Five.browser.resource.DirectoryResource"
+      original="get"
+      replacement=".patch.DirectoryResource_get"
+      />
+      
 
 </configure>

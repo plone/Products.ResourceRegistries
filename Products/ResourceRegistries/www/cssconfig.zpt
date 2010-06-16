@@ -177,6 +177,18 @@ legend {
     &lt;!--[if <em>Condition</em>]&gt;...&lt;![endif]--&gt;
     </p>
     
+    <p>If your stylesheet uses relative URLs in a <code>url()</code>
+    statement, e.g. to refer to another stylesheet or image, you may
+    experience problems when using the registry in non-debug-mode, as
+    portal_css alters the URL seen by the browser. If so, tick the "Replace
+    relative paths in url() statements with absolute paths?" option to replace
+    any relative path inside a <code>url()</code> statement with an absolute
+    path (prefixed with the Plone site root path) during the resource merging
+    stage. This does not modify the original stylesheet. It may have a slight
+    performance impact, but it should not be an issue if resources get cached
+    properly. It has no effect in debug mode.</p>
+
+    
     <p>Please use care as external resources defined without SSL may cause an
     error to be displayed in a user's browser if they are visiting your site
     using SSL.</p>
@@ -242,6 +254,14 @@ legend {
                    tal:attributes="checked stylesheet/getCacheable | default;
                                    disabled stylesheet/isExternalResource | nothing" />
             <input type="hidden" name="stylesheets.cacheable:records:boolean:default" value="False" />
+            
+            <label title="This may be necessary when merging stylesheets that use relative URLs. It will not change the underlying stylesheet.">
+                Replace relative paths in <code>url()</code> statements with absolute paths?
+            </label>
+            <input type="checkbox" name="stylesheets.applyPrefix:records:boolean"
+                   tal:attributes="checked stylesheet/getApplyPrefix | default;
+                                   disabled stylesheet/isExternalResource | nothing" />
+            <input type="hidden" name="stylesheets.applyPrefix:records:boolean:default" value="False" />
         </div>
 
         <div class="stylesheetform">
@@ -354,6 +374,14 @@ legend {
               <label>Caching allowed?</label>
               <input type="checkbox" name="cacheable:boolean" checked="1" />
               <input type="hidden" name="cacheable:boolean:default" value="False" />
+          </div>
+
+           <div>
+              <label title="This may be necessary when merging stylesheets that use relative URLs. It will not change the underlying stylesheet.">
+                Replace relative paths in <code>url()</code> statements with absolute paths?
+              </label>
+              <input type="checkbox" name="applyPrefix:boolean" value="True" />
+              <input type="hidden" name="applyPrefix:boolean:default" value="False" />
           </div>
 
           <div>

@@ -1,6 +1,8 @@
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
+from Acquisition import aq_parent
+
 from zope.interface import implements
 
 from Products.CMFCore.utils import getToolByName
@@ -12,6 +14,8 @@ from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
+
+from Products.ResourceRegistries.utils import applyPrefix
 
 from packer import CSSPacker
 
@@ -26,6 +30,7 @@ class Stylesheet(Resource):
         self._data['title'] = kwargs.get('title', '')
         self._data['rendering'] = kwargs.get('rendering', 'import')
         self._data['compression'] = kwargs.get('compression', 'safe')
+        self._data['applyPrefix'] = kwargs.get('applyPrefix', False)
         if self.isExternal:
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
                 self._data['compression'] = 'none' #we have to assume none because of the default values
@@ -89,6 +94,15 @@ class Stylesheet(Resource):
         if self.isExternalResource() and compression not in config.CSS_COMPRESSION_METHODS:
             raise ValueError, "Compression method %s not valid, must be one of: %s" % (compression, ', '.join(config.CSS_EXTERNAL_COMPRESSION_METHODS))
         self._data['compression'] = compression
+        
+    security.declareProtected(permissions.ManagePortal, 'setApplyPrefix')
+    def setApplyPrefix(self, applyPrefix):
+        self._data['applyPrefix'] = applyPrefix
+
+    security.declarePublic('getApplyPrefix')
+    def getApplyPrefix(self):
+        return self._data['applyPrefix']
+
 
 InitializeClass(Stylesheet)
 
@@ -193,6 +207,18 @@ class CSSRegistryTool(BaseRegistryTool):
         m = resource.getMedia()
         if m:
             content = '@media %s {\n%s\n}\n' % (m, content)
+        
+        if resource.getApplyPrefix() and not self.getDebugMode():
+            prefix = aq_parent(self).absolute_url_path()
+            if prefix.endswith('/'):
+                prefix = prefix[:-1]
+            
+            resourceName = resource.getId()
+            
+            if '/' in resourceName:
+                prefix += '/' + '/'.join(resourceName.split('/')[:-1])
+            
+            content = applyPrefix(content, prefix)
 
         return content
 
@@ -204,12 +230,14 @@ class CSSRegistryTool(BaseRegistryTool):
     def manage_addStylesheet(self, id, expression='', media='',
                              rel='stylesheet', title='', rendering='import',
                              enabled=False, cookable=True, compression='safe',
-                             cacheable=True, REQUEST=None, conditionalcomment=''):
+                             cacheable=True, REQUEST=None, conditionalcomment='',
+                             applyPrefix=False):
         """Register a stylesheet from a TTW request."""
 
         self.registerStylesheet(id, expression, media, rel, title,
                                 rendering, enabled, cookable, compression,
-                                cacheable, conditionalcomment)
+                                cacheable, conditionalcomment,
+                                applyPrefix=applyPrefix)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -238,7 +266,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                     cookable=r.get('cookable', False),
                                     cacheable=r.get('cacheable', False),
                                     compression=r.get('compression', 'safe'),
-                                    conditionalcomment=r.get('conditionalcomment',''))
+                                    conditionalcomment=r.get('conditionalcomment', ''),
+                                    applyPrefix=r.get('applyPrefix', False))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -260,8 +289,13 @@ class CSSRegistryTool(BaseRegistryTool):
     def registerStylesheet(self, id, expression='', media='', rel='stylesheet',
                            title='', rendering='import',  enabled=1,
                            cookable=True, compression='safe', cacheable=True,
-                           conditionalcomment='', skipCooking=False):
+                           conditionalcomment='', skipCooking=False,
+                           applyPrefix=False):
         """Register a stylesheet."""
+        
+        if not id:
+            return ValueError("id is required")
+        
         stylesheet = Stylesheet(id,
                                 expression=expression,
                                 media=media,
@@ -272,7 +306,9 @@ class CSSRegistryTool(BaseRegistryTool):
                                 cookable=cookable,
                                 compression=compression,
                                 cacheable=cacheable,
-                                conditionalcomment=conditionalcomment)
+                                conditionalcomment=conditionalcomment,
+                                applyPrefix=applyPrefix)
+                    
         self.storeResource(stylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateStylesheet')
@@ -299,8 +335,11 @@ class CSSRegistryTool(BaseRegistryTool):
             stylesheet.setCompression(data['compression'])
         if data.get('cacheable', None) is not None:
             stylesheet.setCacheable(data['cacheable'])
-        if data.get('conditionalcomment',None) is not None:
+        if data.get('conditionalcomment', None) is not None:
             stylesheet.setConditionalcomment(data['conditionalcomment'])
+        if data.get('applyPrefix', None) is not None:
+            stylesheet.setApplyPrefix(data['applyPrefix'])
+
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):

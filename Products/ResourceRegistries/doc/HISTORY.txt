@@ -16,10 +16,6 @@ Changelog
   Backported from r36098 to fix http://dev.plone.org/plone/ticket/10656.
   [optilude]
 
-* Added monkey patch to allow for DirectoryResource traversal by the
-  registries. This fixes http://dev.plone.org/plone/ticket/10655.
-  [dunlapm]
-
 
 1.5.4 - 2009-12-08
 ------------------

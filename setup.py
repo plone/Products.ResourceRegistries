@@ -29,7 +29,6 @@ setup(name='Products.ResourceRegistries',
       zip_safe=False,
       install_requires=[
         'setuptools',
-        'collective.monkeypatcher',
       ],
       entry_points="""
       # -*- Entry points: -*-

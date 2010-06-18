@@ -393,7 +393,7 @@ class TestStylesheetAbsolutePrefix(RegistryTestCase):
 
     def testURLReplace(self):
         self.tool.registerStylesheet('++resource++test_rr/test_1.css', applyPrefix=True, cookable=True)
-        self.tool.registerStylesheet('++resource++test_rr/css/test_2.css', applyPrefix=False, cookable=True)
+        self.tool.registerStylesheet('++resource++test_rr/test_2.css', applyPrefix=False, cookable=True)
         
         self.tool.setDebugMode(False)
         

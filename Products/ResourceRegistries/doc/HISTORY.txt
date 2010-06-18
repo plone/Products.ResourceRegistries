@@ -1,8 +1,11 @@
 Changelog
 ---------
 
-1.5.6 - Unreleased
+1.5.5.1 - Unreleased
 ------------------
+
+* Don't assume applyPrefix exists, since it likely wont when you upgrade.
+  [dunlapm]
 
 1.5.5 - 2010-06-17
 ------------------

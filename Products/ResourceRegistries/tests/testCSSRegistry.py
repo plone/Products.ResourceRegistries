@@ -450,7 +450,7 @@ class TestStylesheetMoving(RegistryTestCase):
         self.tool.registerStylesheet('eggs')
         self.assertEqual(self.tool.getResourceIds(),
                          ('ham', 'spam', 'eggs'))
-        self.assertRaises(ValueError, self.tool.moveResourceUp, 'foo')
+        self.tool.moveResourceUp('foo')
 
     def testStylesheetMoveToBottom(self):
         self.tool.registerStylesheet('ham')

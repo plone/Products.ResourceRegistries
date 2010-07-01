@@ -677,7 +677,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """Move the resource before the resource with dest_id."""
         index = self.getResourcePosition(id)
         dest_index = self.getResourcePosition(dest_id)
-        if index < dest_index:
+        if dest_index == -1:
+            self.moveResourceToTop(id)
+        elif index < dest_index:
             self.moveResource(id, dest_index - 1)
         else:
             self.moveResource(id, dest_index)
@@ -689,7 +691,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """Move the resource after the resource with dest_id."""
         index = self.getResourcePosition(id)
         dest_index = self.getResourcePosition(dest_id)
-        if index < dest_index:
+        if dest_index == -1:
+            self.moveResourceToBottom(id)
+        elif index < dest_index:
             self.moveResource(id, dest_index)
         else:
             self.moveResource(id, dest_index + 1)
@@ -787,7 +791,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def getResourcePosition(self, id):
         """Get the position (order) of an resource given its id."""
         resource_ids = list(self.getResourceIds())
-        return resource_ids.index(id)
+        if id in resource_ids:
+            return resource_ids.index(id)
+        return -1
 
     security.declareProtected(permissions.ManagePortal, 'getDevelMode')
     def getDevelMode(self):

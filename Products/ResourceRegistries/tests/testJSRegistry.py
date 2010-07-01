@@ -328,7 +328,7 @@ class TestScriptMoving(RegistryTestCase):
         self.tool.registerScript('eggs')
         self.assertEqual(self.tool.getResourceIds(),
                          ('ham', 'spam', 'eggs'))
-        self.assertRaises(ValueError, self.tool.moveResourceUp, 'foo')
+        self.tool.moveResourceUp('foo')
 
     def testScriptMoveToBottom(self):
         self.tool.registerScript('ham')

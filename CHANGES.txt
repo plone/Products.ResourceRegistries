@@ -4,6 +4,11 @@ Changelog
 2.0b6 - unreleased
 ------------------
 
+- Changed the registries moveResourceAfter and moveResourceBefore methods to
+  gracefully handle missing destination ids. This is useful for GenericSetup
+  upgrade steps to work even if the resources specified in "insert-after" or
+  "insert-before" do not exist.
+  [hannosch]
 
 2.0b5 - 2010-06-13
 ------------------

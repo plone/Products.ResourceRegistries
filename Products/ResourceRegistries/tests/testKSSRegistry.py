@@ -328,7 +328,7 @@ class TestKineticStylesheetMoving(KSSRegistryTestCase):
         self.tool.registerKineticStylesheet('eggs')
         self.assertEqual(self.tool.getResourceIds(),
                          ('ham', 'spam', 'eggs'))
-        self.assertRaises(ValueError, self.tool.moveResourceUp, 'foo')
+        self.tool.moveResourceUp('foo')
 
     def testKineticStylesheetMoveToBottom(self):
         self.tool.registerKineticStylesheet('ham')

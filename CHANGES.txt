@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.0b6 - unreleased
-------------------
+2.0 - 2010-07-01
+----------------
 
 - Changed the registries moveResourceAfter and moveResourceBefore methods to
   gracefully handle missing destination ids. This is useful for GenericSetup

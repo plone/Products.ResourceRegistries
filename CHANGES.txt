@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.1 - unreleased
+2.0.1 - 2010-07-15
 ------------------
 
 - Silence the `Nothing to import.` log messages.

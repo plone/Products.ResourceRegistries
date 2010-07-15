@@ -4,6 +4,8 @@ Changelog
 2.0.1 - unreleased
 ------------------
 
+- Silence the `Nothing to import.` log messages.
+  [hannosch]
 
 2.0 - 2010-07-01
 ----------------

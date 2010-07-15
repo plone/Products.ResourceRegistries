@@ -15,7 +15,6 @@ def importResRegistry(context, reg_id, reg_title, filename):
 
     body = context.readDataFile(filename)
     if body is None:
-        logger.info("%s: Nothing to import" % reg_title)
         return
 
     res_reg = getToolByName(site, reg_id)
@@ -36,7 +35,6 @@ def exportResRegistry(context, reg_id, reg_title, filename):
     logger = context.getLogger('resourceregistry')
     res_reg = getToolByName(site, reg_id, None)
     if res_reg is None:
-        logger.info("%s: Nothing to export." % reg_title)
         return
 
     exporter = queryMultiAdapter((res_reg, context), IBody)
@@ -148,7 +146,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
                     data['skipCooking'] = True
                     method(res_id, **data)
                     del data['skipCooking']
-                except ValueError, e:
+                except ValueError:
                     # this feels a bit dirty too, but we always want to update
                     # if the resource already exists (in which case 'ValueError:
                     # Duplicate id ...' is raised.

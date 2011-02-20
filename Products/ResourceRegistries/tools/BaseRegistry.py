@@ -20,6 +20,7 @@ from OFS.Image import File
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
 from OFS.Cache import Cacheable
+from ZPublisher.Iterators import IStreamIterator
 
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.Expression import createExprContext
@@ -620,7 +621,15 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     if not isinstance(content, unicode):
                         content = unicode(content, default_charset)
                 elif callable(obj):
-                    content = obj(self.REQUEST, self.REQUEST.RESPONSE)
+                    try:
+                        content = obj(self.REQUEST, self.REQUEST.RESPONSE)
+                    except TypeError:
+                        # Could be a view or browser resource
+                        content = obj()
+                    
+                    if IStreamIterator.providedBy(content):
+                        content = content.read()
+                    
                     if not isinstance(content, unicode):
                         content = unicode(content, default_charset)
                 else:

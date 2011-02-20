@@ -27,6 +27,13 @@
       name="test_rr"
       directory="test_resources"
       />
+  
+  <browser:view
+      name="streamed-resource"
+      for="*"
+      class=".streamed.StreamedResource"
+      permission="zope.Public"
+      />
 
   <genericsetup:registerProfile
       name="test"

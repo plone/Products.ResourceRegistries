@@ -882,6 +882,7 @@ class TestUnicodeAwareness(RegistryTestCase):
         self.tool.registerScript('test_rr_3.js')
         self.tool.registerScript('testmethod.js')
         self.tool.registerScript('testfile.js')
+        self.tool.registerScript('@@streamed-resource')
         scripts = self.tool.getEvaluatedResources(self.portal)
         magicId = None
         for script in scripts:
@@ -891,6 +892,8 @@ class TestUnicodeAwareness(RegistryTestCase):
         self.failUnless(magicId)
         content = self.tool.getResourceContent(magicId, self.portal, original=True)
 
+        self.assertTrue(u"window.alert('running')" in content)
+        self.assertTrue(u"alert('streamed');" in content)
 
 class TestCachingHeaders(FunctionalRegistryTestCase):
 

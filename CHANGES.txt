@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.3 - unreleased
+2.0.3 - 2011-03-02
 ------------------
 
 - Support merging of resources that return IStreamIterators

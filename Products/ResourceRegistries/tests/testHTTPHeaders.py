@@ -52,10 +52,15 @@ class TestHTTPHeaders(FunctionalRegistryTestCase):
         response = self.publish(self.toolpath+'/test_rr_2.css', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
         self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
         self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
+        response = self.publish(self.toolpath+'/test_rr_2.css')
+        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
 
-        #response = self.publish(self.toolpath+'/test_rr_2.css')
-        #self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
-
+        # And for OFS.Image.File
+	# This test triggers the failure reported in #9849
+        self.portal.manage_addFile('testFile')
+        self.tool.registerStylesheet('testFile')
+        response = self.publish(self.toolpath+'/testFile', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() + 60.0/(24.0*3600.0)))})
+        self.assertEqual(response.getStatus(), 200) # this should in fact send a 200
 
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type

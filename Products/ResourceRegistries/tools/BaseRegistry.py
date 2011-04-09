@@ -576,16 +576,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     # response so first we must save the headers.
                     # Especially, we must delete the If-Modified-Since, because
                     # otherwise we might get a 30x response status in some cases.
-                    response_headers = self.REQUEST.RESPONSE.headers.copy()
-                    if_modif = self.REQUEST.get_header('If-Modified-Since', None)
-                    try:
-                        del self.REQUEST.environ['IF_MODIFIED_SINCE']
-                    except KeyError:
-                        pass
-                    try:
-                        del self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE']
-                    except KeyError:
-                        pass
+                    original_headers, if_modified = self._removeCachingHeaders()
                     # Now, get the content.
                     try:
                         method = obj.__browser_default__(self.REQUEST)[1][0]
@@ -597,12 +588,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
                         contenttype = getCharsetFromContentType(contenttype, default_charset)
                         content = unicode(content, contenttype)
-                    # Now restore the headers and for safety, check that we
-                    # have a 20x response. If not, we have a problem and
-                    # some browser would hang indefinitely at this point.
-                    assert int(self.REQUEST.RESPONSE.getStatus()) / 100 == 2
-                    self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE'] = if_modif
-                    self.REQUEST.RESPONSE.headers = response_headers
+                    self._restoreCachingHeaders(original_headers, if_modified)
                 elif hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)
@@ -620,10 +606,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     content = unicode(str(f), contenttype)
                 # We should add more explicit type-matching checks
                 elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
+                    original_headers, if_modified = self._removeCachingHeaders()
                     content = obj.index_html(self.REQUEST,
                                              self.REQUEST.RESPONSE)
                     if not isinstance(content, unicode):
                         content = unicode(content, default_charset)
+                    self._restoreCachingHeaders(original_headers, if_modified)
                 elif callable(obj):
                     content = obj(self.REQUEST, self.REQUEST.RESPONSE)
                     if not isinstance(content, unicode):
@@ -631,6 +619,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 else:
                     content = str(obj)
                     content = unicode(content, default_charset)
+                assert int(self.REQUEST.RESPONSE.getStatus()) / 100 == 2, \
+                    "Status for resource \"%s\" must be 20x, but is %s" % \
+                    (id, self.REQUEST.RESPONSE.getStatus())
 
             # Add start/end notes to the resource for better
             # understanding and debugging
@@ -642,6 +633,28 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     output += self.finalizeContent(resources[id], content)
                 output += u'\n'
         return output
+
+    def _removeCachingHeaders(self):
+        orig_response_headers = self.REQUEST.RESPONSE.headers.copy()
+        if_modif = self.REQUEST.get_header('If-Modified-Since', None)
+        try:
+            del self.REQUEST.environ['IF_MODIFIED_SINCE']
+        except KeyError:
+            pass
+        try:
+            del self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE']
+        except KeyError:
+            pass
+        return orig_response_headers, if_modif
+
+    def _restoreCachingHeaders(self, original_response_headers, if_modified):
+        # Now restore the headers and for safety, check that we
+        # have a 20x response. If not, we have a problem and
+        # some browser would hang indefinitely at this point.
+        assert int(self.REQUEST.RESPONSE.getStatus()) / 100 == 2
+        self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE'] = if_modified
+        self.REQUEST.RESPONSE.headers = original_response_headers
+        
 
     #
     # ZMI Methods

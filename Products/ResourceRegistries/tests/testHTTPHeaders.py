@@ -42,20 +42,24 @@ class TestHTTPHeaders(FunctionalRegistryTestCase):
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')
         response = self.publish(self.toolpath+'/testmethod', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
-        #response = self.publish(self.toolpath+'/testmethod')
         self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
-        self.assertEqual(response.getStatus(), 200) # this should in fact send a 200
+        self.assertEqual(response.getStatus(), 200)
 
         # we also add an fsfile for good measure
         self.tool.registerStylesheet('test_rr_2.css')
         rs = self.tool.getEvaluatedResources(self.portal)
         response = self.publish(self.toolpath+'/test_rr_2.css', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() - 60.0/(24.0*3600.0)))})
-        self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
+        self.assertEqual(response.getStatus(), 200)
         self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
+        response = self.publish(self.toolpath+'/test_rr_2.css')
+        self.assertEqual(response.getStatus(), 200)
 
-        #response = self.publish(self.toolpath+'/test_rr_2.css')
-        #self.assertEqual(response.getStatus(), 200)  # this should send a 200 when things are fixed, but right now should send a 304
-
+        # And for OFS.Image.File
+	# This test triggers the failure reported in #9849
+        self.portal.manage_addFile('testFile')
+        self.tool.registerStylesheet('testFile')
+        response = self.publish(self.toolpath+'/testFile', env={'IF_MODIFIED_SINCE': rfc1123_date((DateTime() + 60.0/(24.0*3600.0)))})
+        self.assertEqual(response.getStatus(), 200)
 
     def testContentLengthHeaders(self):
         # Test that the main page retains its content-type
@@ -63,7 +67,6 @@ class TestHTTPHeaders(FunctionalRegistryTestCase):
 
         request = self.portal.REQUEST
         request.environ['IF_MODIFIED_SINCE'] = rfc1123_date((DateTime() - 60.0/(24.0*3600.0))) # if modified in the last minute
-        #print self.portal.REQUEST.get_header('If-Modified-Since')
         self.tool.registerStylesheet('test_rr_1.css')
         self.portal.addDTMLMethod('testmethod', file="""/* YES WE ARE RENDERED */""")
         self.tool.registerStylesheet('testmethod')
@@ -75,7 +78,6 @@ class TestHTTPHeaders(FunctionalRegistryTestCase):
         self.assertEqual(len(rs),1)
         response = self.publish(self.toolpath+'/'+rs[0].getId())
         self.assertEqual(response.getHeader('Content-Type'), 'text/css;charset=utf-8')
-        #print str(response)
         self.assertEqual(int(response.getHeader('content-length')), len(response.getBody()))
         self.assertEqual(response.getStatus(), 200)
 

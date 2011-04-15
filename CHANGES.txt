@@ -1,8 +1,11 @@
 Changelog
 =========
 
-2.0.4 - Unreleased
+2.0.4 (2011-04-15)
 ------------------
+
+* Bugfix for #9849. Incomplete caching.
+  [do3cc]
 
 2.0.3 - 2011-03-02
 ------------------

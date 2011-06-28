@@ -276,6 +276,11 @@ ul {
         </div>
 
         <div class="stylesheetform">
+            
+            <label>Bundle</label>
+            <input type="text" name="stylesheets.bundle:records"
+                   tal:attributes="value stylesheet/getBundle|nothing" />
+            
             <label>CSS Media</label>
             <input type="text" name="stylesheets.media:records"
                    tal:attributes="value stylesheet/getMedia|nothing" />
@@ -327,10 +332,15 @@ ul {
           </div>
 
           <div>
+              <label>Bundle</label>
+              <input type="text" name="bundle" size="50" />
+          </div>
+          
+          <div>
               <label>Title</label>
               <input type="text" name="title" />
           </div>
-
+          
           <div>
               <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
               <input type="checkbox" name="authenticated" value="0" />

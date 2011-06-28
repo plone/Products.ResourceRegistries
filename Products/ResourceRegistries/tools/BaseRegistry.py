@@ -1,4 +1,5 @@
 import random
+import logging
 
 # we *have* to use StringIO here, because we can't add attributes to cStringIO
 # instances (needed in BaseRegistryTool.__getitem__).
@@ -6,6 +7,11 @@ from StringIO import StringIO
 from urllib import quote_plus
 
 from zope.interface import implements, alsoProvides
+from zope.component import getAdapters
+from zope.component import queryUtility
+from zope.site.hooks import getSite
+
+from plone.registry.interfaces import IRegistry
 
 from AccessControl import ClassSecurityInfo, Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager
@@ -27,11 +33,19 @@ from Products.CMFCore.Expression import createExprContext
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.Five.browser.resource import Resource as z3_Resource
 
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
 from Products.ResourceRegistries import permissions
+from Products.ResourceRegistries import config
+
 from Products.ResourceRegistries.interfaces import IResourceRegistry
 from Products.ResourceRegistries.interfaces import ICookedFile
+from Products.ResourceRegistries.interfaces import IResourceProvider
+from Products.ResourceRegistries.interfaces.settings import IResourceRegistriesSettings
 
 DEVEL_MODE = dict()
+
+LOGGER = logging.getLogger('ResourceRegistries')
 
 def getDummyFileForContent(name, ctype):
     # make output file like and add an headers dict, so the contenttype
@@ -56,6 +70,24 @@ def is_anonymous():
     user = getSecurityManager().getUser()
     return bool(user.getUserName() == 'Anonymous User')
 
+class PersistentResourceProvider(object):
+    implements(IResourceProvider)
+    
+    def __init__(self, context):
+        self.context = context
+    
+    def getResources(self):
+        """Get a list of available Resource objects
+        """
+        return self.context.resources
+
+def cookWhenChangingSettings(settings, event):
+    """When our settings are changed, re-cook the main registries
+    """
+    for name in (config.JSTOOLNAME, config.CSSTOOLNAME, config.KSSTOOLNAME,):
+        tool = getToolByName(getSite(), 'portal_css', None)
+        if tool is not None:
+            tool.cookResources()
 
 class Resource(Persistent):
     security = ClassSecurityInfo()
@@ -73,6 +105,7 @@ class Resource(Persistent):
         self._data['cookable'] = kwargs.get('cookable', True)
         self._data['cacheable'] = kwargs.get('cacheable', True)
         self._data['conditionalcomment'] = kwargs.get('conditionalcomment','')
+        self._data['bundle'] = kwargs.get('bundle', 'default')
         self.isExternal = extres
         if extres:
             self._data['cacheable'] = False #External resources are NOT cacheable
@@ -172,14 +205,23 @@ class Resource(Persistent):
     def isExternalResource(self):
         return getattr(self, 'isExternal', False)
 
+    security.declarePublic('getBundle')
+    def getBundle(self):
+        return self._data.get('bundle', None) or 'default'
+    
+    security.declareProtected(permissions.ManagePortal, 'setBundle')
+    def setBundle(self, bundle):
+        self._data['bundle'] = bundle
+
 InitializeClass(Resource)
 
 
 class Skin(Acquisition.Implicit):
     security = ClassSecurityInfo()
 
-    def __init__(self, skin):
+    def __init__(self, skin, resources):
         self._skin = skin
+        self.resources = resources
 
     def __before_publishing_traverse__(self, object, REQUEST):
         """ Pre-traversal hook. Specify the skin. 
@@ -188,8 +230,7 @@ class Skin(Acquisition.Implicit):
 
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""
-        if REQUEST is not None and \
-           self.concatenatedresources.get(name, None) is not None:
+        if REQUEST is not None and self.resources.get(name, None) is not None:
             parent = aq_parent(self)
             # see BaseTool.__bobo_traverse__
             deferred = getDummyFileForContent(name, self.getContentType())
@@ -206,13 +247,22 @@ class Skin(Acquisition.Implicit):
 
 InitializeClass(Skin)
 
+_marker = {} # must be a dict
 
 class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     """Base class for a Plone registry managing resource files."""
 
     security = ClassSecurityInfo()
     implements(IResourceRegistry)
-    manage_options = SimpleItem.manage_options
+    
+    manage_bundlesForm = PageTemplateFile('www/bundles', config.GLOBALS)
+    
+    manage_options = (
+        {
+            'label': 'Bundles',
+            'action': 'manage_bundlesForm',
+        },
+    ) + SimpleItem.manage_options
 
     attributes_to_compare = ('getAuthenticated', 'getExpression',
                              'getCookable', 'getCacheable',
@@ -223,6 +273,10 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     cache_duration = 3600
     resource_class = Resource
 
+    # Kept here for BBB to avoid need to migrate these in
+    cookedResourcesByTheme = _marker
+    concatenatedResourcesByTheme = _marker
+    
     #
     # Private Methods
     #
@@ -230,8 +284,35 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     def __init__(self):
         """Add the storages."""
         self.resources = ()
-        self.cookedresources = ()
-        self.concatenatedresources = {}
+
+        self.cookedResourcesByTheme = {} # theme -> tuple of cooked resources
+        self.concatenatedResourcesByTheme = {} # theme -> {magic (public) id -> list of actual resource ids}
+    
+    # Get/set cooked resources and concatenated resources for the current
+    # theme. This is mainly BBB support.
+    
+    @property
+    def cookedresources(self):
+        if 'cookedresources' in self.__dict__:
+            LOGGER.warn("Migrating old cooked resources storage on the fly - this should only happen once per tool")
+            self.cookResources()
+            del self.__dict__['cookedresources']
+            del self.__dict__['concatenatedresources']
+            
+        
+        theme = self.getCurrentSkinName()
+        return self.cookedResourcesByTheme.get(theme, ())
+
+    @property
+    def concatenatedresources(self):
+        if 'concatenatedresources' in self.__dict__:
+            LOGGER.warn("Migrating old concatenated resources storage on the fly - this should only happen once per tool")
+            self.cookResources()
+            del self.__dict__['cookedresources']
+            del self.__dict__['concatenatedresources']
+        
+        theme = self.getCurrentSkinName()
+        return self.concatenatedResourcesByTheme.get(theme, {})
 
     def __getitem__(self, item):
         """Return a resource from the registry."""
@@ -298,10 +379,12 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         skintool = getToolByName(self, 'portal_skins')
         skins = skintool.getSkinSelections()
         if name in skins:
-            return Skin(name).__of__(self)
-
+            return Skin(name, self.concatenatedResourcesByTheme.get(name, {})).__of__(self)
+        
+        theme = self.getCurrentSkinName()
+        
         if REQUEST is not None and \
-           self.concatenatedresources.get(name, None) is not None:
+                self.concatenatedResourcesByTheme.get(theme, {}).get(name, None) is not None:
             # __bobo_traverse__ is called before the authentication has
             # taken place, so if some operations require an authenticated
             # user (like restrictedTraverse in __getitem__) it will fail.
@@ -326,9 +409,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         raise AttributeError('%s' % (name,))
 
     security.declarePublic('isCacheable')
-    def isCacheable(self, name):
+    def isCacheable(self, name, theme=None):
         """Return a boolean whether the resource is cacheable or not."""
-        resource_id = self.concatenatedresources.get(name, [None])[0]
+        
+        if theme is None:
+            theme = self.getCurrentSkinName()
+        
+        resource_id = self.concatenatedResourcesByTheme.get(theme, {}).get(name, [None])[0]
         if resource_id is None:
             return False
         resources = self.getResourcesDict()
@@ -346,7 +433,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declarePrivate('storeResource')
     def storeResource(self, resource, skipCooking=False):
         """Store a resource."""
-        self.validateId(resource.getId(), self.getResources())
+        self.validateId(resource.getId(), self.resources)
         resources = list(self.resources)
         resources.append(resource)
         self.resources = tuple(resources)
@@ -360,8 +447,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         Convenience funtion for Plone migrations and tests.
         """
         self.resources = ()
-        self.cookedresources = ()
-        self.concatenatedresources = {}
+        self.cookedResourcesByTheme = {}
+        self.concatenatedResourcesByTheme = {}
 
     security.declarePrivate('getResourcesDict')
     def getResourcesDict(self):
@@ -425,41 +512,70 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         """Cook the stored resources."""
         if self.ZCacheable_isCachingEnabled():
             self.ZCacheable_invalidate()
-        resources = [r.copy() for r in self.getResources() if r.getEnabled()]
-        self.concatenatedresources = {}
-        self.cookedresources = ()
-        results = []
-        for resource in resources:
-            if results:
-                previtem = results[-1]
-                if resource.getCookable() and previtem.getCookable() \
-                       and self.compareResources(resource, previtem):
-                    res_id = resource.getId()
-                    prev_id = previtem.getId()
-                    self.finalizeResourceMerging(resource, previtem)
-                    if self.concatenatedresources.has_key(prev_id):
-                        self.concatenatedresources[prev_id].append(res_id)
+        
+        self.concatenatedResourcesByTheme = {}
+        self.cookedResourcesByTheme = {}
+        
+        bundlesForThemes = self.getBundlesForThemes()
+        for theme, bundles in bundlesForThemes.items():
+            
+            resources = [r.copy() for r in self.getResources() if r.getEnabled()]
+            results = []
+            
+            concatenatedResources = self.concatenatedResourcesByTheme[theme] = {}
+            
+            for resource in resources:
+                
+                # Skip resources in bundles not in this theme. None bundles
+                # are assumed to 
+                
+                bundle = resource.getBundle()
+                if bundle not in bundles:
+                    continue
+                
+                if results:
+                    previtem = results[-1]
+                
+                    # Is this resource compatible the previous one we used?
+                    if resource.getCookable() and previtem.getCookable() \
+                           and self.compareResources(resource, previtem):
+                        res_id = resource.getId()
+                        prev_id = previtem.getId()
+                        self.finalizeResourceMerging(resource, previtem)
+                        
+                        # Add the original id under concatenated resources or
+                        # create a new one starting with the previous item
+                        if concatenatedResources.has_key(prev_id):
+                            concatenatedResources[prev_id].append(res_id)
+                        else:
+                            magic_id = self.generateId(res_id, prev_id)
+                            concatenatedResources[magic_id] = [prev_id, res_id]
+                            previtem._setId(magic_id)
+                        
                     else:
-                        magic_id = self.generateId(res_id, prev_id)
-                        self.concatenatedresources[magic_id] = [prev_id, res_id]
-                        previtem._setId(magic_id)
-                else:
+                        if resource.getCookable() or resource.getCacheable():
+                            magic_id = self.generateId(resource.getId())
+                            concatenatedResources[magic_id] = [resource.getId()]
+                            resource._setId(magic_id)
+                        results.append(resource)
+                else: # No resources collated yet
+                
+                    # If cookable or cacheable, generate a magic id, change
+                    # the resource id to be this id, and record the old id in the
+                    # list of ids for this magic id under concatenated resources
                     if resource.getCookable() or resource.getCacheable():
                         magic_id = self.generateId(resource.getId())
-                        self.concatenatedresources[magic_id] = [resource.getId()]
+                        concatenatedResources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)
                     results.append(resource)
-            else:
-                if resource.getCookable() or resource.getCacheable():
-                    magic_id = self.generateId(resource.getId())
-                    self.concatenatedresources[magic_id] = [resource.getId()]
-                    resource._setId(magic_id)
-                results.append(resource)
-
-        resources = self.getResources()
-        for resource in resources:
-            self.concatenatedresources[resource.getId()] = [resource.getId()]
-        self.cookedresources = tuple(results)
+                    
+            # Get the raw list of resources and store these as well in
+            # concatenated resources
+            resources = self.getResources()
+            for resource in resources:
+                concatenatedResources[resource.getId()] = [resource.getId()]
+            
+            self.cookedResourcesByTheme[theme] = tuple(results)
 
     security.declarePrivate('evaluate')
     def evaluate(self, item, context):
@@ -520,9 +636,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         return None
 
     security.declarePrivate('getResourceContent')
-    def getResourceContent(self, item, context, original=False):
+    def getResourceContent(self, item, context, original=False, theme=None):
         """Fetch resource content for delivery."""
-        ids = self.concatenatedresources.get(item, None)
+        
+        if theme is None:
+            theme = self.getCurrentSkinName()
+
+        ids = self.concatenatedResourcesByTheme.get(theme, {}).get(item, None)
         resources = self.getResourcesDict()
         if ids is not None:
             ids = ids[:]
@@ -719,6 +839,52 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
+    security.declareProtected(permissions.ManagePortal, 'getBundlesForThemes')
+    def getBundlesForThemes(self):
+        """Get the mapping of theme names to lists of bundles
+        """
+        
+        mappings = {}
+        
+        registry = queryUtility(IRegistry)
+        if registry is not None:
+            mappings = registry.forInterface(IResourceRegistriesSettings, False).resourceBundlesForThemes or {}
+            mappings = dict(mappings) # clone as builtin dict, even if non-builtin dict
+        
+        portal_skins = getToolByName(self, 'portal_skins')
+        for theme in portal_skins.getSkinSelections():
+            if not theme in mappings:
+                mappings[theme] = ['default']
+        
+        return mappings
+        
+    security.declareProtected(permissions.ManagePortal, 'getBundlesForTheme')
+    def getBundlesForTheme(self, theme=None):
+        """Get the bundles for a particular theme (defaults to the current)
+        """
+        
+        if theme is None:
+            theme = self.getCurrentSkinName()
+        
+        return self.getBundlesForThemes().get(theme, ['default'])
+
+    security.declareProtected(permissions.ManagePortal, 'manage_saveBundlesForThemes')
+    def manage_saveBundlesForThemes(self, mappings={}, REQUEST=None):
+        """Save theme -> bundle mappings
+        """
+        registry = queryUtility(IRegistry)
+        settings = registry.forInterface(IResourceRegistriesSettings)
+        
+        m = {}
+        for k,v in mappings.items():
+            m[str(k)] = [str(x) for x in v if x]
+        settings.resourceBundlesForThemes = m
+        
+        self.cookResources()
+        
+        if REQUEST:
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+    
     #
     # Protected Methods
     #
@@ -726,7 +892,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'registerResource')
     def registerResource(self, id, expression='', enabled=True,
                          cookable=True, cacheable=True, conditionalcomment='',
-                         authenticated=False):
+                         authenticated=False, bundle='default'):
         """Register a resource."""
         resource = Resource(id,
                             expression=expression,
@@ -734,13 +900,14 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                             cookable=cookable,
                             cacheable=cacheable,
                             conditionalcomment=conditionalcomment,
-                            authenticated=authenticated)
+                            authenticated=authenticated,
+                            bundle=bundle)
         self.storeResource(resource)
 
     security.declareProtected(permissions.ManagePortal, 'unregisterResource')
     def unregisterResource(self, id):
         """Unregister a registered resource."""
-        resources = [item for item in self.getResources()
+        resources = [item for item in self.resources
                      if item.getId() != id]
         self.resources = tuple(resources)
         self.cookResources()
@@ -748,7 +915,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'renameResource')
     def renameResource(self, old_id, new_id):
         """Change the id of a registered resource."""
-        self.validateId(new_id, self.getResources())
+        self.validateId(new_id, self.resources)
         resources = list(self.resources)
         for resource in resources:
             if resource.getId() == old_id:
@@ -760,7 +927,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'getResourceIds')
     def getResourceIds(self):
         """Return the ids of all resources."""
-        return tuple([x.getId() for x in self.getResources()])
+        return tuple([x.getId() for x in self.resources])
 
     security.declareProtected(permissions.ManagePortal, 'getResources')
     def getResources(self):
@@ -769,27 +936,41 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         For management screens.
         """
         result = []
-        for item in self.resources:
-            if isinstance(item, dict):
-                # BBB we used dicts before
-                item = item.copy()
-                item_id = item['id']
-                del item['id']
-                obj = self.resource_class(item_id, **item)
-                result.append(obj)
-            else:
-                result.append(item)
+        
+        for name, provider in getAdapters((self,), IResourceProvider):
+            for item in provider.getResources():
+                if isinstance(item, dict):
+                    # BBB we used dicts before
+                    item = item.copy()
+                    item_id = item['id']
+                    del item['id']
+                    obj = self.resource_class(item_id, **item)
+                    result.append(obj)
+                else:
+                    result.append(item)
         return tuple(result)
 
     security.declareProtected(permissions.ManagePortal, 'getCookedResources')
-    def getCookedResources(self):
+    def getCookedResources(self, theme=None):
         """Get the cooked resource data."""
         result = []
+        
+        if theme is None:
+            theme = self.getCurrentSkinName()
+        
+        # If we don't recognise the theme, pretend we're the default one
+        bundlesForThemes = self.getBundlesForThemes()
+        
+        if theme not in bundlesForThemes or theme not in self.cookedResourcesByTheme:
+            portal_skins = getToolByName(self, 'portal_skins')
+            theme = portal_skins.getDefaultSkin()
+        
         if self.getDebugMode():
-            resources = [r.copy() for r in self.getResources() if r.getEnabled()]
-            result = [x for x in resources]
+            bundles = bundlesForThemes.get(theme, ['default'])
+            result = [r.copy() for r in self.getResources() \
+                            if r.getEnabled() and (not r.getBundle() or r.getBundle() in bundles)]
         else:
-            result = [x for x in self.cookedresources]
+            result = [x for x in self.cookedResourcesByTheme.get(theme, ())]
         return tuple(result)
 
     security.declareProtected(permissions.ManagePortal, 'moveResource')
@@ -800,7 +981,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             return
         elif position < 0:
             position = 0
-        resources = list(self.getResources())
+        resources = list(self.resources)
         resource = resources.pop(index)
         resources.insert(position, resource)
         self.resources = tuple(resources)
@@ -834,9 +1015,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         DEVEL_MODE[self.id] = bool(value)
 
     security.declareProtected(permissions.View, 'getEvaluatedResources')
-    def getEvaluatedResources(self, context):
+    def getEvaluatedResources(self, context, theme=None):
         """Return the filtered evaluated resources."""
-        results = self.getCookedResources()
+        results = self.getCookedResources(theme=theme)
         return [item for item in results if self.evaluate(item, context)]
 
     security.declareProtected(permissions.View, 'getInlineResource')
@@ -860,5 +1041,15 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         Should be overwritten by subclasses.
         """
         return 'text/plain'
+
+    security.declarePublic('getCurrentSkinName')
+    def getCurrentSkinName(self):
+        """Get the currently active skin name
+        """
+        
+        # For reasons of horridness, we can't use acquisition here
+        portal_url = getToolByName(getSite(), 'portal_url')
+        return portal_url.getPortalObject().getCurrentSkinName()
+        
 
 InitializeClass(BaseRegistryTool)

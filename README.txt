@@ -37,6 +37,13 @@ Linked stylesheets take some parameters:
 
 id -- The id mentioned above. the Zope id of the stylesheet to be used.
 
+bundle -- A resource bundle is like a tag, which can be applied to each
+resource. The default (implicit) bundle is called 'default', but other names
+can be used. Bundles are associated with themes (skins) on the 'Bundles' tab
+in the ZMI. Note that the same association applies to all resource registries,
+i.e. this is a global setting. Bundles act like a filter - only resources in
+the bundles listed for the current theme will be included.
+
 expression -- A CMF expression to be evaluated to check if the stylesheet
 should be included in output or not.
 

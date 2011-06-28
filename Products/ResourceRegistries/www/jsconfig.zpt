@@ -246,6 +246,11 @@ legend {
         </div>
 
         <div class="scriptform">
+            
+            <label>Bundle</label>
+            <input type="text" name="scripts.bundle:records"
+                   tal:attributes="value script/getBundle|nothing" />
+            
             <label>Inline rendering</label>
             <input type="checkbox" name="scripts.inline:records:boolean"
                    tal:attributes="checked script/getInline;
@@ -286,6 +291,11 @@ legend {
             <label for="id">ID/URL</label>
             <input type="text" name="id" size="50" />
         </div>
+
+        <div>
+              <label>Bundle</label>
+              <input type="text" name="bundle" size="50" />
+          </div>
 
         <div>
             <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>

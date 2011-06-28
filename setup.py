@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '2.0.5dev'
+version = '2.1a1'
 
 setup(name='Products.ResourceRegistries',
       version=version,
@@ -42,5 +42,6 @@ setup(name='Products.ResourceRegistries',
         'DateTime',
         'ZODB3',
         'Zope2',
+        'plone.app.registry',
       ],
 )

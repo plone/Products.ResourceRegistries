@@ -2,8 +2,13 @@ Changelog
 =========
 
 
-2.0.5 - unreleased
+2.1a1 - unreleased
 ------------------
+
+- Add bundle concept - a bundle is a string tag against a resource, which can
+  be used to filter resources by theme. Each theme has a list of enabled
+  bundles, managed on the 'Bundles' tab in the ZMI (note that this is global).
+  [optilude]
 
 - Add MANIFEST.in.
   [WouterVH]

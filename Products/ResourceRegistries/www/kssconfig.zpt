@@ -241,6 +241,11 @@ legend {
         </div>
 
         <div class="kineticstylesheetform">
+            
+            <label>Bundle</label>
+            <input type="text" name="kineticstylesheets.bundle:records"
+                   tal:attributes="value kineticstylesheet/getBundle|nothing" />
+            
             <label>Compression type</label>
             <select name="kineticstylesheets.compression:records">
                 <option tal:define="options python:test(kineticstylesheet.isExternalResource(),here.getExternalCompressionOptions(),here.getCompressionOptions())"
@@ -272,6 +277,11 @@ legend {
           <div>
               <label for="id">ID/URL</label>
               <input type="text" name="id" size="50" />
+          </div>
+          
+          <div>
+              <label>Bundle</label>
+              <input type="text" name="bundle" size="50" />
           </div>
 
           <div>

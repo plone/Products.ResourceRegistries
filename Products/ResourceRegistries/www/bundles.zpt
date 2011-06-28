@@ -1,0 +1,99 @@
+<div tal:replace="structure here/manage_page_header" />
+
+<style type="text/css">
+form {
+    margin-bottom: 3em;
+}
+
+fieldset label,fieldset input,fieldset  select {
+    font-size: 80%;
+    font-family: sans-serif;
+    float: left;
+}
+
+legend input {
+    float: none;
+}
+
+fieldset label {
+    width: 11em;
+    text-align: right;
+    padding: 0.2em 0.4em;
+    font-weight: bold;
+    clear: left;
+}
+
+
+fieldset {
+    margin: 0.2em;
+    border: 1px solid black;
+    margin-bottom: 0.5em;
+    padding-bottom: 0;
+    clear: both;
+}
+
+legend {
+    font-size: 90%;
+}
+
+.hiddenLabel {
+    display: block;
+    background: transparent;
+    background-image: none; /* */
+    border: none;
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    margin: -1px 0 0 -1px;
+    width: 1px;
+}
+
+</style>
+
+<div tal:replace="structure here/manage_tabs" />
+
+    <p>
+        Resource bundles are collections of related resources. Every resource
+        can be associated with a bundle.
+    </p>
+    <p>
+        Bundles are managed globally, across all registries. They are
+        associated with themes (skins): when a particular theme is enabled,
+        all the active resources in the associated bundles will be used. If a
+        resource is not associated with a bundle, it will be considered
+        global, and hence used always.
+    </p>
+
+    <form action="manage_saveBundlesForThemes"
+          tal:attributes="action string:${context/absolute_url}/manage_saveBundlesForThemes"
+          tal:define="mappings context/getBundlesForThemes"
+          method="post">
+
+        <fieldset>
+              <legend>Bundles for themes</legend>
+              
+              <p>Choose which bundles are associated with which themes</p>
+
+              <div tal:repeat="theme context/aq_parent/portal_skins/getSkinSelections">
+                  <label tal:content="theme" />
+                  
+                  <textarea
+                    rows="5"
+                    style="margin-bottom: 10px"
+                    tal:define="m python:mappings.get(theme, [])"
+                    tal:attributes="name string:mappings.${theme}:record:lines"
+                    tal:content="python:'\n'.join(m)"
+                    />
+                  
+              </div>
+
+              <p style="clear:both">&nbsp;</p>
+              <div>
+                  <input type="submit" i18n:attributes="value" value="Save" />
+              </div>
+              <p style="clear:both">&nbsp;</p>
+
+        </fieldset>
+    </form>
+
+<div tal:replace="structure here/manage_page_footer" />

@@ -1,4 +1,5 @@
 import unittest
+
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool, Resource
 
 class BaseRegistryTestCase(unittest.TestCase):
@@ -25,7 +26,7 @@ class BaseRegistryTestCase(unittest.TestCase):
                }
         for id in ids:
             if ids[id]: #This shouldn't error
-                res = Resource(id)
+                Resource(id)
             else: #This should throw a ValueError
                 self.failUnlessRaises(ValueError,Resource,id)
                 self.assertRaises(ValueError,Resource,id)
@@ -34,11 +35,9 @@ class BaseRegistryTestCase(unittest.TestCase):
         self.testGenerateId()
         self.testTraversableResourceID()
 
+
+
 def test_suite():
     suite = unittest.TestSuite()
-
     suite.addTest(BaseRegistryTestCase())
-
     return suite
-
-

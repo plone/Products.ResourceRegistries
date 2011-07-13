@@ -5,6 +5,11 @@ Changelog
 2.0.5 - unreleased
 ------------------
 
+- Switched <link rel="kinetic-stylesheet" type="text/css" /> to <link
+  rel="stylesheet" data-rel="kinetic-stylesheet" type="text/kss" /> to fix HTML5
+  validation. References http://dev.plone.org/plone/ticket/11300
+  [spliter]
+  
 - Add MANIFEST.in.
   [WouterVH]
 

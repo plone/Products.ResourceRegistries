@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.0.5 - unreleased
+2.0.5 - 2011-07-19
 ------------------
 
 - Switched <link rel="kinetic-stylesheet" type="text/css" /> to <link

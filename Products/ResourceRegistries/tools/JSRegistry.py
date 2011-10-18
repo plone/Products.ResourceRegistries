@@ -156,7 +156,7 @@ class JSRegistryTool(BaseRegistryTool):
         """
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
-        records = REQUEST.form.get('scripts')
+        records = REQUEST.form.get('scripts', [])
         records.sort(lambda a, b: a.sort-b.sort)
         self.resources = ()
         scripts = []

@@ -161,7 +161,8 @@ class JSRegistryTool(BaseRegistryTool):
         self.resources = ()
         scripts = []
         for r in records:
-            script = JavaScript(r.get('id'),
+            script = self.resource_class(
+                                r.get('id'),
                                 expression=r.get('expression', ''),
                                 inline=r.get('inline', False),
                                 enabled=r.get('enabled', True),
@@ -194,7 +195,8 @@ class JSRegistryTool(BaseRegistryTool):
                        conditionalcomment='', authenticated=False,
                        skipCooking=False, bundle='default'):
         """Register a script."""
-        script = JavaScript(id,
+        script = self.resource_class(
+                            id,
                             expression=expression,
                             inline=inline,
                             enabled=enabled,

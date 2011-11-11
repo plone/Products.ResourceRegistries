@@ -5,7 +5,10 @@ Changelog
 2.0.6 - Unreleased
 ------------------
 
-- Nothing changed yet.
+- Fixed "AttributeError: 'FileResourceXX' object has no attribute 'POST'
+  when displaying inline resources when using a POST request.
+  Fixes http://dev.plone.org/ticket/8998
+  [maurits]
 
 
 2.0.5 - 2011-07-19

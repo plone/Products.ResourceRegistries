@@ -577,7 +577,13 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         try:
                             method = obj.browserDefault(self.REQUEST)[1][0]
                         except (AttributeError, IndexError):
-                            method = obj.browserDefault(self.REQUEST)[0].__name__
+                            try:
+                                method = obj.browserDefault(self.REQUEST)[0].__name__
+                            except AttributeError:
+                                # The above can all fail if request.method is
+                                # POST.  We can still at least try to use the
+                                # GET method, as we prefer that anyway.
+                                method = getattr(obj, 'GET').__name__
                     method = method in ('HEAD','POST') and 'GET' or method
                     content = getattr(obj, method)()
                     if not isinstance(content, unicode): 

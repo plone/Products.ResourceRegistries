@@ -10,6 +10,23 @@ Changelog
   bundles, managed on the 'Bundles' tab in the ZMI (note that this is global).
   [optilude]
 
+2.0.6 - Unreleased
+------------------
+
+- Fixed "AttributeError: 'FileResourceXX' object has no attribute 'POST'
+  when displaying inline resources when using a POST request.
+  Fixes http://dev.plone.org/ticket/8998
+  [maurits]
+
+
+2.0.5 - 2011-07-19
+------------------
+
+- Switched <link rel="kinetic-stylesheet" type="text/css" /> to <link
+  rel="stylesheet" data-rel="kinetic-stylesheet" type="text/kss" /> to fix HTML5
+  validation. References http://dev.plone.org/plone/ticket/11300
+  [spliter]
+  
 - Add MANIFEST.in.
   [WouterVH]
 

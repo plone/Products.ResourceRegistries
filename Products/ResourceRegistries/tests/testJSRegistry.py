@@ -490,6 +490,33 @@ class TestPublishing(FunctionalRegistryTestCase):
                          'text/html;charset=utf-8')
         self.assertEqual(response.getStatus(), 200)
 
+class TestRequestTypesInlineRendering(FunctionalRegistryTestCase):
+    # Test how well various request types render resources inline.
+    # See http://dev.plone.org/ticket/8998
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        # Define an inline resource
+        self.tool.registerScript('++resource++test_rr_1.js', inline=True)
+        self.portalpath = '/' + getToolByName(self.portal, 'portal_url')(1)
+
+    def testGETRequest(self):
+        response = self.publish(self.portalpath, request_method='GET')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertTrue("window.alert('running')" in response.getBody())
+
+    def testHEADRequest(self):
+        response = self.publish(self.portalpath, request_method='HEAD')
+        self.assertEqual(response.getStatus(), 200)
+        # This is a HEAD request, so we won't get anything back.
+        self.assertTrue(response.getBody() == '')
+
+    def testPOSTRequest(self):
+        response = self.publish(self.portalpath, request_method='POST')
+        self.assertEqual(response.getStatus(), 200)
+        self.assertTrue("window.alert('running')" in response.getBody())
+
 class TestFivePublishing(FunctionalRegistryTestCase):
     'Publishing with Five'
 
@@ -1079,6 +1106,7 @@ def test_suite():
     suite.addTest(makeSuite(TestScriptMoving))
     suite.addTest(makeSuite(TestJSTraversal))
     suite.addTest(makeSuite(TestPublishing))
+    suite.addTest(makeSuite(TestRequestTypesInlineRendering))
     suite.addTest(makeSuite(TestFivePublishing))
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestZODBTraversal))

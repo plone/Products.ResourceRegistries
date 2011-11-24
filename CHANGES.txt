@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.0.6 - Unreleased
+2.0.6 (2011-11-24)
 ------------------
 
 - Fixed "AttributeError: 'FileResourceXX' object has no attribute 'POST'

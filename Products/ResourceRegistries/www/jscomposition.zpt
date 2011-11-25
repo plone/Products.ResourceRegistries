@@ -38,7 +38,7 @@
             <ul tal:define="scripts python:context.concatenatedResourcesByTheme.get(theme, {})">
               <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
                            tal:repeat="subentry python:scripts.get(entry.getId())">
-                <li tal:define="resourceExists python:entry.isExternalResource() or path('exists:portal/%s' % subentry);"
+                <li tal:define="resourceExists python:entry.isExternalResource() or portal.restrictedTraverse(subentry, False) and True;"
                     tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
                     <a href="" tal:define="subPortalHref string:${portal_url}/portal_javascripts/${subentry}"
                                tal:attributes="href python:test(entry.isExternalResource(),subentry,subPortalHref)"

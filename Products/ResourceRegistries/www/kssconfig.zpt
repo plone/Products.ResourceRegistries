@@ -182,7 +182,7 @@ legend {
     
     <tal:kineticstylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="kineticstylesheet here/getResources">
-      <fieldset tal:define="resourceExists python:kineticstylesheet.isExternalResource() or path('exists:portal/%s' % kineticstylesheet.getId());"
+      <fieldset tal:define="resourceExists python:kineticstylesheet.isExternalResource() or portal.restrictedTraverse(kineticstylesheet.getId(), False) and True;"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="kineticstylesheets.sort:records:int"

@@ -201,7 +201,7 @@ ul {
     
     <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="stylesheet here/getResources">
-      <fieldset tal:define="resourceExists python:stylesheet.isExternalResource() or path('exists:portal/%s' % stylesheet.getId());"
+      <fieldset tal:define="resourceExists python:stylesheet.isExternalResource() or portal.restrictedTraverse(stylesheet.getId(), False) and True;"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="stylesheets.sort:records:int"

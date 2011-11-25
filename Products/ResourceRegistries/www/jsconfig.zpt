@@ -187,7 +187,7 @@ legend {
 
     <tal:scripts tal:define="portal python:here.portal_url.getPortalObject();"
                  tal:repeat="script here/getResources">
-      <fieldset tal:define="resourceExists python:script.isExternalResource() or path('exists:portal/%s' % script.getId());"
+      <fieldset tal:define="resourceExists python:script.isExternalResource() or portal.restrictedTraverse(script.getId(), False) and True;"
                 tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
 
         <input type="hidden" name="scripts.sort:records:int"

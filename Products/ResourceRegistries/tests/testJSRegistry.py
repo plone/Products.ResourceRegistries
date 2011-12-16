@@ -5,6 +5,7 @@ from zope.component import getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
 from App.Common import rfc1123_date
+from OFS.Image import Pdata
 from DateTime import DateTime
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
@@ -1091,6 +1092,29 @@ class TestBundling(RegistryTestCase):
         components = self.tool.concatenatedResourcesByTheme[current][merged[0].getId()]
         self.assertEqual(components, ['ham', 'eggs'])
 
+class TestPdataAwareness(FunctionalRegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        self.toolpath = '/' + self.tool.absolute_url(1)
+
+        self.setRoles(['Manager'])
+        self.skinstool = getattr(self.portal, 'portal_skins')
+        self.skinstool.custom.manage_addFile(id='hello_world.js',
+                                   content_type='application/javascript',
+                                   file=Pdata('alert("Hello world!");'))
+        self.tool.registerScript('hello_world.js')
+        self.setRoles(['Member'])
+
+    def testPublishFileResourceWithPdata(self):
+        default_skin_name = self.skinstool.getDefaultSkin()
+        response = self.publish(self.toolpath + '/' + default_skin_name +\
+                                '/hello_world.js')
+        self.assertEqual(response.getStatus(), 200)
+        self.failUnless('Hello world!' in str(response))
+
+
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
@@ -1115,4 +1139,5 @@ def test_suite():
     suite.addTest(makeSuite(TestUnicodeAwareness))
     suite.addTest(makeSuite(TestCachingHeaders))
     suite.addTest(makeSuite(TestBundling))
+    suite.addTest(makeSuite(TestPdataAwareness))
     return suite

@@ -85,7 +85,7 @@ def cookWhenChangingSettings(settings, event):
     """When our settings are changed, re-cook the main registries
     """
     for name in (config.JSTOOLNAME, config.CSSTOOLNAME, config.KSSTOOLNAME,):
-        tool = getToolByName(getSite(), 'portal_css', None)
+        tool = getToolByName(getSite(), name, None)
         if tool is not None:
             tool.cookResources()
 

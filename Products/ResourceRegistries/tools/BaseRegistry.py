@@ -294,25 +294,22 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     @property
     def cookedresources(self):
         if 'cookedresources' in self.__dict__:
-            LOGGER.warn("Migrating old cooked resources storage on the fly - this should only happen once per tool")
-            self.cookResources()
-            del self.__dict__['cookedresources']
-            del self.__dict__['concatenatedresources']
-            
-        
+            self._migrateCookedResouces()
         theme = self.getCurrentSkinName()
         return self.cookedResourcesByTheme.get(theme, ())
 
     @property
     def concatenatedresources(self):
         if 'concatenatedresources' in self.__dict__:
-            LOGGER.warn("Migrating old concatenated resources storage on the fly - this should only happen once per tool")
-            self.cookResources()
-            del self.__dict__['cookedresources']
-            del self.__dict__['concatenatedresources']
-        
+            self._migrateCookedResouces()
         theme = self.getCurrentSkinName()
         return self.concatenatedResourcesByTheme.get(theme, {})
+
+    def _migrateCookedResouces(self):
+        LOGGER.warn("Migrating old concatenated resources storage on the fly - this should only happen once per tool")
+        self.cookResources()
+        del self.__dict__['cookedresources']
+        del self.__dict__['concatenatedresources']
 
     def __getitem__(self, item):
         """Return a resource from the registry."""
@@ -966,6 +963,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         
         # If we don't recognise the theme, pretend we're the default one
         bundlesForThemes = self.getBundlesForThemes()
+
+        if self.cookedResourcesByTheme is _marker:
+            self._migrateCookedResouces()
         
         if theme not in bundlesForThemes or theme not in self.cookedResourcesByTheme:
             portal_skins = getToolByName(self, 'portal_skins')

@@ -96,7 +96,7 @@ Changelog
   the various constructor methods, or as an attribute in a cssregistry.xml
   file. It defaults to false. It has no effect in debug mode. In non-debug-
   mode, however, it will parse a stylesheet for 'url()' statements that
-  container *relative- paths. These will be prefixed with the Plone site path.
+  contain *relative* paths. These will be prefixed with the Plone site path.
   If the stylesheet id contains a path (e.g. '++resource++foo/css/bar.css')
   this will be used in the prefix as well. The goal is to make relative paths
   internal to a resource directory work, even when resource merging is used.

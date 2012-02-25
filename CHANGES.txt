@@ -9,6 +9,9 @@ Changelog
   bundles, managed on the 'Bundles' tab in the ZMI (note that this is global).
   [optilude]
 
+- Fix handling of the purge attribute on import.
+  [rossp]
+
 
 2.0.7 (unreleased)
 ------------------

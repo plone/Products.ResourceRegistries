@@ -96,7 +96,7 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         reg_method = getattr(registry, self.register_method)
         unreg_method = getattr(registry, self.unregister_method)
         update_method = getattr(registry, self.update_method)
-        if node.attributes.get('purge', '') == 'true':
+        if node.attributes.get('purge', '').value == 'true':
             registry.clearResources()
         for child in node.childNodes:
             if child.nodeName != self.resource_type:

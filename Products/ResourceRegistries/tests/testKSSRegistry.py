@@ -780,8 +780,7 @@ class TestDebugMode(FunctionalKSSRegistryTestCase):
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        # Use almostEqual to account for rollover to the next second while running.
-        self.assertAlmostEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 

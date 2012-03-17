@@ -733,22 +733,19 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     f = obj.getFile()
                     contenttype = getCharsetFromContentType(f.getContentType(), default_charset)
                     content = unicode(str(f), contenttype)
-                elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'File':
-                    data=obj.data
-                    if isinstance(data, str):
-                        content = data
-                    else:
-                        content = ''
-                        while data is not None:
-                            content += data.data
-                            data=data.next
-                    contenttype = getCharsetFromContentType(obj.content_type, default_charset)
-                    content = unicode(content, contenttype)
                 # We should add more explicit type-matching checks
                 elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                     original_headers, if_modified = self._removeCachingHeaders()
-                    content = obj.index_html(self.REQUEST,
-                                             self.REQUEST.RESPONSE)
+                    # "index_html" may use "RESPONSE.write" (e.g. for OFS.Image.Pdata)
+                    tmp = StringIO()
+                    response_write = self.REQUEST.RESPONSE.write
+                    self.REQUEST.RESPONSE.write = tmp.write
+                    try:
+                        content = obj.index_html(self.REQUEST,
+                                                 self.REQUEST.RESPONSE)
+                    finally:
+                        self.REQUEST.RESPONSE.write = response_write
+                    content = tmp.getvalue() or content
                     if not isinstance(content, unicode):
                         content = unicode(content, default_charset)
                     self._restoreCachingHeaders(original_headers, if_modified)

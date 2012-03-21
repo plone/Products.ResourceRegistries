@@ -3,6 +3,9 @@ Changelog
 
 In next release ...
 
+- Add time element. This is necessary for the generated ids to update
+  on any save, to reflect possible updates in the served content.
+  [malthe]
 
 2.0.7 (2012-03-14)
 ------------------

@@ -1,6 +1,14 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Use iterative magic number generation based on all included
+    resources (for each concatenated resource).
+
+    This fixes an issue where resources for different content would
+    sometimes get assigned the same resource id (due to the previous
+    implementation using a random integer).
+    [malthe]
+
   * Do not try to export the `cooked_expression` into the GenericSetup
     profiles. It is only an internal optimization and the value is reflected
     in the `expression` value.

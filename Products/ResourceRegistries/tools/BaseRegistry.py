@@ -6,6 +6,7 @@ from StringIO import StringIO
 from urllib import quote_plus
 from cPickle import dumps
 from md5 import md5
+from time import time
 
 from App.Common import rfc1123_date
 from DateTime import DateTime
@@ -382,7 +383,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         else:
             pickle = dumps(resource.__dict__)
             base = res_id.replace('++', '').replace('/', '').rsplit('.', 1)[0]
-            key = "%s-cachekey-%s" % (base, md5(pickle).hexdigest())
+            key = md5(pickle)
+            key.update(str(int(time() * 1000)))
+            key = "%s-cachekey-%s" % (base, key.hexdigest())
             ext = self.filename_appendix
 
         return key + ext

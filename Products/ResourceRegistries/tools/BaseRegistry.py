@@ -4,8 +4,8 @@ import random
 # instances (needed in BaseRegistryTool.__getitem__).
 from StringIO import StringIO
 from urllib import quote_plus
-from cPickle import dumps
 from md5 import md5
+from time import time
 
 from zope.interface import implements, alsoProvides
 
@@ -400,16 +400,17 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         res_id = resource.getId()
 
         if other is not None:
-            pickle = dumps(other.__dict__)
-            key = md5(pickle)
+            other_id = other.getId()
+            key = md5(other_id)
             key.update(res_id)
             base = res_id.rsplit('-')[0]
             key = "%s-" % (base, key.hexdigest())
             ext = "." + res_id.rsplit('.', 1)[1]
         else:
-            pickle = dumps(resource.__dict__)
             base = res_id.replace('++', '').replace('/', '').rsplit('.', 1)[0]
-            key = "%s-cachekey-%s" % (base, md5(pickle).hexdigest())
+            key = md5(res_id)
+            key.update(str(int(time() * 1000)))
+            key = "%s-cachekey-%s" % (base, key.hexdigest())
             ext = self.filename_appendix
 
         return key + ext

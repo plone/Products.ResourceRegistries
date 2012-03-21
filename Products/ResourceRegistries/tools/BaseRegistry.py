@@ -4,6 +4,8 @@ import random
 # instances (needed in BaseRegistryTool.__getitem__).
 from StringIO import StringIO
 from urllib import quote_plus
+from cPickle import dumps
+from md5 import md5
 
 from zope.interface import implements, alsoProvides
 
@@ -392,17 +394,25 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                 self.attributes_to_compare]
 
     security.declarePrivate('generateId')
-    def generateId(self, res_id, prev_id=None):
+    def generateId(self, resource, other=None):
         """Generate a random id."""
-        id_parts = res_id.split('.')
-        if (len(id_parts) > 1):
-            base = '.'.join(id_parts[:-1])
-            appendix = ".%s" % id_parts[-1]
+
+        res_id = resource.getId()
+
+        if other is not None:
+            pickle = dumps(other.__dict__)
+            key = md5(pickle)
+            key.update(res_id)
+            base = res_id.rsplit('-')[0]
+            key = "%s-" % (base, key.hexdigest())
+            ext = "." + res_id.rsplit('.', 1)[1]
         else:
-            base = id_parts[0]
-            appendix = self.filename_appendix
-        base = base.replace('++', '').replace('/', '')
-        return '%s-cachekey%04d%s' % (base, random.randint(0, 9999), appendix)
+            pickle = dumps(resource.__dict__)
+            base = res_id.replace('++', '').replace('/', '').rsplit('.', 1)[0]
+            key = "%s-cachekey-%s" % (base, md5(pickle).hexdigest())
+            ext = self.filename_appendix
+
+        return key + ext
 
     security.declarePrivate('finalizeResourceMerging')
     def finalizeResourceMerging(self, resource, previtem):
@@ -440,18 +450,18 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     if self.concatenatedresources.has_key(prev_id):
                         self.concatenatedresources[prev_id].append(res_id)
                     else:
-                        magic_id = self.generateId(res_id, prev_id)
+                        magic_id = self.generateId(resource, previtem)
                         self.concatenatedresources[magic_id] = [prev_id, res_id]
                         previtem._setId(magic_id)
                 else:
                     if resource.getCookable() or resource.getCacheable():
-                        magic_id = self.generateId(resource.getId())
+                        magic_id = self.generateId(resource)
                         self.concatenatedresources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)
                     results.append(resource)
             else:
                 if resource.getCookable() or resource.getCacheable():
-                    magic_id = self.generateId(resource.getId())
+                    magic_id = self.generateId(resource)
                     self.concatenatedresources[magic_id] = [resource.getId()]
                     resource._setId(magic_id)
                 results.append(resource)

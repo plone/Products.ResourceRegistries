@@ -1,6 +1,16 @@
 Changelog
 =========
 
+- Use iterative magic number generation based on the properties of all
+  included resources (for each concatenated resource).
+
+  This fixes an issue with external caches where resources for
+  different content would sometimes get assigned the same resource id
+  (due to the previous implementation using a random integer), making
+  it impossible to cache a resource correctly without additional
+  information.
+  [malthe]
+
 
 2.0.7 (unreleased)
 ------------------

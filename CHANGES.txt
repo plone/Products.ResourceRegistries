@@ -1,7 +1,8 @@
 Changelog
 =========
 
-In next release ...
+2.0.8 (2012-03-14)
+------------------
 
 - Add time element. This is necessary for the generated ids to update
   on any save, to reflect possible updates in the served content.

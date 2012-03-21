@@ -4,6 +4,16 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
+- Use iterative magic number generation based on the properties of all
+  included resources (for each concatenated resource).
+
+  This fixes an issue with external caches where resources for
+  different content would sometimes get assigned the same resource id
+  (due to the previous implementation using a random integer), making
+  it impossible to cache a resource correctly without additional
+  information.
+  [malthe]
+
 - Add bundle concept - a bundle is a string tag against a resource, which can
   be used to filter resources by theme. Each theme has a list of enabled
   bundles, managed on the 'Bundles' tab in the ZMI (note that this is global).

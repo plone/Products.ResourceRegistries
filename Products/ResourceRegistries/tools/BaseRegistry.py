@@ -91,10 +91,10 @@ class Resource(Persistent):
 
     security.declarePublic('getId')
     def getId(self):
-        return self._data['id']
+        return self._data['id'] or ''
 
     def getQuotedId(self):
-        return quote_plus(self._data['id'])
+        return quote_plus(self._data['id'] or '')
 
     def _setId(self, id):
         self._data['id'] = id

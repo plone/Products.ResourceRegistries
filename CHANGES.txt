@@ -1,6 +1,9 @@
 Changelog
 =========
 
+2.0.7 (2012-03-14)
+------------------
+
 - Use iterative magic number generation based on the properties of all
   included resources (for each concatenated resource).
 
@@ -10,10 +13,6 @@ Changelog
   it impossible to cache a resource correctly without additional
   information.
   [malthe]
-
-
-2.0.7 (unreleased)
-------------------
 
 - Fixed ZMI screens to render for resources containing query strings in their
   ids, like found in the plone.session refresh support.

@@ -555,7 +555,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         if concatenatedResources.has_key(prev_id):
                             concatenatedResources[prev_id].append(res_id)
                         else:
-                            magic_id = self.generateId(res_id, prev_id)
+                            magic_id = self.generateId(resource, previtem)
                             concatenatedResources[magic_id] = [prev_id, res_id]
                             previtem._setId(magic_id)
                         

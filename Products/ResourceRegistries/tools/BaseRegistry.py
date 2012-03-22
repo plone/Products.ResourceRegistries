@@ -907,7 +907,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                          cookable=True, cacheable=True, conditionalcomment='',
                          authenticated=False, bundle='default'):
         """Register a resource."""
-        resource = Resource(id,
+        resource = self.resource_class(
+                            id,
                             expression=expression,
                             enabled=enabled,
                             cookable=cookable,

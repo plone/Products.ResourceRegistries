@@ -247,12 +247,13 @@ class CSSRegistryTool(BaseRegistryTool):
         """
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
-        records = REQUEST.get('stylesheets')
+        records = REQUEST.get('stylesheets', [])
         records.sort(lambda a, b: a.sort - b.sort)
         self.resources = ()
         stylesheets = []
         for r in records:
-            stylesheet = Stylesheet(r.get('id'),
+            stylesheet = self.resource_class(
+                                    r.get('id'),
                                     expression=r.get('expression', ''),
                                     media=r.get('media', 'screen'),
                                     rel=r.get('rel', 'stylesheet'),
@@ -295,7 +296,8 @@ class CSSRegistryTool(BaseRegistryTool):
         if not id:
             raise ValueError("id is required")
         
-        stylesheet = Stylesheet(id,
+        stylesheet = self.resource_class(
+                                id,
                                 expression=expression,
                                 media=media,
                                 rel=rel,

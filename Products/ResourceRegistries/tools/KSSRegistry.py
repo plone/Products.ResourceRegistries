@@ -133,12 +133,13 @@ class KSSRegistryTool(BaseRegistryTool):
         """
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
-        records = REQUEST.get('kineticstylesheets')
+        records = REQUEST.get('kineticstylesheets', [])
         records.sort(lambda a, b: a.sort - b.sort)
         self.resources = ()
         kineticstylesheets = []
         for r in records:
-            kss = KineticStylesheet(r.get('id'),
+            kss = self.resource_class(
+                                    r.get('id'),
                                     expression=r.get('expression', ''),
                                     enabled=r.get('enabled', True),
                                     cookable=r.get('cookable', True),
@@ -171,7 +172,7 @@ class KSSRegistryTool(BaseRegistryTool):
                                   authenticated=False,
                                   skipCooking=False, bundle='default'):
         """Register a kineticstylesheet."""
-        kineticstylesheet = KineticStylesheet(id,
+        kineticstylesheet = self.resource_class(id,
                                 expression=expression,
                                 enabled=enabled,
                                 cookable=cookable,

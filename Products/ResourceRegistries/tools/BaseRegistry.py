@@ -561,7 +561,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                         
                     else:
                         if resource.getCookable() or resource.getCacheable():
-                            magic_id = self.generateId(resource.getId())
+                            magic_id = self.generateId(resource)
                             concatenatedResources[magic_id] = [resource.getId()]
                             resource._setId(magic_id)
                         results.append(resource)
@@ -571,7 +571,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     # the resource id to be this id, and record the old id in the
                     # list of ids for this magic id under concatenated resources
                     if resource.getCookable() or resource.getCacheable():
-                        magic_id = self.generateId(resource.getId())
+                        magic_id = self.generateId(resource)
                         concatenatedResources[magic_id] = [resource.getId()]
                         resource._setId(magic_id)
                     results.append(resource)

@@ -1,7 +1,13 @@
 Changelog
 =========
 
-In next release ...
+2.0.9 (Unreleased)
+------------------
+
+- Revert a change which introduced HTML5 code into the XHTML 1.0 validated 4.1 
+  branch. Refs http://dev.plone.org/ticket/12803
+  [esteele]
+
 
 2.0.8 (2012-03-14)
 ------------------

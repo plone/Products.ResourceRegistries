@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1 (Unreleased)
+2.1 (2012-04-18)
 ----------------
 
 - Use iterative magic number generation based on the properties of all

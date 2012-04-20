@@ -4,7 +4,9 @@ Changelog
 2.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added support for OFS.Image.File-objects using OFS.Image.PData
+  This fixes https://dev.plone.org/ticket/12479
+  [datakurre]
 
 
 2.1 (2012-04-18)
@@ -43,10 +45,6 @@ Changelog
 
 2.0.7 (2012-03-14)
 ------------------
-
-- Added support for OFS.Image.File-objects using OFS.Image.PData
-  This fixes https://dev.plone.org/ticket/12479
-  [datakurre]
 
 - Fixed ZMI screens to render for resources containing query strings in their
   ids, like found in the plone.session refresh support.

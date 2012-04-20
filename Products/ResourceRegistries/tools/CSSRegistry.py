@@ -149,8 +149,8 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('storeResource')
     def storeResource(self, resource, skipCooking=False):
         """Store a resource."""
-        self.validateId(resource.getId(), self.getResources())
-        resources = list(self.getResources())
+        self.validateId(resource.getId(), self.resources)
+        resources = list(self.resources)
         if len(resources) and resources[-1].getId() == 'ploneCustom.css':
             # ploneCustom.css should be the last item
             resources.insert(-1, resource)
@@ -230,12 +230,12 @@ class CSSRegistryTool(BaseRegistryTool):
                              enabled=False, cookable=True, compression='safe',
                              cacheable=True, REQUEST=None,
                              conditionalcomment='', authenticated=False,
-                             applyPrefix=False):
+                             applyPrefix=False, bundle='default'):
         """Register a stylesheet from a TTW request."""
         self.registerStylesheet(id, expression, media, rel, title,
                                 rendering, enabled, cookable, compression,
                                 cacheable, conditionalcomment, authenticated,
-                                applyPrefix=applyPrefix)
+                                applyPrefix=applyPrefix, bundle=bundle)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -247,12 +247,13 @@ class CSSRegistryTool(BaseRegistryTool):
         """
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
-        records = REQUEST.get('stylesheets')
+        records = REQUEST.get('stylesheets', [])
         records.sort(lambda a, b: a.sort - b.sort)
         self.resources = ()
         stylesheets = []
         for r in records:
-            stylesheet = Stylesheet(r.get('id'),
+            stylesheet = self.resource_class(
+                                    r.get('id'),
                                     expression=r.get('expression', ''),
                                     media=r.get('media', 'screen'),
                                     rel=r.get('rel', 'stylesheet'),
@@ -264,7 +265,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                     compression=r.get('compression', 'safe'),
                                     conditionalcomment=r.get('conditionalcomment',''),
                                     authenticated=r.get('authenticated', False),
-                                    applyPrefix=r.get('applyPrefix', False))
+                                    applyPrefix=r.get('applyPrefix', False),
+                                    bundle=r.get('bundle', 'default'))
             stylesheets.append(stylesheet)
         self.resources = tuple(stylesheets)
         self.cookResources()
@@ -288,13 +290,14 @@ class CSSRegistryTool(BaseRegistryTool):
                            enabled=1, cookable=True, compression='safe',
                            cacheable=True, conditionalcomment='',
                            authenticated=False, skipCooking=False,
-                           applyPrefix=False):
+                           applyPrefix=False, bundle='default'):
         """Register a stylesheet."""
         
         if not id:
             raise ValueError("id is required")
         
-        stylesheet = Stylesheet(id,
+        stylesheet = self.resource_class(
+                                id,
                                 expression=expression,
                                 media=media,
                                 rel=rel,
@@ -306,7 +309,8 @@ class CSSRegistryTool(BaseRegistryTool):
                                 cacheable=cacheable,
                                 conditionalcomment=conditionalcomment,
                                 authenticated=authenticated,
-                                applyPrefix=applyPrefix)
+                                applyPrefix=applyPrefix,
+                                bundle=bundle)
         self.storeResource(stylesheet, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateStylesheet')
@@ -339,6 +343,8 @@ class CSSRegistryTool(BaseRegistryTool):
             stylesheet.setConditionalcomment(data['conditionalcomment'])
         if data.get('applyPrefix',None) is not None:
             stylesheet.setApplyPrefix(data['applyPrefix'])
+        if data.get('bundle', None) is not None:
+            stylesheet.setBundle(data['bundle'])
 
     security.declareProtected(permissions.ManagePortal, 'getRenderingOptions')
     def getRenderingOptions(self):

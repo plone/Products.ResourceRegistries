@@ -779,6 +779,7 @@ class TestDebugMode(FunctionalKSSRegistryTestCase):
         self.tool.setDebugMode(True)
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
+        self.tool.setDebugMode(False)
         self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
         self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
@@ -856,14 +857,14 @@ class TestSkinAwareness(FunctionalKSSRegistryTestCase):
     def testRenderIncludesSkinInPath(self):
         self.portal.changeSkin('PinkSkin', REQUEST=self.portal.REQUEST)
         view = self.portal.restrictedTraverse('@@plone')
-        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.kineticstylesheets')
         viewletmanager.update()
         content = viewletmanager.render()
         self.failUnless('/PinkSkin/' in content)
         self.failIf('/PurpleSkin/' in content)
         self.portal.changeSkin('PurpleSkin', REQUEST=self.portal.REQUEST)
         view = self.portal.restrictedTraverse('@@plone')
-        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
+        viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.kineticstylesheets')
         viewletmanager.update()
         content = viewletmanager.render()
         self.failUnless('/PurpleSkin/' in content)
@@ -877,6 +878,74 @@ class TestSkinAwareness(FunctionalKSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
         self.failUnless('purple' in str(response))
 
+class TestBundling(RegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, KSSTOOLNAME)
+        self.tool.clearResources()
+        
+        # Fake install of portal_registry tool
+        from Products.ResourceRegistries.interfaces.settings import IResourceRegistriesSettings
+        from plone.registry.interfaces import IRegistry
+        from zope.component import getUtility
+        
+        self.portal['portal_skins'].addSkinSelection('alpha', 'pink,ResourceRegistries')
+        self.portal['portal_skins'].addSkinSelection('beta', 'purple,ResourceRegistries')
+        self.portal['portal_skins'].addSkinSelection('delta', 'yellow,ResourceRegistries')
+        
+        self.registry = getUtility(IRegistry)
+        self.registry.registerInterface(IResourceRegistriesSettings)
+
+    def test_getBundlesForThemes_default(self):
+        bundlesForThemes = self.tool.getBundlesForThemes()
+        for theme in self.portal['portal_skins'].getSkinSelections():
+            self.assertEqual(bundlesForThemes[theme], ['default'])
+            self.assertEqual(self.tool.getBundlesForTheme(theme), ['default'])
+    
+    def test_getBundlesForTheme_fallback(self):
+        self.assertEqual(self.tool.getBundlesForTheme('invalid-theme'), ['default'])
+
+    def test_manage_saveBundlesForThemes(self):
+        self.tool.manage_saveBundlesForThemes({
+                'alpha': ['default', 'foobar'],
+                'beta': [],
+            })
+        
+        self.assertEqual(self.tool.getBundlesForTheme('alpha'), ['default', 'foobar'])
+        self.assertEqual(self.tool.getBundlesForTheme('beta'), [])
+        self.assertEqual(self.tool.getBundlesForTheme('invalid-theme'), ['default'])
+
+    def test_getCookedResourcesByTheme(self):
+        self.tool.registerKineticStylesheet('ham', bundle='default')
+        self.tool.registerKineticStylesheet('spam', bundle='foo')
+        self.tool.registerKineticStylesheet('eggs') # will be in the 'default' bundle
+        
+        self.tool.manage_saveBundlesForThemes({
+                'alpha': ['default', 'foo'],
+                'beta': ['foo'],
+                'delta': ['default'],
+            })
+        
+        merged = self.tool.getCookedResources('alpha')
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme['alpha'][merged[0].getId()]
+        self.assertEqual(components, ['ham', 'spam', 'eggs'])
+        
+        merged = self.tool.getCookedResources('beta')
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme['beta'][merged[0].getId()]
+        self.assertEqual(components, ['spam'])
+        
+        merged = self.tool.getCookedResources('delta')
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme['delta'][merged[0].getId()]
+        self.assertEqual(components, ['ham', 'eggs'])
+        
+        current = self.portal['portal_skins'].getCurrentSkinName()
+        merged = self.tool.getCookedResources(current)
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme[current][merged[0].getId()]
+        self.assertEqual(components, ['ham', 'eggs'])
 
 def test_suite():
     from unittest import TestSuite, makeSuite
@@ -899,5 +968,5 @@ def test_suite():
     suite.addTest(makeSuite(TestDebugMode))
     suite.addTest(makeSuite(TestResourceObjects))
     suite.addTest(makeSuite(TestSkinAwareness))
-
+    suite.addTest(makeSuite(TestBundling))
     return suite

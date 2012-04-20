@@ -6,6 +6,18 @@ class ICookedFile(Interface):
     concatenated resources.
     """
 
+class IResourceProvider(Interface):
+    """A provider of resources.
+    
+    Register a named adapter from the particular resource registry object
+    to this interface to provide resources from locations other than the
+    main persistent registry.
+    """
+    
+    def getResources(self):
+        """Get a list of available Resource objects
+        """
+
 class IResourceRegistry(Interface):
     """A tool for registering and evaluating resource linkage."""
 

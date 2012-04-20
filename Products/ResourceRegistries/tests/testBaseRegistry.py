@@ -1,4 +1,5 @@
 import unittest
+
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool, Resource
 
 class BaseRegistryTestCase(unittest.TestCase):
@@ -9,8 +10,10 @@ class BaseRegistryTestCase(unittest.TestCase):
     # Make sure we don't generate an id that could screw up traversal to
     # the cached resource.
     def testGenerateId(self):
-        self.failIf('++' in self.registry.generateId('++resource++foobar.css'))
-        self.failIf('/' in self.registry.generateId('++resource++foo/bar.css'))
+        self.failIf('++' in self.registry.generateId(
+            Resource('++resource++foobar.css')))
+        self.failIf('/' in self.registry.generateId(
+            Resource('++resource++foo/bar.css')))
     
     #Resources with double //'s in them aren't traversable. The page templates
     # assume that no resource will have a '/' at the start or end, and won't
@@ -25,7 +28,7 @@ class BaseRegistryTestCase(unittest.TestCase):
                }
         for id in ids:
             if ids[id]: #This shouldn't error
-                res = Resource(id)
+                Resource(id)
             else: #This should throw a ValueError
                 self.failUnlessRaises(ValueError,Resource,id)
                 self.assertRaises(ValueError,Resource,id)
@@ -34,11 +37,9 @@ class BaseRegistryTestCase(unittest.TestCase):
         self.testGenerateId()
         self.testTraversableResourceID()
 
+
+
 def test_suite():
     suite = unittest.TestSuite()
-
     suite.addTest(BaseRegistryTestCase())
-
     return suite
-
-

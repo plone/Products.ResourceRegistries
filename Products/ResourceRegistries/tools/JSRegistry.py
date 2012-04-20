@@ -141,10 +141,10 @@ class JSRegistryTool(BaseRegistryTool):
     def manage_addScript(self, id, expression='', inline=False,
                          enabled=False, cookable=True, compression='safe',
                          cacheable=True, conditionalcomment='',
-                         authenticated=False, REQUEST=None):
+                         authenticated=False, bundle='default', REQUEST=None):
         """Register a script from a TTW request."""
         self.registerScript(id, expression, inline, enabled, cookable,
-            compression, cacheable, conditionalcomment, authenticated)
+            compression, cacheable, conditionalcomment, authenticated, bundle=bundle)
         if REQUEST:
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -156,20 +156,22 @@ class JSRegistryTool(BaseRegistryTool):
         """
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
-        records = REQUEST.form.get('scripts')
+        records = REQUEST.form.get('scripts', [])
         records.sort(lambda a, b: a.sort-b.sort)
         self.resources = ()
         scripts = []
         for r in records:
-            script = JavaScript(r.get('id'),
+            script = self.resource_class(
+                                r.get('id'),
                                 expression=r.get('expression', ''),
-                                inline=r.get('inline'),
-                                enabled=r.get('enabled'),
-                                cookable=r.get('cookable'),
-                                cacheable=r.get('cacheable'),
+                                inline=r.get('inline', False),
+                                enabled=r.get('enabled', True),
+                                cookable=r.get('cookable', False),
+                                cacheable=r.get('cacheable', True),
                                 compression=r.get('compression', 'safe'),
                                 conditionalcomment=r.get('conditionalcomment',''),
-                                authenticated=r.get('authenticated'),)
+                                authenticated=r.get('authenticated', False),
+                                bundle=r.get('bundle', 'default'))
             scripts.append(script)
         self.resources = tuple(scripts)
         self.cookResources()
@@ -191,9 +193,10 @@ class JSRegistryTool(BaseRegistryTool):
     def registerScript(self, id, expression='', inline=False, enabled=True,
                        cookable=True, compression='safe', cacheable=True,
                        conditionalcomment='', authenticated=False,
-                       skipCooking=False):
+                       skipCooking=False, bundle='default'):
         """Register a script."""
-        script = JavaScript(id,
+        script = self.resource_class(
+                            id,
                             expression=expression,
                             inline=inline,
                             enabled=enabled,
@@ -201,7 +204,8 @@ class JSRegistryTool(BaseRegistryTool):
                             compression=compression,
                             cacheable=cacheable,
                             conditionalcomment=conditionalcomment,
-                            authenticated=authenticated)
+                            authenticated=authenticated,
+                            bundle=bundle)
         self.storeResource(script, skipCooking=skipCooking)
 
     security.declareProtected(permissions.ManagePortal, 'updateScript')
@@ -225,6 +229,8 @@ class JSRegistryTool(BaseRegistryTool):
             script.setCacheable(data['cacheable'])
         if data.get('conditionalcomment',None) is not None:
             script.setConditionalcomment(data['conditionalcomment'])
+        if data.get('bundle', None) is not None:
+            script.setBundle(data['bundle'])
 
     security.declareProtected(permissions.ManagePortal, 'getCompressionOptions')
     def getCompressionOptions(self):

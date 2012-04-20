@@ -1023,6 +1023,74 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
+class TestBundling(RegistryTestCase):
+
+    def afterSetUp(self):
+        self.tool = getattr(self.portal, JSTOOLNAME)
+        self.tool.clearResources()
+        
+        # Fake install of portal_registry tool
+        from Products.ResourceRegistries.interfaces.settings import IResourceRegistriesSettings
+        from plone.registry.interfaces import IRegistry
+        from zope.component import getUtility
+        
+        self.portal['portal_skins'].addSkinSelection('alpha', 'pink,ResourceRegistries')
+        self.portal['portal_skins'].addSkinSelection('beta', 'purple,ResourceRegistries')
+        self.portal['portal_skins'].addSkinSelection('delta', 'yellow,ResourceRegistries')
+        
+        self.registry = getUtility(IRegistry)
+        self.registry.registerInterface(IResourceRegistriesSettings)
+
+    def test_getBundlesForThemes_default(self):
+        bundlesForThemes = self.tool.getBundlesForThemes()
+        for theme in self.portal['portal_skins'].getSkinSelections():
+            self.assertEqual(bundlesForThemes[theme], ['default'])
+            self.assertEqual(self.tool.getBundlesForTheme(theme), ['default'])
+    
+    def test_getBundlesForTheme_fallback(self):
+        self.assertEqual(self.tool.getBundlesForTheme('invalid-theme'), ['default'])
+
+    def test_manage_saveBundlesForThemes(self):
+        self.tool.manage_saveBundlesForThemes({
+                'alpha': ['default', 'foobar'],
+                'beta': [],
+            })
+        
+        self.assertEqual(self.tool.getBundlesForTheme('alpha'), ['default', 'foobar'])
+        self.assertEqual(self.tool.getBundlesForTheme('beta'), [])
+        self.assertEqual(self.tool.getBundlesForTheme('invalid-theme'), ['default'])
+
+    def test_getCookedResourcesByTheme(self):
+        self.tool.registerScript('ham', bundle='default')
+        self.tool.registerScript('spam', bundle='foo')
+        self.tool.registerScript('eggs') # will be in the 'default' bundle
+        
+        self.tool.manage_saveBundlesForThemes({
+                'alpha': ['default', 'foo'],
+                'beta': ['foo'],
+                'delta': ['default'],
+            })
+        
+        merged = self.tool.getCookedResources('alpha')
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme['alpha'][merged[0].getId()]
+        self.assertEqual(components, ['ham', 'spam', 'eggs'])
+        
+        merged = self.tool.getCookedResources('beta')
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme['beta'][merged[0].getId()]
+        self.assertEqual(components, ['spam'])
+        
+        merged = self.tool.getCookedResources('delta')
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme['delta'][merged[0].getId()]
+        self.assertEqual(components, ['ham', 'eggs'])
+        
+        current = self.portal['portal_skins'].getCurrentSkinName()
+        merged = self.tool.getCookedResources(current)
+        self.assertEqual(len(merged), 1)
+        components = self.tool.concatenatedResourcesByTheme[current][merged[0].getId()]
+        self.assertEqual(components, ['ham', 'eggs'])
 
 class TestPdataAwareness(FunctionalRegistryTestCase):
 
@@ -1070,6 +1138,6 @@ def test_suite():
     suite.addTest(makeSuite(TestResourcePermissions))
     suite.addTest(makeSuite(TestUnicodeAwareness))
     suite.addTest(makeSuite(TestCachingHeaders))
+    suite.addTest(makeSuite(TestBundling))
     suite.addTest(makeSuite(TestPdataAwareness))
-
     return suite

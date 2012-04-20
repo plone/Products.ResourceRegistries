@@ -11,41 +11,46 @@
 
 <p>Overview of which stylesheets are merged to create composite stylesheets.</p> 
 
-<ul tal:define="portal_url python:here.portal_url()">
-    <li tal:repeat="entry python:here.getCookedResources()">
-        <div>
-            <a href=""
-               tal:define="portalHref string:${portal_url}/portal_css/${entry/getId}"
-               tal:attributes="href python:test(entry.isExternalResource(),entry.getId(),portalHref)">
-                <b tal:content="entry/getId">ploneCustom.css</b>
-            </a>
-            <tal:block tal:condition="entry/getAuthenticated | nothing">
-            - <strong>restricted to authenticated users</strong>
-            </tal:block>
-            <tal:block tal:condition="not:entry/getAuthenticated">
-                <tal:block tal:condition="entry/getExpression | nothing">
-                - <span tal:replace="entry/getExpression" />
-                </tal:block>
-            </tal:block>
-            <tal:block tal:condition="entry/getConditionalcomment | nothing">
-            - <span tal:replace="string:&lt;!--[if ${entry/getConditionalcomment}]&gt;" />
-            </tal:block>
-        </div>
-        <ul tal:define="sheets here/concatenatedresources">
-          <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
-                           tal:repeat="subentry python:sheets.get(entry.getId())">
-            <li tal:define="resourceExists python:entry.isExternalResource() or portal.restrictedTraverse(subentry, False) and True;"
-                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
-                <a href="" tal:define="subPortalHref string:${portal_url}/portal_css/${subentry}"
-                           tal:attributes="href python:test(entry.isExternalResource(),subentry,subPortalHref)"
-                           tal:content="subentry">
-                    plone.css
+<div tal:repeat="theme context/aq_parent/portal_skins/getSkinSelections">
+    
+    <h2 tal:content="theme" />
+
+    <ul tal:define="portal_url python:here.portal_url()">
+        <li tal:repeat="entry python:here.getCookedResources(theme)">
+            <div>
+                <a href=""
+                   tal:define="portalHref string:${portal_url}/portal_css/${entry/getId}"
+                   tal:attributes="href python:test(entry.isExternalResource(),entry.getId(),portalHref)">
+                    <b tal:content="entry/getId">ploneCustom.css</b>
                 </a>
-                <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
-            </li>
-          </tal:stylesheets>
-        </ul>
-    </li>
-</ul>
+                <tal:block tal:condition="entry/getAuthenticated | nothing">
+                - <strong>restricted to authenticated users</strong>
+                </tal:block>
+                <tal:block tal:condition="not:entry/getAuthenticated">
+                    <tal:block tal:condition="entry/getExpression | nothing">
+                    - <span tal:replace="entry/getExpression" />
+                    </tal:block>
+                </tal:block>
+                <tal:block tal:condition="entry/getConditionalcomment | nothing">
+                - <span tal:replace="string:&lt;!--[if ${entry/getConditionalcomment}]&gt;" />
+                </tal:block>
+            </div>
+            <ul tal:define="sheets python:context.concatenatedResourcesByTheme.get(theme, {})">
+              <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
+                               tal:repeat="subentry python:sheets.get(entry.getId())">
+                <li tal:define="resourceExists python:entry.isExternalResource() or portal.restrictedTraverse(subentry, False) and True;"
+                    tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
+                    <a href="" tal:define="subPortalHref string:${portal_url}/portal_css/${subentry}"
+                               tal:attributes="href python:test(entry.isExternalResource(),subentry,subPortalHref)"
+                               tal:content="subentry">
+                        plone.css
+                    </a>
+                    <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
+                </li>
+              </tal:stylesheets>
+            </ul>
+        </li>
+    </ul>
+</div>
 
 <div tal:replace="structure here/manage_page_footer" />

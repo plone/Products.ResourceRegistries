@@ -1,2 +1,3 @@
-from registries import IResourceRegistry, ICSSRegistry, IKSSRegistry, IJSRegistry, ICookedFile
-from viewletmanagers import IHtmlHeadScripts, IHtmlHeadStyles
+from Products.ResourceRegistries.interfaces.registries import IResourceRegistry, ICSSRegistry, IKSSRegistry, IJSRegistry, ICookedFile, IResourceProvider
+from Products.ResourceRegistries.interfaces.viewletmanagers import IHtmlHeadScripts, IHtmlHeadStyles
+from Products.ResourceRegistries.interfaces.settings import IResourceRegistriesSettings

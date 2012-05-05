@@ -4,10 +4,14 @@ Changelog
 2.1.1 (unreleased)
 ------------------
 
+- Added theme-parameter for getResourceContent for JavaScriptRegistry.
+  Even if it is unused it now allows the same arguments as the
+  BaseRegistry
+  [tom_gross]
+
 - Added support for OFS.Image.File-objects using OFS.Image.PData
   This fixes https://dev.plone.org/ticket/12479
   [datakurre]
-
 
 2.1 (2012-04-18)
 ----------------

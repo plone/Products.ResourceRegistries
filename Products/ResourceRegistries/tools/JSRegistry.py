@@ -248,8 +248,8 @@ class JSRegistryTool(BaseRegistryTool):
         return 'application/x-javascript;charset=utf-8'
 
     security.declarePrivate('getResourceContent')
-    def getResourceContent(self, item, context, original=False):
-        output = BaseRegistryTool.getResourceContent(self, item, context, original)
+    def getResourceContent(self, item, context, original=False, theme=None):
+        output = BaseRegistryTool.getResourceContent(self, item, context, original, theme)
         if not original:
             mapper = JavascriptKeywordMapper()
             regexp = re.compile(r"/\* sTART eNCODE \*/\s*(.*?)\s*/\* eND eNCODE \*/", re.DOTALL)

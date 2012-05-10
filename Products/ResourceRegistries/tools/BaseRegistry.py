@@ -4,7 +4,7 @@ import logging
 # instances (needed in BaseRegistryTool.__getitem__).
 from StringIO import StringIO
 from urllib import quote_plus
-from md5 import md5
+from hashlib import md5
 from time import time
 
 from zope.interface import implements, alsoProvides

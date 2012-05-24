@@ -4,6 +4,9 @@ Changelog
 2.1.2 (unreleased)
 ------------------
 
+- Fix test failure under Plone 4.2.
+  [hannosch]
+
 - using hashlib.md5 (fixing a deprecation warning)
   [ajung]
 

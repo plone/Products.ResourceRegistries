@@ -362,13 +362,11 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             if 'charset=' not in contenttype:
                 contenttype += ';charset=utf-8'
 
-        out = StringIO(output)
-        out.headers = {'content-type': contenttype}
         # At this point we are ready to provide some content
         # for our dummy and since it's just a File instance,
         # we can "upload" (a quite delusive method name) the
         # data and that's it.
-        deferred.manage_upload(out)
+        deferred.update_data(output, content_type=contenttype)
     
     def __bobo_traverse__(self, REQUEST, name):
         """Traversal hook."""

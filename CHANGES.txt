@@ -4,8 +4,12 @@ Changelog
 2.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Change BaseRegistryTool.deferredGetContent method to use
+  OFS.File.update_data instead of OFS.File.manage_upload. The 
+  manage_upload method is a "ZMI" API.  By calling manage_upload
+  an ObjectModifiedEvent would be generated for every resource
+  served from the registry.  Let's do less work.
+  [runyaga]
 
 2.1.2 (2012-05-25)
 ------------------

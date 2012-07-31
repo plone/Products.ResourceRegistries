@@ -870,10 +870,15 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
             mappings = registry.forInterface(IResourceRegistriesSettings, False).resourceBundlesForThemes or {}
             mappings = dict(mappings) # clone as builtin dict, even if non-builtin dict
         
+        if '(default)' in mappings:
+            default = mappings['(default)']
+        else:
+            default = ['default']
+
         portal_skins = getToolByName(self, 'portal_skins')
         for theme in portal_skins.getSkinSelections():
             if not theme in mappings:
-                mappings[theme] = ['default']
+                mappings[theme] = default
         
         return mappings
         

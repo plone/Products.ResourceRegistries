@@ -4,6 +4,10 @@ Changelog
 2.2.1 (unreleased)
 ----------------
 
+- Make it possible to change the default bundles for a theme by
+  assigning bundles to '(default)'
+  [davisagli]
+
 - Nothing changed yet.
 
 

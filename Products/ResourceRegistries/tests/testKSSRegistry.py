@@ -899,8 +899,8 @@ class TestBundling(RegistryTestCase):
     def test_getBundlesForThemes_default(self):
         bundlesForThemes = self.tool.getBundlesForThemes()
         for theme in self.portal['portal_skins'].getSkinSelections():
-            self.assertEqual(bundlesForThemes[theme], ['default'])
-            self.assertEqual(self.tool.getBundlesForTheme(theme), ['default'])
+            self.assertTrue('default' in bundlesForThemes[theme])
+            self.assertTrue('default' in self.tool.getBundlesForTheme(theme))
     
     def test_getBundlesForTheme_fallback(self):
         self.assertEqual(self.tool.getBundlesForTheme('invalid-theme'), ['default'])

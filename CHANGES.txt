@@ -1,15 +1,18 @@
 Changelog
 =========
 
-2.2.1 (unreleased)
-----------------
+2.2.2 (unreleased)
+------------------
+
+- Changed deprecated getSiteEncoding to hardcoded `utf-8`
+  [tom_gross]
+
+2.2.1 (2012-08-11)
+------------------
 
 - Make it possible to change the default bundles for a theme by
   assigning bundles to '(default)'
   [davisagli]
-
-- Nothing changed yet.
-
 
 2.2 (2012-07-02)
 ----------------

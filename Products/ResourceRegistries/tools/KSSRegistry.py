@@ -219,9 +219,7 @@ class KSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""
-        plone_utils = getToolByName(self, 'plone_utils')
-        encoding = plone_utils.getSiteEncoding()
-        return 'text/css;charset=%s' % encoding
+        return 'text/css;charset=utf-8'
 
 
 InitializeClass(KSSRegistryTool)

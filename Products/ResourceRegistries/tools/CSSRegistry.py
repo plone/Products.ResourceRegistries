@@ -369,18 +369,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""
-        plone_utils = getToolByName(self, 'plone_utils')
-        try:
-            encoding = plone_utils.getSiteEncoding()
-        except AttributeError:
-            # For Plone < 2.1
-            pprop = getToolByName(self, 'portal_properties')
-            default = 'utf-8'
-            try:
-                encoding = pprop.site_properties.getProperty('default_charset', default)
-            except AttributeError:
-                encoding = default
-        return 'text/css;charset=%s' % encoding
+        return 'text/css;charset=utf-8'
 
 
 InitializeClass(CSSRegistryTool)

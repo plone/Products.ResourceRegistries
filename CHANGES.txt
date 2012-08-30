@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.2 (unreleased)
+2.2.2 (2012-08-29)
 ------------------
 
 - Changed deprecated getSiteEncoding to hardcoded `utf-8`

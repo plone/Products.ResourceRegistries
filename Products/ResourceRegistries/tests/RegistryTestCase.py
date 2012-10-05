@@ -17,6 +17,11 @@ def setupPackage():
     load_config('test.zcml', Products.ResourceRegistries.tests)
     metaconfigure.debug_mode = False
 
+    from Products.CMFCore.DirectoryView import registerFileExtension
+    from Products.CMFCore.FSFile import FSFile
+    registerFileExtension('kss', FSFile)
+
+
 setupPackage()
 
 PloneTestCase.setupPloneSite(extension_profiles=(

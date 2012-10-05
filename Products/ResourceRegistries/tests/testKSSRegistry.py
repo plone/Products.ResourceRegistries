@@ -878,9 +878,10 @@ class TestSkinAwareness(FunctionalKSSRegistryTestCase):
         self.assertEqual(response.getStatus(), 200)
         self.failUnless('purple' in str(response))
 
-class TestBundling(RegistryTestCase):
+class TestBundling(KSSRegistryTestCase):
 
     def afterSetUp(self):
+        super(TestBundling, self).afterSetUp()
         self.tool = getattr(self.portal, KSSTOOLNAME)
         self.tool.clearResources()
         

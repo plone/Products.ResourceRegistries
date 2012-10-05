@@ -11,13 +11,17 @@ def importKSSRegistry(context):
     """
     Import KSS registry.
     """
-    return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    portal_kss = context.getSite().get('portal_kss')
+    if portal_kss is not None:
+        return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
 
 def exportKSSRegistry(context):
     """
     Export KSS registry.
     """
-    return exportResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+    portal_kss = context.getSite().get('portal_kss')
+    if portal_kss is not None:
+        return exportResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
 
 
 class KSSRegistryNodeAdapter(ResourceRegistryNodeAdapter):

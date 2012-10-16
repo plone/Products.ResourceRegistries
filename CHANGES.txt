@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.3 (unreleased)
+2.2.3 (2012-10-16)
 ------------------
 
 - Don't break if the site doesn't have a portal_kss registry.

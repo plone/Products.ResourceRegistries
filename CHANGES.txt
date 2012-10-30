@@ -4,8 +4,8 @@ Changelog
 2.2.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add some space between up/down and remove links in ZMI
+  [maartenking]
 
 2.2.3 (2012-10-16)
 ------------------
@@ -31,7 +31,7 @@ Changelog
 ----------------
 
 - Change BaseRegistryTool.deferredGetContent method to use
-  OFS.File.update_data instead of OFS.File.manage_upload. The 
+  OFS.File.update_data instead of OFS.File.manage_upload. The
   manage_upload method is a "ZMI" API.  By calling manage_upload
   an ObjectModifiedEvent would be generated for every resource
   served from the registry.  Let's do less work.
@@ -117,7 +117,7 @@ Changelog
   rel="stylesheet" data-rel="kinetic-stylesheet" type="text/kss" /> to fix HTML5
   validation. References http://dev.plone.org/plone/ticket/11300
   [spliter]
-  
+
 - Add MANIFEST.in.
   [WouterVH]
 
@@ -542,7 +542,7 @@ Changelog
 
 - Extended the GenericSetup import step to support positioning of resources:
   the 'position-before' and 'position-after' attributes cause the resource
-  to be positioned before or after resource named in the attribute. 
+  to be positioned before or after resource named in the attribute.
   'position-top' and 'position-bottom' move a resource to the top or bottom.
   [mj]
 

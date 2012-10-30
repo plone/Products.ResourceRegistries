@@ -20,7 +20,7 @@ function getSortInput(node) {
     }
     return null;
 }
- 
+
 function exchangeSortValues(a, b) {
     var aInput = getSortInput(a);
     var bInput = getSortInput(b);
@@ -30,8 +30,8 @@ function exchangeSortValues(a, b) {
     bInput.value = tmp;
     return true;
 }
- 
- 
+
+
 function moveDown(node) {
     var node, fieldset, nextBlock = null;
     while (node.nodeName != 'FIELDSET') {
@@ -48,7 +48,7 @@ function moveDown(node) {
         }
     }
 }
- 
+
 function moveUp(node) {
     var node, fieldset, previousBlock = null;
     while (node.nodeName != 'FIELDSET') {
@@ -65,7 +65,7 @@ function moveUp(node) {
         }
     }
 }
- 
+
 function shiftBlocks(fieldset, block) {
     while (block.nodeType == 3) {
          block = block.previousSibling;
@@ -160,26 +160,26 @@ legend {
         In development mode, KSS declarations are not merged to composites, and
         caching and compression of KSS is disabled. The registry also sends
         HTTP headers to prevent browsers from caching the stylesheets.
-        Useful for testing KSS modifications. 
+        Useful for testing KSS modifications.
     </p>
     <ul>
     <li>Will affect all Plone instances, not just the one you change the setting in, so be careful.</li>
     <li>The setting will not be saved between restarts to avoid accidental performance degradation.</li>
     </ul>
-    
+
     <hr/>
 
     <p>The order of the kineticstylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
-    
+
     <p>Defined stylesheets can exist as a browser resource, an item in a skin
     layer, or as a complete URL.</p>
 
     <p>Please use care as external resources defined without SSL may cause an
     error to be displayed in a user's browser if they are visiting your site
     using SSL.</p>
-    
+
     <tal:kineticstylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="kineticstylesheet here/getResources">
       <fieldset tal:define="resourceExists python:kineticstylesheet.isExternalResource() or portal.restrictedTraverse(kineticstylesheet.getId(), False) and True;"
@@ -208,21 +208,21 @@ legend {
                    tal:attributes="href string:moveResourceDown?id=${kineticstylesheet/getQuotedId}">
                      &darr;
                 </a>
-                <a href="#" 
+                <a href="#"
                    title="Remove"
-                   style="color: red;"
+                   style="color: red; margin-left: 20px;"
                    tal:attributes="href string:manage_removeKineticStylesheet?id=${kineticstylesheet/getQuotedId}">
                     x
                 </a>
                 <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
         </legend>
-        
+
         <div class="kineticstylesheetform">
             <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
             <input type="checkbox" name="kineticstylesheets.authenticated:records:boolean"
                    tal:attributes="checked kineticstylesheet/getAuthenticated | default" />
             <input type="hidden" name="kineticstylesheets.authenticated:records:boolean:default" value="False" />
-        
+
             <label>Condition</label>
             <input type="text" name="kineticstylesheets.expression:records"
                    tal:attributes="value kineticstylesheet/getExpression" />
@@ -241,11 +241,11 @@ legend {
         </div>
 
         <div class="kineticstylesheetform">
-            
+
             <label>Bundle</label>
             <input type="text" name="kineticstylesheets.bundle:records"
                    tal:attributes="value kineticstylesheet/getBundle|nothing" />
-            
+
             <label>Compression type</label>
             <select name="kineticstylesheets.compression:records">
                 <option tal:define="options python:test(kineticstylesheet.isExternalResource(),here.getExternalCompressionOptions(),here.getCompressionOptions())"
@@ -257,7 +257,7 @@ legend {
         </div>
 
         <div style="clear: both;">&nbsp;</div>
-        
+
 
       </fieldset>
     </tal:kineticstylesheets>
@@ -278,7 +278,7 @@ legend {
               <label for="id">ID/URL</label>
               <input type="text" name="id" size="50" />
           </div>
-          
+
           <div>
               <label>Bundle</label>
               <input type="text" name="bundle" size="50" />
@@ -288,7 +288,7 @@ legend {
               <label>Condition</label>
               <input type="text" name="expression" size="50" />
           </div>
-          
+
           <div>
               <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
               <input type="checkbox" name="authenticated" value="0" />

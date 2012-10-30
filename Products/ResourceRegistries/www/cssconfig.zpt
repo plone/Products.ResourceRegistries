@@ -20,7 +20,7 @@ function getSortInput(node) {
     }
     return null;
 }
- 
+
 function exchangeSortValues(a, b) {
     var aInput = getSortInput(a);
     var bInput = getSortInput(b);
@@ -30,8 +30,8 @@ function exchangeSortValues(a, b) {
     bInput.value = tmp;
     return true;
 }
- 
- 
+
+
 function moveDown(node) {
     var node, fieldset, nextBlock = null;
     while (node.nodeName != 'FIELDSET') {
@@ -48,7 +48,7 @@ function moveDown(node) {
         }
     }
 }
- 
+
 function moveUp(node) {
     var node, fieldset, previousBlock = null;
     while (node.nodeName != 'FIELDSET') {
@@ -65,7 +65,7 @@ function moveUp(node) {
         }
     }
 }
- 
+
 function shiftBlocks(fieldset, block) {
     while (block.nodeType == 3) {
          block = block.previousSibling;
@@ -164,26 +164,26 @@ ul {
         In development mode, stylesheets are not merged to composites, and
         caching and compression of CSS is disabled. The registry also sends
         HTTP headers to prevent browsers from caching the stylesheets.
-        Useful for testing CSS modifications. 
+        Useful for testing CSS modifications.
     </p>
     <ul>
     <li>Will affect all Plone instances, not just the one you change the setting in, so be careful.</li>
     <li>The setting will not be saved between restarts to avoid accidental performance degradation.</li>
     </ul>
-    
+
     <hr/>
 
     <p>The order of the stylesheets in this form is the same as the
     order in the header of the resulting HTML code. Use the up/down arrows
     to change the rendering order.</p>
-    
+
     <p>Defined stylesheets can exist as a browser resource, an item in a skin
     layer, or as a complete URL. An IE-only
     <a href="http://msdn.microsoft.com/en-us/library/ms537512.aspx">Conditional
     Comment</a> may be specified and will be printed in the form of:
     &lt;!--[if <em>Condition</em>]&gt;...&lt;![endif]--&gt;
     </p>
-    
+
     <p>If your stylesheet uses relative URLs in a <code>url()</code>
     statement, e.g. to refer to another stylesheet or image, you may
     experience problems when using the registry in non-debug-mode, as
@@ -194,11 +194,11 @@ ul {
     stage. This does not modify the original stylesheet. It may have a slight
     performance impact, but it should not be an issue if resources get cached
     properly. It has no effect in debug mode.</p>
-    
+
     <p>Please use care when using external resources, as resources defined
     without SSL may cause an error to be displayed in a user's browser if they
     are visiting your site using SSL.</p>
-    
+
     <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="stylesheet here/getResources">
       <fieldset tal:define="resourceExists python:stylesheet.isExternalResource() or portal.restrictedTraverse(stylesheet.getId(), False) and True;"
@@ -227,15 +227,15 @@ ul {
                    tal:attributes="href string:moveResourceDown?id=${stylesheet/getQuotedId}">
                      &darr;
                 </a>
-                <a href="#" 
+                <a href="#"
                    title="Remove"
-                   style="color: red;"
+                   style="color: red; margin-left: 20px;"
                    tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/getQuotedId}">
                     x
                 </a>
                 <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
         </legend>
-        
+
         <div class="stylesheetform">
             <label>Title</label>
             <input type="text" name="stylesheets.title:records"
@@ -265,7 +265,7 @@ ul {
                    tal:attributes="checked stylesheet/getCacheable | default;
                                    disabled stylesheet/isExternalResource | nothing" />
             <input type="hidden" name="stylesheets.cacheable:records:boolean:default" value="False" />
-            
+
             <label title="This may be necessary when merging stylesheets that use relative URLs. It will not change the underlying stylesheet.">
                 Replace relative paths in <code>url()</code> statements with absolute paths?
             </label>
@@ -276,11 +276,11 @@ ul {
         </div>
 
         <div class="stylesheetform">
-            
+
             <label>Bundle</label>
             <input type="text" name="stylesheets.bundle:records"
                    tal:attributes="value stylesheet/getBundle|nothing" />
-            
+
             <label>CSS Media</label>
             <input type="text" name="stylesheets.media:records"
                    tal:attributes="value stylesheet/getMedia|nothing" />
@@ -309,7 +309,7 @@ ul {
         </div>
 
         <div style="clear: both;">&nbsp;</div>
-        
+
 
       </fieldset>
     </tal:stylesheets>
@@ -335,12 +335,12 @@ ul {
               <label>Bundle</label>
               <input type="text" name="bundle" size="50" />
           </div>
-          
+
           <div>
               <label>Title</label>
               <input type="text" name="title" />
           </div>
-          
+
           <div>
               <label>Restrict to authenticated users? If yes, the condition will be ignored.</label>
               <input type="checkbox" name="authenticated" value="0" />

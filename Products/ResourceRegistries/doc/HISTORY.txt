@@ -1,6 +1,10 @@
 1.4.4 (SVN/unreleased)
 ======================
 
+  * Backported changes that fixes a 301 redirect when trying to fetch resources,
+    this has been causing empty responses of length zero
+    [bosim]
+
   * Use iterative magic number generation based on all included
     resources (for each concatenated resource).
 

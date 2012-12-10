@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.4 (unreleased)
+2.2.4 (2012-12-09)
 ------------------
 
 - Add some space between up/down and remove links in ZMI

@@ -144,6 +144,10 @@ legend {
     background-color: #ffce7b;
     border: 1px solid #ffa500;
 }
+.alternate {
+    background-color: #00daff;
+    border: 1px solid #7bacff;
+}
 ul {
     font-family: Verdana,sans-serif;
     color: #333;
@@ -201,8 +205,9 @@ ul {
 
     <tal:stylesheets tal:define="portal python:here.portal_url.getPortalObject();"
                      tal:repeat="stylesheet here/getResources">
-      <fieldset tal:define="resourceExists python:stylesheet.isExternalResource() or portal.restrictedTraverse(stylesheet.getId(), False) and True;"
-                tal:attributes="class python:test(resourceExists, nothing, 'notFound')">
+      <fieldset tal:define="resourceExists python:stylesheet.isExternalResource() or portal.restrictedTraverse(stylesheet.getId(), False) and True;
+alternateStylesheet python:stylesheet.getRendering() == 'link' and stylesheet.getTitle()"
+                tal:attributes="class python:test(resourceExists, test(alternateStylesheet, 'alternate', nothing), 'notFound')">
 
         <input type="hidden" name="stylesheets.sort:records:int"
                tal:attributes="value repeat/stylesheet/index" />
@@ -234,6 +239,7 @@ ul {
                     x
                 </a>
                 <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>
+                <span tal:condition="alternateStylesheet">(browsers will not render this stylesheet by default - <a href="https://developer.mozilla.org/en-US/docs/CSS/Alternative_style_sheets">more info</a>)</span>
         </legend>
 
         <div class="stylesheetform">

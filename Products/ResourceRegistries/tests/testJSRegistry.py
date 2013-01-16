@@ -21,6 +21,9 @@ from Products.ResourceRegistries.interfaces import ICookedFile
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
+ONE_SECOND = 1.0 / (60 * 60 * 24)
+
+
 class TestJSImplementation(RegistryTestCase):
 
     def test_interfaces(self):
@@ -561,11 +564,14 @@ class TestDebugMode(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.tool.setDebugMode(True)
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.assertNotEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertNotEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(DateTime().timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
@@ -940,8 +946,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -949,8 +957,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
     def testCachingHeadersFromSkin(self):
@@ -962,8 +972,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -971,8 +983,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
     def testCachingHeadersFromToolWithRAMCache(self):
@@ -985,8 +999,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -994,8 +1010,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
     def testCachingHeadersFromSkinWithRAMCache(self):
@@ -1010,8 +1028,10 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -1019,9 +1039,12 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
+
 
 class TestBundling(RegistryTestCase):
 

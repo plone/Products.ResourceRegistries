@@ -20,6 +20,8 @@ from Products.ResourceRegistries.interfaces import ICookedFile
 from Products.ResourceRegistries.tests.RegistryTestCase import RegistryTestCase
 from Products.ResourceRegistries.tests.RegistryTestCase import FunctionalRegistryTestCase
 
+ONE_SECOND = 1.0 / (60 * 60 * 24)
+
 
 class KSSRegistryTestCase(RegistryTestCase):
 
@@ -776,12 +778,18 @@ class TestDebugMode(FunctionalKSSRegistryTestCase):
         now = DateTime()
         days = 7
         soon = now + days
+        soon2 = soon + ONE_SECOND
         self.tool.setDebugMode(True)
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.tool.setDebugMode(False)
         self.assertNotEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertNotEqual(response.getHeader('Expires'), rfc1123_date(soon2.timeTime()))
+        # There are spurious test failures because the Expires header
+        # may be a second later, so we do two checks.
+        #self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertGreaterEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertLessEqual(response.getHeader('Expires'), rfc1123_date(DateTime().timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 

@@ -4,7 +4,8 @@ Changelog
 2.2.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed spurious test failures for Expires being off by one second.
+  [maurits
 
 
 2.2.5 (2013-01-13)

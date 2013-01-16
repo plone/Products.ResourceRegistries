@@ -4,7 +4,6 @@
 from zope.component import getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
-from App.Common import rfc1123_date
 from DateTime import DateTime
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
@@ -780,8 +779,8 @@ class TestDebugMode(FunctionalKSSRegistryTestCase):
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.tool.setDebugMode(False)
-        self.assertNotEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertExpiresNotEqual(response.getHeader('Expires'), soon.timeTime())
+        self.assertExpiresEqual(response.getHeader('Expires'), now.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 

@@ -10,9 +10,9 @@ class BaseRegistryTestCase(unittest.TestCase):
     # Make sure we don't generate an id that could screw up traversal to
     # the cached resource.
     def testGenerateId(self):
-        self.failIf('++' in self.registry.generateId(
+        self.assertFalse('++' in self.registry.generateId(
             Resource('++resource++foobar.css')))
-        self.failIf('/' in self.registry.generateId(
+        self.assertFalse('/' in self.registry.generateId(
             Resource('++resource++foo/bar.css')))
     
     #Resources with double //'s in them aren't traversable. The page templates
@@ -30,7 +30,7 @@ class BaseRegistryTestCase(unittest.TestCase):
             if ids[id]: #This shouldn't error
                 Resource(id)
             else: #This should throw a ValueError
-                self.failUnlessRaises(ValueError,Resource,id)
+                self.assertRaises(ValueError,Resource,id)
                 self.assertRaises(ValueError,Resource,id)
 
     def runTest(self):

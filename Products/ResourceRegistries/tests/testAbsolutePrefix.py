@@ -30,7 +30,7 @@ table p {
 """
     
     def test_simple_prefix(self):
-        self.assertEquals("""\
+        self.assertEqual("""\
 @import url(/prefix/common.css);
 
 #foo {
@@ -55,7 +55,7 @@ table p {
 """, applyPrefix(self.cssSource, '/prefix'))
 
     def test_trailing_slash(self):
-        self.assertEquals("""\
+        self.assertEqual("""\
 @import url(/prefix/common.css);
 
 #foo {
@@ -80,7 +80,7 @@ table p {
 """, applyPrefix(self.cssSource, '/prefix/'))
 
     def test_deep_prefix(self):
-        self.assertEquals("""\
+        self.assertEqual("""\
 @import url(/some/prefix/common.css);
 
 #foo {

@@ -25,30 +25,30 @@ class TestJSImplementation(RegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, JSTOOLNAME)
-        self.failUnless(IJSRegistry.providedBy(tool))
-        self.failUnless(verifyObject(IJSRegistry, tool))
+        self.assertTrue(IJSRegistry.providedBy(tool))
+        self.assertTrue(verifyObject(IJSRegistry, tool))
 
 
 class TestJSTool(RegistryTestCase):
 
     def testToolExists(self):
-        self.failUnless(JSTOOLNAME in self.portal.objectIds())
+        self.assertTrue(JSTOOLNAME in self.portal.objectIds())
 
     def testZMIForm(self):
         tool = getattr(self.portal, JSTOOLNAME)
         self.setRoles(['Manager'])
-        self.failUnless(tool.manage_jsForm())
-        self.failUnless(tool.manage_jsComposition())
+        self.assertTrue(tool.manage_jsForm())
+        self.assertTrue(tool.manage_jsComposition())
 
 
 class TestJSSkin(RegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
-        self.failUnless('ResourceRegistries' in skins)
+        self.assertTrue('ResourceRegistries' in skins)
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'test_rr_1.js'))
+        self.assertTrue(getattr(self.portal, 'test_rr_1.js'))
 
 
 class testJSZMIMethods(RegistryTestCase):
@@ -60,7 +60,7 @@ class testJSZMIMethods(RegistryTestCase):
     def testAdd(self):
         self.tool.manage_addScript(id='joe')
         self.assertEqual(len(self.tool.getResources()), 1)
-        self.failUnless(self.tool.getResources())
+        self.assertTrue(self.tool.getResources())
 
 
 class TestJSScriptRegistration(RegistryTestCase):
@@ -149,22 +149,22 @@ class TestJSToolExpression(RegistryTestCase):
 
     def testSimplestExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:1'), context))
-        self.failIf(self.tool.evaluateExpression(
+        self.assertFalse(self.tool.evaluateExpression(
             Expression('python:0'), context))
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:0+1'), context))
 
     def testNormalExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('object/absolute_url'), context))
 
     def testExpressionInFolder(self):
         self.folder.invokeFactory('Document', 'eggs')
         context = self.folder
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:"eggs" in object.objectIds()'), context))
 
 
@@ -204,11 +204,11 @@ class TestJSScriptCooking(RegistryTestCase):
         self.tool.registerScript('eggs')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
         magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[2]])
-        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('ham' in self.tool.concatenatedresources[magic_ids[0]])
+        self.assertTrue('eggs' in self.tool.concatenatedresources[magic_ids[2]])
+        self.assertTrue('spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
     def testGetEvaluatedScriptsWithExpression(self):
         self.tool.registerScript('ham')
@@ -241,8 +241,8 @@ class TestJSScriptCooking(RegistryTestCase):
         for magic_id in magic_ids:
             self.assertEqual(len(self.tool.concatenatedresources[magic_id]), 1)
             ids.append(self.tool.concatenatedresources[magic_id][0])
-        self.failUnless(ids[0] == 'ham')
-        self.failUnless(ids[1] == 'spam')
+        self.assertTrue(ids[0] == 'ham')
+        self.assertTrue(ids[1] == 'spam')
 
     def testRenderingScriptLinks(self):
         self.tool.registerScript('ham')
@@ -255,9 +255,9 @@ class TestJSScriptCooking(RegistryTestCase):
         all = viewletmanager.render()
         evaluated = self.tool.getEvaluatedResources(self.folder)
         magic_ids = [item.getId() for item in evaluated]
-        self.failUnless('background-color' in all)
-        self.failUnless('<script' in all)
-        self.failUnless('/%s' %(magic_ids[1],) in all)
+        self.assertTrue('background-color' in all)
+        self.assertTrue('<script' in all)
+        self.assertTrue('/%s' %(magic_ids[1],) in all)
 
     def testReenderingConcatenatesInline(self):
         self.tool.registerScript('test_rr_1.css', inline='1')
@@ -266,15 +266,15 @@ class TestJSScriptCooking(RegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
         viewletmanager.update()
         all = viewletmanager.render()
-        self.failUnless('background-color' in all)
-        self.failUnless('blue' in all)
+        self.assertTrue('background-color' in all)
+        self.assertTrue('blue' in all)
 
     def testRenderingWorksInMainTemplate(self):
         renderedpage = getattr(self.portal, 'index_html')()
-        self.failIf('background-color' in renderedpage)
+        self.assertFalse('background-color' in renderedpage)
         self.tool.registerScript('test_rr_1.css', inline=1)
         renderedpage = getattr(self.portal, 'index_html')()
-        self.failUnless('background-color' in renderedpage)
+        self.assertTrue('background-color' in renderedpage)
 
 
 class TestScriptMoving(RegistryTestCase):
@@ -396,7 +396,7 @@ class TestJSTraversal(RegistryTestCase):
 
     def testMarker(self):
         traversed = self.portal.restrictedTraverse('portal_javascripts/test_rr_1.js')
-        self.failUnless(ICookedFile.providedBy(traversed))
+        self.assertTrue(ICookedFile.providedBy(traversed))
     
     def testMarkerComposite(self):
         self.tool.registerScript('test_rr_2.css')
@@ -404,17 +404,17 @@ class TestJSTraversal(RegistryTestCase):
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].getId()
         traversed = self.portal.restrictedTraverse('portal_javascripts/%s' % magicId)
-        self.failUnless(ICookedFile.providedBy(traversed))
+        self.assertTrue(ICookedFile.providedBy(traversed))
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['test_rr_1.js'])
+        self.assertTrue(self.tool['test_rr_1.js'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('running' in str(
+        self.assertTrue('running' in str(
                         self.tool['test_rr_1.js']))
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('running' in str(
+        self.assertTrue('running' in str(
                         self.portal.restrictedTraverse(
                             'portal_javascripts/test_rr_1.js')))
 
@@ -425,8 +425,8 @@ class TestJSTraversal(RegistryTestCase):
         magicId = scripts[0].getId()
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
         # XXX: Review
-        #self.failUnless('test_rr_1.js' in content)
-        #self.failUnless('registerPloneFunction' in content)
+        #self.assertTrue('test_rr_1.js' in content)
+        #self.assertTrue('registerPloneFunction' in content)
 
     def testCompositesWithBrokenId(self):
         self.tool.registerScript('nonexistant.js')
@@ -535,7 +535,7 @@ class TestFivePublishing(FunctionalRegistryTestCase):
     def testPublishFiveResource(self):
         response = self.publish(self.toolpath + '/++resource++test_rr_1.js')
         self.assertEqual(response.getStatus(), 200)
-        self.failUnless(response.getHeader('Content-Type').endswith('javascript'))
+        self.assertTrue(response.getHeader('Content-Type').endswith('javascript'))
         self.assertEqual("window.alert('running')" in response.getBody(), True)
 
 class TestDebugMode(FunctionalRegistryTestCase):
@@ -564,7 +564,7 @@ class TestDebugMode(FunctionalRegistryTestCase):
         self.tool.setDebugMode(True)
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
-        self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertNotEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
         self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
@@ -593,24 +593,24 @@ class TestZODBTraversal(RegistryTestCase):
         self.tool.setDebugMode(False)
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['testroot.js'])
-        self.failUnless(self.tool['subfolder/testsubfolder.js'])
+        self.assertTrue(self.tool['testroot.js'])
+        self.assertTrue(self.tool['subfolder/testsubfolder.js'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('red' in str(self.tool['testroot.js']))
-        self.failUnless('blue' in str(self.tool['subfolder/testsubfolder.js']))
-        self.failIf('blue' in str(self.tool['testroot.js']))
-        self.failIf('red' in str(self.tool['subfolder/testsubfolder.js']))
+        self.assertTrue('red' in str(self.tool['testroot.js']))
+        self.assertTrue('blue' in str(self.tool['subfolder/testsubfolder.js']))
+        self.assertFalse('blue' in str(self.tool['testroot.js']))
+        self.assertFalse('red' in str(self.tool['subfolder/testsubfolder.js']))
 
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('red' in str(
+        self.assertTrue('red' in str(
                         self.portal.restrictedTraverse('portal_javascripts/testroot.js')))
-        self.failUnless('blue' in str(
+        self.assertTrue('blue' in str(
                         self.portal.restrictedTraverse('portal_javascripts/subfolder/testsubfolder.js')))
-        self.failIf('blue' in str(
+        self.assertFalse('blue' in str(
                         self.portal.restrictedTraverse('portal_javascripts/testroot.js')))
-        self.failIf('red' in str(
+        self.assertFalse('red' in str(
                         self.portal.restrictedTraverse('portal_javascripts/subfolder/testsubfolder.js')))
 
     def testRestrictedTraverseComposition(self):
@@ -618,8 +618,8 @@ class TestZODBTraversal(RegistryTestCase):
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].getId()
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
-        self.failUnless('red' in content)
-        self.failUnless('blue' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('blue' in content)
 
     def testContextDependantInlineJS(self):
         self.tool.clearResources()
@@ -642,14 +642,14 @@ class TestZODBTraversal(RegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal.folder1, self.portal.folder1.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('pink' in content)
-        self.failIf('purple' in content)
+        self.assertTrue('pink' in content)
+        self.assertFalse('purple' in content)
         view = self.portal.restrictedTraverse('@@plone')
         viewletmanager = getMultiAdapter((self.portal.folder2, self.portal.folder2.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.scripts')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('purple' in content)
-        self.failIf('pink' in content)
+        self.assertTrue('purple' in content)
+        self.assertFalse('pink' in content)
 
 class TestResourcePermissions(FunctionalRegistryTestCase):
 
@@ -700,7 +700,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testRaiseUnauthorizedOnPublish(self):
         response = self.publish(self.toolpath + '/testroot.js')
         #Will be 302 if CookieCrumbler is enabled
-        self.failUnless(response.getStatus() in [302, 403, 401])
+        self.assertTrue(response.getStatus() in [302, 403, 401])
 
     def testRemovedFromResources(self):
         # This test assumes that content is not merged or cached
@@ -708,8 +708,8 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
         self.tool.registerResource('test_rr_1.js', cookable=False, cacheable=False)
         scripts = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in scripts]
-        self.failIf('testroot.js' in ids)
-        self.failUnless('test_rr_1.js' in ids)
+        self.assertFalse('testroot.js' in ids)
+        self.assertTrue('test_rr_1.js' in ids)
         # Return resources to normal (not sure if this is needed)
         self.tool.unregisterResource('test_rr_1.js')
         self.tool.registerScript('test_rr_1.js')
@@ -723,11 +723,11 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
             id = script.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
-        self.failIf('red' in content)
-        self.failUnless('not authorized' in content)
-        self.failUnless('running' in content)
+        self.assertFalse('red' in content)
+        self.assertTrue('not authorized' in content)
+        self.assertTrue('running' in content)
 
     def testAuthorizedGetItem(self):
         self.setRoles(['Manager'])
@@ -746,7 +746,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testAuthorizedOnPublish(self):
         authstr = "%s:%s" % (portal_owner, default_password)
         response = self.publish(self.toolpath + '/testroot.js', basic=authstr)
-        self.failUnlessEqual(response.getStatus(), 200)
+        self.assertEqual(response.getStatus(), 200)
 
 class TestMergingDisabled(RegistryTestCase):
 
@@ -771,11 +771,11 @@ class TestMergingDisabled(RegistryTestCase):
         self.tool.setDebugMode(False)
 
     def testDefaultStylesheetCookableAttribute(self):
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.js')].getCookable())
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.js')].getCookable())
+        self.assertTrue(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.js')].getCookable())
+        self.assertTrue(self.tool.getResources()[self.tool.getResourcePosition('testroot.js')].getCookable())
 
     def testStylesheetCookableAttribute(self):
-        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('simple2.js')].getCookable())
+        self.assertFalse(self.tool.getResources()[self.tool.getResourcePosition('simple2.js')].getCookable())
 
     def testNumberOfResources(self):
         self.assertEqual(len(self.tool.getResources()), 3)
@@ -796,17 +796,17 @@ class TestMergingDisabled(RegistryTestCase):
             id = script.getId()
             if '-cachekey' in id:
                 magicIds.append(id)
-        self.failUnless(magicIds[-1].startswith('simple2'))
+        self.assertTrue(magicIds[-1].startswith('simple2'))
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[-2]))
-        self.failUnless('running' in content)
-        self.failUnless('green' in content)
-        self.failIf('blue' in content)
+        self.assertTrue('running' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[-1]))
-        self.failIf('running' in content)
-        self.failIf('green' in content)
-        self.failUnless('blue' in content)
+        self.assertFalse('running' in content)
+        self.assertFalse('green' in content)
+        self.assertTrue('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositionWithFirstUncooked(self):
         self.tool.moveResourceToTop('simple2.js')
@@ -820,13 +820,13 @@ class TestMergingDisabled(RegistryTestCase):
             id = script.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicId))
-        self.failUnless('running' in content)
-        self.failUnless('green' in content)
-        self.failIf('blue' in content)
+        self.assertTrue('running' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositionWithMiddleUncooked(self):
         self.tool.moveResourceToTop('simple2.js')
@@ -837,11 +837,11 @@ class TestMergingDisabled(RegistryTestCase):
         scripts = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(scripts), 3)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/test_rr_1.js'))
-        self.failUnless('running' in content)
+        self.assertTrue('running' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/testroot.js'))
-        self.failUnless('green' in content)
+        self.assertTrue('green' in content)
 
     def testLargerCompositionWithMiddleUncooked(self):
         self.setRoles(['Manager'])
@@ -873,17 +873,17 @@ class TestMergingDisabled(RegistryTestCase):
                 magicIds.append(id)
         self.assertEqual(len(magicIds), 3)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[0]))
-        self.failUnless('running' in content)
-        self.failUnless('green' in content)
-        self.failIf('pink' in content)
-        self.failIf('purple' in content)
+        self.assertTrue('running' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('pink' in content)
+        self.assertFalse('purple' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/%s' % magicIds[2]))
-        self.failUnless('pink' in content)
-        self.failUnless('purple' in content)
-        self.failIf('running' in content)
-        self.failIf('green' in content)
+        self.assertTrue('pink' in content)
+        self.assertTrue('purple' in content)
+        self.assertFalse('running' in content)
+        self.assertFalse('green' in content)
         content = str(self.portal.restrictedTraverse('portal_javascripts/simple2.js'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
 
 class TestUnicodeAwareness(RegistryTestCase):
@@ -917,7 +917,7 @@ class TestUnicodeAwareness(RegistryTestCase):
             id = script.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = self.tool.getResourceContent(magicId, self.portal, original=True)
 
         self.assertTrue(u"window.alert('running')" in content)
@@ -1112,7 +1112,7 @@ class TestPdataAwareness(FunctionalRegistryTestCase):
         response = self.publish(self.toolpath + '/' + default_skin_name +\
                                 '/hello_world.js')
         self.assertEqual(response.getStatus(), 200)
-        self.failUnless('Hello world!' in str(response))
+        self.assertTrue('Hello world!' in str(response))
 
 
 def test_suite():

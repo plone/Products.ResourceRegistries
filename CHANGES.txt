@@ -4,8 +4,8 @@ Changelog
 2.2.6 (unreleased)
 ------------------
 
-- Raise with of id input field from 30 to 100, so that browser reource ids can
-  be shown as whole.
+- Raise with of id input fields in ZMI from 30 to 80, so that browser reource
+  ids can be shown as whole.
   [thet]
 
 - Fixed spurious test failures for Expires being off by one second.

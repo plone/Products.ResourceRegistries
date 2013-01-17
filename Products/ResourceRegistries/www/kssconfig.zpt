@@ -195,7 +195,7 @@ legend {
                    tal:attributes="checked kineticstylesheet/getEnabled" />
             <input type="hidden" name="kineticstylesheets.enabled:records:boolean:default" value="False" />
 
-            <input type="text" name="kineticstylesheets.id:records" size="100"
+            <input type="text" name="kineticstylesheets.id:records" size="80"
                    tal:attributes="value kineticstylesheet/getId" />
 
             <a onclick="return moveUp(this);" href="#"

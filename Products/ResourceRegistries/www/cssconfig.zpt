@@ -219,7 +219,7 @@ alternateStylesheet python:stylesheet.getRendering() == 'link' and stylesheet.ge
                    tal:attributes="checked stylesheet/getEnabled" />
             <input type="hidden" name="stylesheets.enabled:records:boolean:default" value="False" />
 
-            <input type="text" name="stylesheets.id:records" size="100"
+            <input type="text" name="stylesheets.id:records" size="80"
                    tal:attributes="value stylesheet/getId" />
 
             <a onclick="return moveUp(this);" href="#"

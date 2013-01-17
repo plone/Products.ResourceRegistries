@@ -200,7 +200,7 @@ legend {
                    tal:attributes="checked script/getEnabled" />
             <input type="hidden" name="scripts.enabled:records:boolean:default" value="False" />
 
-            <input type="text" name="scripts.id:records:string" size="100"
+            <input type="text" name="scripts.id:records:string" size="80"
                    tal:attributes="value script/getId" />
 
             <a onclick="return moveUp(this);" href="#"

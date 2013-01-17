@@ -4,6 +4,10 @@ Changelog
 2.2.4 (unreleased)
 ------------------
 
+- Raise with of id input field from 30 to 100, so that browser reource ids can
+  be shown as whole.
+  [thet]
+
 - Add some space between up/down and remove links in ZMI
   [maartenking]
 

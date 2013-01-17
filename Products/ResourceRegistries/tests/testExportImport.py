@@ -13,7 +13,7 @@ class TestExportImport(RegistryTestCase):
             result = tool.runImportStepFromProfile(profile_id, 'jsregistry')
         except UnboundLocalError, e:
             self.fail("UnboundLocalError thrown: %s" % e)
-        self.failUnless("resourceregistry: Javascript registry imported." in \
+        self.assertTrue("resourceregistry: Javascript registry imported." in \
                    result['messages']['jsregistry'],
                "Javascript registry should have been imported")
         # We depend on some other steps:

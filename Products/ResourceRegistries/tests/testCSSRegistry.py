@@ -4,7 +4,6 @@
 from zope.component import getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
-from App.Common import rfc1123_date
 from DateTime import DateTime
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
@@ -25,29 +24,29 @@ class TestImplementation(RegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, CSSTOOLNAME)
-        self.failUnless(ICSSRegistry.providedBy(tool))
-        self.failUnless(verifyObject(ICSSRegistry, tool))
+        self.assertTrue(ICSSRegistry.providedBy(tool))
+        self.assertTrue(verifyObject(ICSSRegistry, tool))
 
 class TestTool(RegistryTestCase):
 
     def testToolExists(self):
-        self.failUnless(CSSTOOLNAME in self.portal.objectIds())
+        self.assertTrue(CSSTOOLNAME in self.portal.objectIds())
 
     def testZMIForm(self):
         tool = getattr(self.portal, CSSTOOLNAME)
         self.setRoles(['Manager'])
-        self.failUnless(tool.manage_cssForm())
-        self.failUnless(tool.manage_cssComposition())
+        self.assertTrue(tool.manage_cssForm())
+        self.assertTrue(tool.manage_cssComposition())
 
 
 class TestSkin(RegistryTestCase):
 
     def testSkins(self):
         skins = self.portal.portal_skins.objectIds()
-        self.failUnless('ResourceRegistries' in skins)
+        self.assertTrue('ResourceRegistries' in skins)
 
     def testSkinExists(self):
-        self.failUnless(getattr(self.portal, 'test_rr_1.css'))
+        self.assertTrue(getattr(self.portal, 'test_rr_1.css'))
 
 
 class testZMIMethods(RegistryTestCase):
@@ -59,7 +58,7 @@ class testZMIMethods(RegistryTestCase):
     def testAdd(self):
         self.tool.manage_addStylesheet(id='joe')
         self.assertEqual(len(self.tool.getResources()), 1)
-        self.failUnless(self.tool.getResources())
+        self.assertTrue(self.tool.getResources())
 
 
 class TestStylesheetRegistration(RegistryTestCase):
@@ -82,16 +81,16 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.assertEqual(self.tool.getResources()[0].getRel(), 'stylesheet')
         self.assertEqual(self.tool.getResources()[0].getTitle(), None)
         self.assertEqual(self.tool.getResources()[0].getRendering(), 'link')
-        self.failUnless(self.tool.getResources()[0].getEnabled())
+        self.assertTrue(self.tool.getResources()[0].getEnabled())
         
     def testExternalDefaultStylesheetAttributes(self):
         self.tool.registerStylesheet('http://example.com/foodefault')
         self.assertEqual(self.tool.getResources()[0].getId(), 'http://example.com/foodefault')
-        self.failUnless(self.tool.getResources()[0].isExternalResource())
-        self.failIf(self.tool.getResources()[0].getCacheable())
+        self.assertTrue(self.tool.getResources()[0].isExternalResource())
+        self.assertFalse(self.tool.getResources()[0].getCacheable())
         self.assertEqual(self.tool.getResources()[0].getCompression(),'none')
-        self.failIf(self.tool.getResources()[0].getCookable())
-        self.failUnless(self.tool.getResources()[0].getEnabled())
+        self.assertFalse(self.tool.getResources()[0].getCookable())
+        self.assertTrue(self.tool.getResources()[0].getEnabled())
 
     def testStylesheetAttributes(self):
         self.tool.registerStylesheet('foo', expression='python:1', authenticated=False,
@@ -104,7 +103,7 @@ class TestStylesheetRegistration(RegistryTestCase):
         self.assertEqual(self.tool.getResources()[0].getRel(), 'alternate stylesheet')
         self.assertEqual(self.tool.getResources()[0].getTitle(), 'Foo')
         self.assertEqual(self.tool.getResources()[0].getRendering(), 'inline')
-        self.failIf(self.tool.getResources()[0].getEnabled())
+        self.assertFalse(self.tool.getResources()[0].getEnabled())
 
     def testDisallowingDuplicateIds(self):
         self.tool.registerStylesheet('foo')
@@ -195,22 +194,22 @@ class TestToolExpression(RegistryTestCase):
 
     def testSimplestExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:1'), context))
-        self.failIf(self.tool.evaluateExpression(
+        self.assertFalse(self.tool.evaluateExpression(
             Expression('python:0'), context))
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:0+1'), context))
 
     def testNormalExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('object/absolute_url'), context))
 
     def testExpressionInFolder(self):
         self.folder.invokeFactory('Document', 'eggs')
         context = self.folder
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:"eggs" in object.objectIds()'), context))
 
 
@@ -250,17 +249,17 @@ class TestStylesheetCooking(RegistryTestCase):
         self.tool.registerStylesheet('eggs')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
         magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[2]])
-        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('ham' in self.tool.concatenatedresources[magic_ids[0]])
+        self.assertTrue('eggs' in self.tool.concatenatedresources[magic_ids[2]])
+        self.assertTrue('spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
     def testConcatenatedStylesheetsHaveNoMedia(self):
         self.tool.registerStylesheet('ham')
         self.tool.registerStylesheet('spam', media='print')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 1)
-        self.failIf(self.tool.getEvaluatedResources(self.folder)[0].getMedia())
+        self.assertFalse(self.tool.getEvaluatedResources(self.folder)[0].getMedia())
 
     def testGetEvaluatedStylesheetsWithExpression(self):
         self.tool.registerStylesheet('ham')
@@ -293,8 +292,8 @@ class TestStylesheetCooking(RegistryTestCase):
         for magic_id in magic_ids:
             self.assertEqual(len(self.tool.concatenatedresources[magic_id]), 1)
             ids.append(self.tool.concatenatedresources[magic_id][0])
-        self.failUnless(ids[0] == 'ham')
-        self.failUnless(ids[1] == 'spam')
+        self.assertTrue(ids[0] == 'ham')
+        self.assertTrue(ids[1] == 'spam')
 
     def testConcatenatedSheetsAreInTheRightOrderToo(self):
         self.tool.registerStylesheet('ham')
@@ -302,9 +301,9 @@ class TestStylesheetCooking(RegistryTestCase):
         self.tool.registerStylesheet('eggs')
         evaluated = self.tool.getEvaluatedResources(self.folder)
         results = self.tool.concatenatedresources[evaluated[0].getId()]
-        self.failUnless(results[0] == 'ham')
-        self.failUnless(results[1] == 'spam')
-        self.failUnless(results[2] == 'eggs')
+        self.assertTrue(results[0] == 'ham')
+        self.assertTrue(results[1] == 'spam')
+        self.assertTrue(results[2] == 'eggs')
 
     def testRenderingStylesheetLinks(self):
         self.tool.registerStylesheet('ham', rendering='link')
@@ -317,10 +316,10 @@ class TestStylesheetCooking(RegistryTestCase):
         all = viewletmanager.render()
         evaluated = self.tool.getEvaluatedResources(self.folder)
         magic_ids = [item.getId() for item in evaluated]
-        self.failUnless('background-color' in all)
-        self.failUnless('<link' in all)
-        self.failUnless('/%s' % magic_ids[1] in all)
-        self.failIf('/test_rr_1.css"' in all)
+        self.assertTrue('background-color' in all)
+        self.assertTrue('<link' in all)
+        self.assertTrue('/%s' % magic_ids[1] in all)
+        self.assertFalse('/test_rr_1.css"' in all)
 
     def testRenderingConcatenatesInline(self):
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
@@ -329,8 +328,8 @@ class TestStylesheetCooking(RegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
         viewletmanager.update()
         all = viewletmanager.render()
-        self.failUnless('background-color' in all)
-        self.failUnless('blue' in all)
+        self.assertTrue('background-color' in all)
+        self.assertTrue('blue' in all)
 
     def testConditionalComment(self):
         self.tool.registerStylesheet('foo', conditionalcomment='IE7')
@@ -353,10 +352,10 @@ class TestStylesheetCooking(RegistryTestCase):
 
     def testRenderingWorksInMainTemplate(self):
         renderedpage = getattr(self.portal, 'index_html')()
-        self.failIf('background-color' in renderedpage)
+        self.assertFalse('background-color' in renderedpage)
         self.tool.registerStylesheet('test_rr_1.css', rendering='inline')
         renderedpage = getattr(self.portal, 'index_html')()
-        self.failUnless('background-color' in renderedpage)
+        self.assertTrue('background-color' in renderedpage)
 
 class TestStylesheetAbsolutePrefix(RegistryTestCase):
 
@@ -376,13 +375,13 @@ class TestStylesheetAbsolutePrefix(RegistryTestCase):
         
         rendered = traversed.data
         
-        self.assertEquals(1, rendered.count("url(/plone/++resource++test_rr/common.css)"))
-        self.assertEquals(1, rendered.count("url(common.css)"))
+        self.assertEqual(1, rendered.count("url(/plone/++resource++test_rr/common.css)"))
+        self.assertEqual(1, rendered.count("url(common.css)"))
         
-        self.assertEquals(1, rendered.count("url ( '/plone/++resource++test_rr/spacer.jpg' )"))
-        self.assertEquals(1, rendered.count("url ( 'spacer.jpg' )"))
+        self.assertEqual(1, rendered.count("url ( '/plone/++resource++test_rr/spacer.jpg' )"))
+        self.assertEqual(1, rendered.count("url ( 'spacer.jpg' )"))
         
-        self.assertEquals(2, rendered.count('url("http://example.org/absolute.jpg")'))
+        self.assertEqual(2, rendered.count('url("http://example.org/absolute.jpg")'))
 
     def testURLReplaceDebugMode(self):
         self.tool.registerStylesheet('++resource++test_rr/test_1.css', applyPrefix=True, cookable=True)
@@ -392,9 +391,9 @@ class TestStylesheetAbsolutePrefix(RegistryTestCase):
         traversed = self.portal.restrictedTraverse('portal_css/++resource++test_rr/test_1.css')
         rendered = traversed.GET()
         
-        self.assertEquals(1, rendered.count("url(common.css)"))
-        self.assertEquals(1, rendered.count("url ( 'spacer.jpg' )"))
-        self.assertEquals(1, rendered.count('url("http://example.org/absolute.jpg")'))
+        self.assertEqual(1, rendered.count("url(common.css)"))
+        self.assertEqual(1, rendered.count("url ( 'spacer.jpg' )"))
+        self.assertEqual(1, rendered.count('url("http://example.org/absolute.jpg")'))
         
         self.tool.setDebugMode(False) # This is a global dict, so you have to tear down!
         
@@ -523,24 +522,24 @@ class TestTraversal(RegistryTestCase):
         self.tool.registerStylesheet('test_rr_1.css')
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['test_rr_1.css'])
+        self.assertTrue(self.tool['test_rr_1.css'])
     
     def testMarker(self):
         traversed = self.portal.restrictedTraverse('portal_css/test_rr_1.css')
-        self.failUnless(ICookedFile.providedBy(traversed))
+        self.assertTrue(ICookedFile.providedBy(traversed))
     
     def testMarkerComposite(self):
         self.tool.registerStylesheet('test_rr_2.css')
         styles = self.tool.getEvaluatedResources(self.portal)
         magicId = styles[0].getId()
         traversed = self.portal.restrictedTraverse('portal_css/%s' % magicId)
-        self.failUnless(ICookedFile.providedBy(traversed))
+        self.assertTrue(ICookedFile.providedBy(traversed))
     
     def testGetItemTraversalContent(self):
-        self.failUnless('background-color' in str(self.tool['test_rr_1.css']))
+        self.assertTrue('background-color' in str(self.tool['test_rr_1.css']))
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('background-color' in str(
+        self.assertTrue('background-color' in str(
                         self.portal.restrictedTraverse('portal_css/test_rr_1.css')))
 
     def testRestrictedTraverseComposition(self):
@@ -549,8 +548,8 @@ class TestTraversal(RegistryTestCase):
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        self.failUnless('background-color' in content)
-        self.failUnless('blue' in content)
+        self.assertTrue('background-color' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositesWithBrokedId(self):
         self.tool.registerStylesheet('nonexistant.css')
@@ -565,9 +564,9 @@ class TestTraversal(RegistryTestCase):
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        self.failUnless('@media print' in content)
-        self.failUnless('background-color : red' in content)
-        self.failUnless('H1 { color: blue; }' in content)
+        self.assertTrue('@media print' in content)
+        self.assertTrue('background-color : red' in content)
+        self.assertTrue('H1 { color: blue; }' in content)
 
 class TestZODBTraversal(RegistryTestCase):
 
@@ -592,24 +591,24 @@ class TestZODBTraversal(RegistryTestCase):
         self.setRoles(['Member'])
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['testroot.css'])
-        self.failUnless(self.tool['subfolder/testsubfolder.css'])
+        self.assertTrue(self.tool['testroot.css'])
+        self.assertTrue(self.tool['subfolder/testsubfolder.css'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('red' in str(self.tool['testroot.css']))
-        self.failUnless('blue' in str(self.tool['subfolder/testsubfolder.css']))
-        self.failIf('blue' in str(self.tool['testroot.css']))
-        self.failIf('red' in str(self.tool['subfolder/testsubfolder.css']))
+        self.assertTrue('red' in str(self.tool['testroot.css']))
+        self.assertTrue('blue' in str(self.tool['subfolder/testsubfolder.css']))
+        self.assertFalse('blue' in str(self.tool['testroot.css']))
+        self.assertFalse('red' in str(self.tool['subfolder/testsubfolder.css']))
 
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('red' in str(
+        self.assertTrue('red' in str(
                         self.portal.restrictedTraverse('portal_css/testroot.css')))
-        self.failUnless('blue' in str(
+        self.assertTrue('blue' in str(
                         self.portal.restrictedTraverse('portal_css/subfolder/testsubfolder.css')))
-        self.failIf('blue' in str(
+        self.assertFalse('blue' in str(
                         self.portal.restrictedTraverse('portal_css/testroot.css')))
-        self.failIf('red' in str(
+        self.assertFalse('red' in str(
                         self.portal.restrictedTraverse('portal_css/subfolder/testsubfolder.css')))
 
     def testRestrictedTraverseComposition(self):
@@ -617,9 +616,9 @@ class TestZODBTraversal(RegistryTestCase):
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        self.failUnless('background-color' in content)
-        self.failUnless('red' in content)
-        self.failUnless('blue' in content)
+        self.assertTrue('background-color' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('blue' in content)
 
     def testContextDependantInlineCSS(self):
         self.tool.clearResources()
@@ -642,14 +641,14 @@ class TestZODBTraversal(RegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal.folder1, self.portal.folder1.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('pink' in content)
-        self.failIf('purple' in content)
+        self.assertTrue('pink' in content)
+        self.assertFalse('purple' in content)
         view = self.portal.restrictedTraverse('@@plone')
         viewletmanager = getMultiAdapter((self.portal.folder2, self.portal.folder2.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('purple' in content)
-        self.failIf('pink' in content)
+        self.assertTrue('purple' in content)
+        self.assertFalse('pink' in content)
 
 class TestMergingDisabled(RegistryTestCase):
 
@@ -668,11 +667,11 @@ class TestMergingDisabled(RegistryTestCase):
         self.setRoles(['Member'])
 
     def testDefaultStylesheetCookableAttribute(self):
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.css')].getCookable())
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.css')].getCookable())
+        self.assertTrue(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.css')].getCookable())
+        self.assertTrue(self.tool.getResources()[self.tool.getResourcePosition('testroot.css')].getCookable())
 
     def testStylesheetCookableAttribute(self):
-        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('test_rr_2.css')].getCookable())
+        self.assertFalse(self.tool.getResources()[self.tool.getResourcePosition('test_rr_2.css')].getCookable())
 
     def testNumberOfResources(self):
         self.assertEqual(len(self.tool.getResources()), 3)
@@ -693,17 +692,17 @@ class TestMergingDisabled(RegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicIds.append(id)
-        self.failUnless(magicIds[-1].startswith('test_rr_2'))
+        self.assertTrue(magicIds[-1].startswith('test_rr_2'))
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[-2]))
-        self.failUnless('red' in content)
-        self.failUnless('green' in content)
-        self.failIf('blue' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[-1]))
-        self.failIf('red' in content)
-        self.failIf('green' in content)
-        self.failUnless('blue' in content)
+        self.assertFalse('red' in content)
+        self.assertFalse('green' in content)
+        self.assertTrue('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositionWithFirstUncooked(self):
         self.tool.moveResourceToTop('test_rr_2.css')
@@ -717,13 +716,13 @@ class TestMergingDisabled(RegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        self.failUnless('red' in content)
-        self.failUnless('green' in content)
-        self.failIf('blue' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositionWithMiddleUncooked(self):
         self.tool.moveResourceToTop('test_rr_2.css')
@@ -734,11 +733,11 @@ class TestMergingDisabled(RegistryTestCase):
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 3)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_1.css'))
-        self.failUnless('red' in content)
+        self.assertTrue('red' in content)
         content = str(self.portal.restrictedTraverse('portal_css/testroot.css'))
-        self.failUnless('green' in content)
+        self.assertTrue('green' in content)
 
     def testLargerCompositionWithMiddleUncooked(self):
         self.setRoles(['Manager'])
@@ -770,17 +769,17 @@ class TestMergingDisabled(RegistryTestCase):
                 magicIds.append(id)
         self.assertEqual(len(magicIds), 3)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[0]))
-        self.failUnless('red' in content)
-        self.failUnless('green' in content)
-        self.failIf('pink' in content)
-        self.failIf('purple' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('pink' in content)
+        self.assertFalse('purple' in content)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicIds[2]))
-        self.failUnless('pink' in content)
-        self.failUnless('purple' in content)
-        self.failIf('red' in content)
-        self.failIf('green' in content)
+        self.assertTrue('pink' in content)
+        self.assertTrue('purple' in content)
+        self.assertFalse('red' in content)
+        self.assertFalse('green' in content)
         content = str(self.portal.restrictedTraverse('portal_css/test_rr_2.css'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
 class TestPublishing(FunctionalRegistryTestCase):
 
@@ -887,14 +886,14 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testUnauthorizedOnPublish(self):
         response = self.publish(self.toolpath + '/testroot.css')
         #Will be 302 if CookieCrumbler is enabled
-        self.failUnless(response.getStatus() in [302, 403, 401])
+        self.assertTrue(response.getStatus() in [302, 403, 401])
 
     def testRemovedFromResources(self):
         styles = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in styles]
         self.assertEqual(len(self.tool.concatenatedresources), 4)
-        self.failIf('testroot.css' in ids)
-        self.failUnless('test_rr_1.css' in self.tool.concatenatedresources[ids[1]])
+        self.assertFalse('testroot.css' in ids)
+        self.assertTrue('test_rr_1.css' in self.tool.concatenatedresources[ids[1]])
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.css')
@@ -905,11 +904,11 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = str(self.portal.restrictedTraverse('portal_css/%s' % magicId))
-        self.failIf('green' in content)
-        self.failUnless('not authorized' in content)
-        self.failUnless('red' in content)
+        self.assertFalse('green' in content)
+        self.assertTrue('not authorized' in content)
+        self.assertTrue('red' in content)
 
     def testAuthorizedGetItem(self):
         self.setRoles(['Manager'])
@@ -928,7 +927,7 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
     def testAuthorizedOnPublish(self):
         authstr = "%s:%s" % (portal_owner, default_password)
         response = self.publish(self.toolpath + '/testroot.css', basic=authstr)
-        self.failUnlessEqual(response.getStatus(), 200)
+        self.assertEqual(response.getStatus(), 200)
 
 class TestDebugMode(FunctionalRegistryTestCase):
 
@@ -956,8 +955,8 @@ class TestDebugMode(FunctionalRegistryTestCase):
         self.tool.setDebugMode(True)
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
-        self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertExpiresNotEqual(response.getHeader('Expires'), soon.timeTime())
+        self.assertExpiresEqual(response.getHeader('Expires'), now.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
@@ -1010,9 +1009,9 @@ class TestResourceObjects(RegistryTestCase):
     def testSetApplyPrefix(self):
         self.tool.registerStylesheet('ham', applyPrefix=True)
         ham = self.tool.getResource('ham')
-        self.assertEquals(True, ham.getApplyPrefix())
+        self.assertEqual(True, ham.getApplyPrefix())
         ham.setApplyPrefix(False)
-        self.assertEquals(False, ham.getApplyPrefix())
+        self.assertEqual(False, ham.getApplyPrefix())
 
 class TestSkinAwareness(FunctionalRegistryTestCase):
 
@@ -1042,23 +1041,23 @@ class TestSkinAwareness(FunctionalRegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('/PinkSkin/' in content)
-        self.failIf('/PurpleSkin/' in content)
+        self.assertTrue('/PinkSkin/' in content)
+        self.assertFalse('/PurpleSkin/' in content)
         self.portal.changeSkin('PurpleSkin', REQUEST=self.portal.REQUEST)
         view = self.portal.restrictedTraverse('@@plone')
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.styles')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('/PurpleSkin/' in content)
-        self.failIf('/PinkSkin/' in content)
+        self.assertTrue('/PurpleSkin/' in content)
+        self.assertFalse('/PinkSkin/' in content)
 
     def testPublishWithSkin(self):
         response = self.publish(self.toolpath + '/PinkSkin/skin.css')
         self.assertEqual(response.getStatus(), 200)
-        self.failUnless('pink' in str(response))
+        self.assertTrue('pink' in str(response))
         response = self.publish(self.toolpath + '/PurpleSkin/skin.css')
         self.assertEqual(response.getStatus(), 200)
-        self.failUnless('purple' in str(response))
+        self.assertTrue('purple' in str(response))
 
 
 class TestCachingHeaders(FunctionalRegistryTestCase):
@@ -1079,7 +1078,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -1088,7 +1087,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
     def testCachingHeadersFromSkin(self):
@@ -1101,7 +1100,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -1110,7 +1109,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
     def testCachingHeadersFromToolWithRAMCache(self):
@@ -1124,7 +1123,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -1133,7 +1132,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
     def testCachingHeadersFromSkinWithRAMCache(self):
@@ -1149,7 +1148,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
         # Publish again
@@ -1158,7 +1157,7 @@ class TestCachingHeaders(FunctionalRegistryTestCase):
         days = 7
         soon = now + days
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
+        self.assertExpiresEqual(response.getHeader('Expires'), soon.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=%d' % int(days*24*3600))
 
 class TestBundling(RegistryTestCase):

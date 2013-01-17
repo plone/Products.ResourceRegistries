@@ -4,7 +4,6 @@
 from zope.component import getMultiAdapter
 from zope.contentprovider.interfaces import IContentProvider
 
-from App.Common import rfc1123_date
 from DateTime import DateTime
 from AccessControl import Unauthorized
 from zope.interface.verify import verifyObject
@@ -43,20 +42,20 @@ class TestImplementation(KSSRegistryTestCase):
 
     def test_interfaces(self):
         tool = getattr(self.portal, KSSTOOLNAME)
-        self.failUnless(IKSSRegistry.providedBy(tool))
-        self.failUnless(verifyObject(IKSSRegistry, tool))
+        self.assertTrue(IKSSRegistry.providedBy(tool))
+        self.assertTrue(verifyObject(IKSSRegistry, tool))
 
 
 class TestTool(KSSRegistryTestCase):
 
     def testToolExists(self):
-        self.failUnless(KSSTOOLNAME in self.portal.objectIds())
+        self.assertTrue(KSSTOOLNAME in self.portal.objectIds())
 
     def testZMIForm(self):
         tool = getattr(self.portal, KSSTOOLNAME)
         self.setRoles(['Manager'])
-        self.failUnless(tool.manage_kssForm())
-        self.failUnless(tool.manage_kssComposition())
+        self.assertTrue(tool.manage_kssForm())
+        self.assertTrue(tool.manage_kssComposition())
 
 
 class testZMIMethods(KSSRegistryTestCase):
@@ -65,7 +64,7 @@ class testZMIMethods(KSSRegistryTestCase):
         self.tool.clearResources()
         self.tool.manage_addKineticStylesheet(id='joe')
         self.assertEqual(len(self.tool.getResources()), 1)
-        self.failUnless(self.tool.getResources())
+        self.assertTrue(self.tool.getResources())
 
 
 class TestKineticStylesheetRegistration(KSSRegistryTestCase):
@@ -83,14 +82,14 @@ class TestKineticStylesheetRegistration(KSSRegistryTestCase):
         self.tool.registerKineticStylesheet('foodefault')
         self.assertEqual(self.tool.getResources()[0].getId(), 'foodefault')
         self.assertEqual(self.tool.getResources()[0].getExpression(), '')
-        self.failUnless(self.tool.getResources()[0].getEnabled())
+        self.assertTrue(self.tool.getResources()[0].getEnabled())
 
     def testKineticStylesheetAttributes(self):
         self.tool.registerKineticStylesheet('foo', expression='python:1',
                                             enabled=0)
         self.assertEqual(self.tool.getResources()[0].getId(), 'foo')
         self.assertEqual(self.tool.getResources()[0].getExpression(), 'python:1')
-        self.failIf(self.tool.getResources()[0].getEnabled())
+        self.assertFalse(self.tool.getResources()[0].getEnabled())
 
     def testDisallowingDuplicateIds(self):
         self.tool.registerKineticStylesheet('foo')
@@ -170,22 +169,22 @@ class TestToolExpression(KSSRegistryTestCase):
 
     def testSimplestExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:1'), context))
-        self.failIf(self.tool.evaluateExpression(
+        self.assertFalse(self.tool.evaluateExpression(
             Expression('python:0'), context))
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:0+1'), context))
 
     def testNormalExpression(self):
         context = self.portal
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('object/absolute_url'), context))
 
     def testExpressionInFolder(self):
         self.folder.invokeFactory('Document', 'eggs')
         context = self.folder
-        self.failUnless(self.tool.evaluateExpression(
+        self.assertTrue(self.tool.evaluateExpression(
             Expression('python:"eggs" in object.objectIds()'), context))
 
 
@@ -225,11 +224,11 @@ class TestKineticStylesheetCooking(KSSRegistryTestCase):
         self.tool.registerKineticStylesheet('eggs')
         self.assertEqual(len(self.tool.getEvaluatedResources(self.folder)), 3)
         magic_ids = [item.getId() for item in self.tool.getEvaluatedResources(self.folder)]
-        self.failUnless('ham' in self.tool.concatenatedresources[magic_ids[0]])
-        self.failUnless('eggs' in self.tool.concatenatedresources[magic_ids[2]])
-        self.failUnless('spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
-        self.failUnless('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('ham' in self.tool.concatenatedresources[magic_ids[0]])
+        self.assertTrue('eggs' in self.tool.concatenatedresources[magic_ids[2]])
+        self.assertTrue('spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('spam spam' in self.tool.concatenatedresources[magic_ids[1]])
+        self.assertTrue('spam spam spam' in self.tool.concatenatedresources[magic_ids[1]])
 
     def testGetEvaluatedKineticStylesheetsWithExpression(self):
         self.tool.registerKineticStylesheet('ham')
@@ -262,8 +261,8 @@ class TestKineticStylesheetCooking(KSSRegistryTestCase):
         for magic_id in magic_ids:
             self.assertEqual(len(self.tool.concatenatedresources[magic_id]), 1)
             ids.append(self.tool.concatenatedresources[magic_id][0])
-        self.failUnless(ids[0] == 'ham')
-        self.failUnless(ids[1] == 'spam')
+        self.assertTrue(ids[0] == 'ham')
+        self.assertTrue(ids[1] == 'spam')
 
     def testConcatenatedSheetsAreInTheRightOrderToo(self):
         self.tool.registerKineticStylesheet('ham')
@@ -271,9 +270,9 @@ class TestKineticStylesheetCooking(KSSRegistryTestCase):
         self.tool.registerKineticStylesheet('eggs')
         evaluated = self.tool.getEvaluatedResources(self.folder)
         results = self.tool.concatenatedresources[evaluated[0].getId()]
-        self.failUnless(results[0] == 'ham')
-        self.failUnless(results[1] == 'spam')
-        self.failUnless(results[2] == 'eggs')
+        self.assertTrue(results[0] == 'ham')
+        self.assertTrue(results[1] == 'spam')
+        self.assertTrue(results[2] == 'eggs')
 
 
 class TestKineticStylesheetMoving(KSSRegistryTestCase):
@@ -402,7 +401,7 @@ class TestTraversal(KSSRegistryTestCase):
 
     def testMarker(self):
         traversed = self.portal.restrictedTraverse('portal_kss/test_rr_1.kss')
-        self.failUnless(ICookedFile.providedBy(traversed))
+        self.assertTrue(ICookedFile.providedBy(traversed))
     
     def testMarkerComposite(self):
         self.tool.registerKineticStylesheet('test_rr_2.kss')
@@ -410,16 +409,16 @@ class TestTraversal(KSSRegistryTestCase):
         self.assertEqual(len(scripts), 1)
         magicId = scripts[0].getId()
         traversed = self.portal.restrictedTraverse('portal_kss/%s' % magicId)
-        self.failUnless(ICookedFile.providedBy(traversed))
+        self.assertTrue(ICookedFile.providedBy(traversed))
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['test_rr_1.kss'])
+        self.assertTrue(self.tool['test_rr_1.kss'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('background-color' in str(self.tool['test_rr_1.kss']))
+        self.assertTrue('background-color' in str(self.tool['test_rr_1.kss']))
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('background-color' in str(
+        self.assertTrue('background-color' in str(
                         self.portal.restrictedTraverse('portal_kss/test_rr_1.kss')))
 
     def testRestrictedTraverseComposition(self):
@@ -428,8 +427,8 @@ class TestTraversal(KSSRegistryTestCase):
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicId))
-        self.failUnless('background-color' in content)
-        self.failUnless('blue' in content)
+        self.assertTrue('background-color' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositesWithBrokedId(self):
         self.tool.registerKineticStylesheet('nonexistant.kss')
@@ -462,24 +461,24 @@ class TestZODBTraversal(KSSRegistryTestCase):
         self.setRoles(['Member'])
 
     def testGetItemTraversal(self):
-        self.failUnless(self.tool['testroot.kss'])
-        self.failUnless(self.tool['subfolder/testsubfolder.kss'])
+        self.assertTrue(self.tool['testroot.kss'])
+        self.assertTrue(self.tool['subfolder/testsubfolder.kss'])
 
     def testGetItemTraversalContent(self):
-        self.failUnless('red' in str(self.tool['testroot.kss']))
-        self.failUnless('blue' in str(self.tool['subfolder/testsubfolder.kss']))
-        self.failIf('blue' in str(self.tool['testroot.kss']))
-        self.failIf('red' in str(self.tool['subfolder/testsubfolder.kss']))
+        self.assertTrue('red' in str(self.tool['testroot.kss']))
+        self.assertTrue('blue' in str(self.tool['subfolder/testsubfolder.kss']))
+        self.assertFalse('blue' in str(self.tool['testroot.kss']))
+        self.assertFalse('red' in str(self.tool['subfolder/testsubfolder.kss']))
 
 
     def testRestrictedTraverseContent(self):
-        self.failUnless('red' in str(
+        self.assertTrue('red' in str(
                         self.portal.restrictedTraverse('portal_kss/testroot.kss')))
-        self.failUnless('blue' in str(
+        self.assertTrue('blue' in str(
                         self.portal.restrictedTraverse('portal_kss/subfolder/testsubfolder.kss')))
-        self.failIf('blue' in str(
+        self.assertFalse('blue' in str(
                         self.portal.restrictedTraverse('portal_kss/testroot.kss')))
-        self.failIf('red' in str(
+        self.assertFalse('red' in str(
                         self.portal.restrictedTraverse('portal_kss/subfolder/testsubfolder.kss')))
 
     def testRestrictedTraverseComposition(self):
@@ -487,9 +486,9 @@ class TestZODBTraversal(KSSRegistryTestCase):
         self.assertEqual(len(styles), 1)
         magicId = styles[0].getId()
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicId))
-        self.failUnless('background-color' in content)
-        self.failUnless('red' in content)
-        self.failUnless('blue' in content)
+        self.assertTrue('background-color' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('blue' in content)
 
 
 class TestMergingDisabled(KSSRegistryTestCase):
@@ -509,11 +508,11 @@ class TestMergingDisabled(KSSRegistryTestCase):
         self.setRoles(['Member'])
 
     def testDefaultKineticStylesheetCookableAttribute(self):
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.kss')].getCookable())
-        self.failUnless(self.tool.getResources()[self.tool.getResourcePosition('testroot.kss')].getCookable())
+        self.assertTrue(self.tool.getResources()[self.tool.getResourcePosition('test_rr_1.kss')].getCookable())
+        self.assertTrue(self.tool.getResources()[self.tool.getResourcePosition('testroot.kss')].getCookable())
 
     def testKineticStylesheetCookableAttribute(self):
-        self.failIf(self.tool.getResources()[self.tool.getResourcePosition('test_rr_2.kss')].getCookable())
+        self.assertFalse(self.tool.getResources()[self.tool.getResourcePosition('test_rr_2.kss')].getCookable())
 
     def testNumberOfResources(self):
         self.assertEqual(len(self.tool.getResources()), 3)
@@ -534,17 +533,17 @@ class TestMergingDisabled(KSSRegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicIds.append(id)
-        self.failUnless(magicIds[-1].startswith('test_rr_2'))
+        self.assertTrue(magicIds[-1].startswith('test_rr_2'))
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicIds[-2]))
-        self.failUnless('red' in content)
-        self.failUnless('green' in content)
-        self.failIf('blue' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicIds[-1]))
-        self.failIf('red' in content)
-        self.failIf('green' in content)
-        self.failUnless('blue' in content)
+        self.assertFalse('red' in content)
+        self.assertFalse('green' in content)
+        self.assertTrue('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/test_rr_2.kss'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositionWithFirstUncooked(self):
         self.tool.moveResourceToTop('test_rr_2.kss')
@@ -558,13 +557,13 @@ class TestMergingDisabled(KSSRegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicId))
-        self.failUnless('red' in content)
-        self.failUnless('green' in content)
-        self.failIf('blue' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/test_rr_2.kss'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
     def testCompositionWithMiddleUncooked(self):
         self.tool.moveResourceToTop('test_rr_2.kss')
@@ -575,11 +574,11 @@ class TestMergingDisabled(KSSRegistryTestCase):
         styles = self.tool.getEvaluatedResources(self.portal)
         self.assertEqual(len(styles), 3)
         content = str(self.portal.restrictedTraverse('portal_kss/test_rr_2.kss'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/test_rr_1.kss'))
-        self.failUnless('red' in content)
+        self.assertTrue('red' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/testroot.kss'))
-        self.failUnless('green' in content)
+        self.assertTrue('green' in content)
 
     def testLargerCompositionWithMiddleUncooked(self):
         self.setRoles(['Manager'])
@@ -611,17 +610,17 @@ class TestMergingDisabled(KSSRegistryTestCase):
                 magicIds.append(id)
         self.assertEqual(len(magicIds), 3)
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicIds[0]))
-        self.failUnless('red' in content)
-        self.failUnless('green' in content)
-        self.failIf('pink' in content)
-        self.failIf('purple' in content)
+        self.assertTrue('red' in content)
+        self.assertTrue('green' in content)
+        self.assertFalse('pink' in content)
+        self.assertFalse('purple' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicIds[2]))
-        self.failUnless('pink' in content)
-        self.failUnless('purple' in content)
-        self.failIf('red' in content)
-        self.failIf('green' in content)
+        self.assertTrue('pink' in content)
+        self.assertTrue('purple' in content)
+        self.assertFalse('red' in content)
+        self.assertFalse('green' in content)
         content = str(self.portal.restrictedTraverse('portal_kss/test_rr_2.kss'))
-        self.failUnless('blue' in content)
+        self.assertTrue('blue' in content)
 
 class TestPublishing(FunctionalKSSRegistryTestCase):
 
@@ -712,14 +711,14 @@ class TestResourcePermissions(FunctionalKSSRegistryTestCase):
     def testUnauthorizedOnPublish(self):
         response = self.publish(self.toolpath + '/testroot.kss')
         #Will be 302 if CookieCrumbler is enabled
-        self.failUnless(response.getStatus() in [302, 403, 401])
+        self.assertTrue(response.getStatus() in [302, 403, 401])
 
     def testRemovedFromResources(self):
         styles = self.tool.getEvaluatedResources(self.portal)
         ids = [item.getId() for item in styles]
         self.assertEqual(len(self.tool.concatenatedresources), 4)
-        self.failIf('testroot.kss' in ids)
-        self.failUnless('test_rr_1.kss' in self.tool.concatenatedresources[ids[1]])
+        self.assertFalse('testroot.kss' in ids)
+        self.assertTrue('test_rr_1.kss' in self.tool.concatenatedresources[ids[1]])
 
     def testRemovedFromMergedResources(self):
         self.tool.unregisterResource('testroot.kss')
@@ -730,11 +729,11 @@ class TestResourcePermissions(FunctionalKSSRegistryTestCase):
             id = style.getId()
             if '-cachekey' in id:
                 magicId = id
-        self.failUnless(magicId)
+        self.assertTrue(magicId)
         content = str(self.portal.restrictedTraverse('portal_kss/%s' % magicId))
-        self.failIf('green' in content)
-        self.failUnless('not authorized' in content)
-        self.failUnless('red' in content)
+        self.assertFalse('green' in content)
+        self.assertTrue('not authorized' in content)
+        self.assertTrue('red' in content)
 
     def testAuthorizedGetItem(self):
         self.setRoles(['Manager'])
@@ -753,7 +752,7 @@ class TestResourcePermissions(FunctionalKSSRegistryTestCase):
     def testAuthorizedOnPublish(self):
         authstr = "%s:%s" % (portal_owner, default_password)
         response = self.publish(self.toolpath + '/testroot.kss', basic=authstr)
-        self.failUnlessEqual(response.getStatus(), 200)
+        self.assertEqual(response.getStatus(), 200)
 
 class TestDebugMode(FunctionalKSSRegistryTestCase):
 
@@ -780,8 +779,8 @@ class TestDebugMode(FunctionalKSSRegistryTestCase):
         # Publish in debug mode
         response = self.publish(self.toolpath+'/ham')
         self.tool.setDebugMode(False)
-        self.failIfEqual(response.getHeader('Expires'), rfc1123_date(soon.timeTime()))
-        self.assertEqual(response.getHeader('Expires'), rfc1123_date(now.timeTime()))
+        self.assertExpiresNotEqual(response.getHeader('Expires'), soon.timeTime())
+        self.assertExpiresEqual(response.getHeader('Expires'), now.timeTime())
         self.assertEqual(response.getHeader('Cache-Control'), 'max-age=0')
 
 
@@ -860,23 +859,23 @@ class TestSkinAwareness(FunctionalKSSRegistryTestCase):
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.kineticstylesheets')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('/PinkSkin/' in content)
-        self.failIf('/PurpleSkin/' in content)
+        self.assertTrue('/PinkSkin/' in content)
+        self.assertFalse('/PurpleSkin/' in content)
         self.portal.changeSkin('PurpleSkin', REQUEST=self.portal.REQUEST)
         view = self.portal.restrictedTraverse('@@plone')
         viewletmanager = getMultiAdapter((self.portal, self.portal.REQUEST, view), IContentProvider, name = u'plone.resourceregistries.kineticstylesheets')
         viewletmanager.update()
         content = viewletmanager.render()
-        self.failUnless('/PurpleSkin/' in content)
-        self.failIf('/PinkSkin/' in content)
+        self.assertTrue('/PurpleSkin/' in content)
+        self.assertFalse('/PinkSkin/' in content)
 
     def testPublishWithSkin(self):
         response = self.publish(self.toolpath + '/PinkSkin/skin.kss')
         self.assertEqual(response.getStatus(), 200)
-        self.failUnless('pink' in str(response))
+        self.assertTrue('pink' in str(response))
         response = self.publish(self.toolpath + '/PurpleSkin/skin.kss')
         self.assertEqual(response.getStatus(), 200)
-        self.failUnless('purple' in str(response))
+        self.assertTrue('purple' in str(response))
 
 class TestBundling(KSSRegistryTestCase):
 

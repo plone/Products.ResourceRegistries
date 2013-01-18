@@ -4,7 +4,9 @@ Changelog
 2.2.7 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed some spurious test failures for Expires being off by
+  minus one second.
+  [maurits]
 
 
 2.2.6 (2013-01-17)

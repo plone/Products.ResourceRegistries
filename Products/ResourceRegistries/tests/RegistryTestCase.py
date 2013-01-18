@@ -34,7 +34,7 @@ class RegistryTestCase(PloneTestCase.PloneTestCase):
 
     def assertExpiresEqual(self, expires, moment):
         """Assert that the Expires header is equal to a moment or one
-        second later.
+        second earlier or later.
 
         Should work for other headers too, but Expires is the most
         common, at least in these tests.
@@ -53,13 +53,15 @@ class RegistryTestCase(PloneTestCase.PloneTestCase):
             return
         if expires == rfc1123_date(moment + 1):
             return
+        if expires == rfc1123_date(moment - 1):
+            return
         # We have a failure.  Call the method that would originally be
         # called.
         self.assertEqual(expires, rfc1123_date(moment))
 
     def assertExpiresNotEqual(self, expires, moment):
         """Assert that the Expires header is NOT equal to a moment or one
-        second later.
+        second earlier or later.
 
         There are some spurious test failures because 'now' is
         calculated, then a request is made and some headers are set,
@@ -72,7 +74,8 @@ class RegistryTestCase(PloneTestCase.PloneTestCase):
           NOT an rfc1123 date
         """
         if expires != rfc1123_date(moment) and \
-                expires != rfc1123_date(moment + 1):
+                expires != rfc1123_date(moment + 1) and \
+                expires != rfc1123_date(moment - 1):
             return
         # We have a failure.  Call the method that would originally be
         # called.

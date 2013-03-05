@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.7 (unreleased)
+2.2.7 (2013-03-05)
 ------------------
 
 - Fixed some spurious test failures for Expires being off by

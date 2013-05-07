@@ -4,7 +4,9 @@ Changelog
 2.2.8 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Avoid recursive call of _migrateCookedResouces method in BaseTool which
+  prevented the old concatenated resource storage from beeing migrated.
+  [thet]
 
 
 2.2.7 (2013-03-05)

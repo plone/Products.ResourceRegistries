@@ -309,9 +309,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
     def _migrateCookedResouces(self):
         LOGGER.warn("Migrating old concatenated resources storage on the fly - this should only happen once per tool")
-        self.cookResources()
         del self.__dict__['cookedresources']
         del self.__dict__['concatenatedresources']
+        self.cookResources()  # Cook after deleting to avoid recursive call.
 
     def __getitem__(self, item):
         """Return a resource from the registry."""

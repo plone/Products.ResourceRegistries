@@ -6,6 +6,7 @@ Changelog
 
 - Avoid recursive call of _migrateCookedResouces method in BaseTool which
   prevented the old concatenated resource storage from beeing migrated.
+  The problem emerged when migrating from Plone 4.2 to 4.3.
   [thet]
 
 

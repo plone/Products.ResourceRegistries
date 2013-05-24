@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.8 (unreleased)
+2.2.8 (2013-05-23)
 ------------------
 
 - Avoid recursive call of _migrateCookedResouces method in BaseTool which

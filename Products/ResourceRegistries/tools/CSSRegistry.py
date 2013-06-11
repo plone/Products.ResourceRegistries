@@ -17,6 +17,7 @@ from Products.ResourceRegistries.tools.BaseRegistry import Resource
 from Products.ResourceRegistries.utils import applyPrefix
 
 from packer import CSSPacker
+import logging
 
 
 class Stylesheet(Resource):
@@ -31,6 +32,10 @@ class Stylesheet(Resource):
         self._data['compression'] = kwargs.get('compression', 'safe')
         self._data['applyPrefix'] = kwargs.get('applyPrefix', False)
         if self.isExternal:
+            if id.startswith('//') and self._data['rendering'] != 'link':
+                # force a link. it doesn't make sense any other way
+                logging.warning(u'Stylesheets beginning with // must be rendered as links. Updated for you.')
+                self._data['rendering'] = 'link'
             if self._data['compression'] not in config.CSS_EXTERNAL_COMPRESSION_METHODS:
                 self._data['compression'] = 'none' #we have to assume none because of the default values
             if self._data['rendering'] not in config.CSS_EXTERNAL_RENDER_METHODS:

@@ -25,6 +25,7 @@ class BaseRegistryTestCase(unittest.TestCase):
                'bar.res/' : False, #expected to fail
                'foo/bar.res' : True, #perfectly fine
                'http://example.com/example.res' : True, #This should work now
+               '//example.com/example.res' : True, #CDN content
                }
         for id in ids:
             if ids[id]: #This shouldn't error

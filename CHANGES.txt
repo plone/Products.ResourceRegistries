@@ -4,7 +4,10 @@ Changelog
 2.2.9 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow users to add resources starting with '//', the proper way to link 
+  to external resources when serving over http and https. This makes it 
+  much easier to manage content on CDNs.
+  [eleddy]
 
 
 2.2.8 (2013-05-23)

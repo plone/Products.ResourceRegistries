@@ -664,6 +664,9 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         default_charset = 'utf-8'
 
         for id in ids:
+            # skip external resources that look like //netdna.bootstrapcdn.com/etc... 
+            if id[0:2] == '//':
+                continue
             try:
                 if portal is not None:
                     obj = context.restrictedTraverse(id)

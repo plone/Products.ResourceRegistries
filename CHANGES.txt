@@ -4,7 +4,9 @@ Changelog
 2.2.10 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Don't try to traverse to remote objects starting with '//', triggered 
+  from plone.css
+  [eleddy]
 
 
 2.2.9 (2013-06-13)

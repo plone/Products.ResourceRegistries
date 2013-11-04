@@ -81,6 +81,10 @@ class KSSRegistryTool(BaseRegistryTool):
     cache_duration = config.KSS_CACHE_DURATION
     resource_class = KineticStylesheet
 
+    @property
+    def manage_workspace_url(self):
+        return "%s/manage_workspace" % self.absolute_url_path()
+
     #
     # Private Methods
     #
@@ -123,7 +127,7 @@ class KSSRegistryTool(BaseRegistryTool):
                                        cookable, compression, cacheable,
                                        conditionalcomment, authenticated, bundle=bundle)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
 
     security.declareProtected(permissions.ManagePortal, 'manage_saveKineticStylesheets')
     def manage_saveKineticStylesheets(self, REQUEST=None):
@@ -152,14 +156,14 @@ class KSSRegistryTool(BaseRegistryTool):
         self.resources = tuple(kineticstylesheets)
         self.cookResources()
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
 
     security.declareProtected(permissions.ManagePortal, 'manage_removeKineticStylesheet')
     def manage_removeKineticStylesheet(self, id, REQUEST=None):
         """Remove kineticstylesheet from the ZMI."""
         self.unregisterResource(id)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
 
     #
     # Protected Methods

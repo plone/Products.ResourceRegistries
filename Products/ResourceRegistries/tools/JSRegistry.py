@@ -101,6 +101,10 @@ class JSRegistryTool(BaseRegistryTool):
 """
     resource_class = JavaScript
 
+    @property
+    def manage_workspace_url(self):
+        return "%s/manage_workspace" % self.absolute_url_path()
+
     #
     # Private Methods
     #
@@ -146,7 +150,7 @@ class JSRegistryTool(BaseRegistryTool):
         self.registerScript(id, expression, inline, enabled, cookable,
             compression, cacheable, conditionalcomment, authenticated, bundle=bundle)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
 
     security.declareProtected(permissions.ManagePortal, 'manage_saveScripts')
     def manage_saveScripts(self, REQUEST=None):
@@ -176,14 +180,14 @@ class JSRegistryTool(BaseRegistryTool):
         self.resources = tuple(scripts)
         self.cookResources()
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
 
     security.declareProtected(permissions.ManagePortal, 'manage_removeScript')
     def manage_removeScript(self, id, REQUEST=None):
         """Remove script with ZMI button."""
         self.unregisterResource(id)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
 
     #
     # Protected Methods

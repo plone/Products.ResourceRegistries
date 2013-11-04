@@ -254,6 +254,9 @@ class CSSRegistryTool(BaseRegistryTool):
 
         Updates the whole sequence. For editing and reordering.
         """
+        if REQUEST and not REQUEST.form:
+            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            return
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
         records = REQUEST.get('stylesheets', [])

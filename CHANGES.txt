@@ -4,6 +4,10 @@ Changelog
 2.2.10 (unreleased)
 -------------------
 
+- Properly handle redirections from login view; resources used to be erased
+  on authentication redirect for POST action
+  [mihneasim]
+
 - Don't try to traverse to remote objects starting with '//', triggered 
   from plone.css
   [eleddy]

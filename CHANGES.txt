@@ -8,6 +8,10 @@ Changelog
   on authentication redirect for POST action
   [mihneasim]
 
+- Replace troublesome HTTP_REFERER redirects, they can lead to infinite
+  redirects on expired session re-login
+  [mihneasim]
+
 - Don't try to traverse to remote objects starting with '//', triggered 
   from plone.css
   [eleddy]

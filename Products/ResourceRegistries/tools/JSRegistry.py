@@ -150,7 +150,7 @@ class JSRegistryTool(BaseRegistryTool):
         self.registerScript(id, expression, inline, enabled, cookable,
             compression, cacheable, conditionalcomment, authenticated, bundle=bundle)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
 
     security.declareProtected(permissions.ManagePortal, 'manage_saveScripts')
     def manage_saveScripts(self, REQUEST=None):
@@ -159,7 +159,7 @@ class JSRegistryTool(BaseRegistryTool):
         Updates the whole sequence. For editing and reordering.
         """
         if REQUEST and not REQUEST.form:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
             return
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
@@ -183,14 +183,14 @@ class JSRegistryTool(BaseRegistryTool):
         self.resources = tuple(scripts)
         self.cookResources()
         if REQUEST:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
 
     security.declareProtected(permissions.ManagePortal, 'manage_removeScript')
     def manage_removeScript(self, id, REQUEST=None):
         """Remove script with ZMI button."""
         self.unregisterResource(id)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
 
     #
     # Protected Methods

@@ -127,7 +127,7 @@ class KSSRegistryTool(BaseRegistryTool):
                                        cookable, compression, cacheable,
                                        conditionalcomment, authenticated, bundle=bundle)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
 
     security.declareProtected(permissions.ManagePortal, 'manage_saveKineticStylesheets')
     def manage_saveKineticStylesheets(self, REQUEST=None):
@@ -136,7 +136,7 @@ class KSSRegistryTool(BaseRegistryTool):
         Updates the whole sequence. For editing and reordering.
         """
         if REQUEST and not REQUEST.form:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
             return
         debugmode = REQUEST.get('debugmode', False)
         self.setDebugMode(debugmode)
@@ -159,14 +159,14 @@ class KSSRegistryTool(BaseRegistryTool):
         self.resources = tuple(kineticstylesheets)
         self.cookResources()
         if REQUEST:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
 
     security.declareProtected(permissions.ManagePortal, 'manage_removeKineticStylesheet')
     def manage_removeKineticStylesheet(self, id, REQUEST=None):
         """Remove kineticstylesheet from the ZMI."""
         self.unregisterResource(id)
         if REQUEST:
-            REQUEST.RESPONSE.redirect(self.manage_workspace_url)
+            REQUEST.RESPONSE.redirect("manage_workspace")
 
     #
     # Protected Methods

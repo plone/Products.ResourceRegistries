@@ -1,8 +1,11 @@
 Changelog
 =========
 
-2.2.10 (unreleased)
--------------------
+2.3.0 (unreleased)
+------------------
+
+- add csrf token to delete urls for resources
+  [vangheem]
 
 - Properly handle redirections from login view; resources used to be erased
   on authentication redirect for POST action

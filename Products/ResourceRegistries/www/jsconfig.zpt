@@ -151,6 +151,7 @@ legend {
 <div tal:replace="structure here/manage_tabs" />
 
 <form action="manage_saveScripts"
+      tal:define="csrftoken context/authenticator/token|string:"
       tal:attributes="action python:here.absolute_url()+'/manage_saveScripts'"
       method="post">
 
@@ -213,7 +214,7 @@ legend {
                tal:attributes="href string:moveResourceDown?id=${script/getQuotedId}">
                  &darr;
             </a>
-            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getQuotedId}"
+            <a href="#" tal:attributes="href string:manage_removeScript?id=${script/getQuotedId}&_authenticator=${csrftoken}"
                style="color: red; margin-left: 20px;"
                title="Remove">
                  x

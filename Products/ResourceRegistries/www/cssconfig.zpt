@@ -158,6 +158,7 @@ ul {
 <div tal:replace="structure here/manage_tabs" />
 
 <form action="manage_saveStylesheets"
+      tal:define="csrftoken context/authenticator/token|string:"
       tal:attributes="action python:here.absolute_url()+'/manage_saveStylesheets'"
       method="post">
 
@@ -235,7 +236,7 @@ alternateStylesheet python:stylesheet.getRendering() == 'link' and stylesheet.ge
             <a href="#"
                title="Remove"
                style="color: red; margin-left: 20px;"
-               tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/getQuotedId}">
+               tal:attributes="href string:manage_removeStylesheet?id=${stylesheet/getQuotedId}&_authenticator=${csrftoken}">
                 x
             </a>
             <span tal:condition="not:resourceExists">(resource not found or not accessible)</span>

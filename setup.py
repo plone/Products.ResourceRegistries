@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '2.2.10.dev0'
+version = '2.3.0.dev0'
 
 setup(name='Products.ResourceRegistries',
       version=version,
@@ -37,6 +37,7 @@ setup(name='Products.ResourceRegistries',
         'zope.interface',
         'zope.viewlet',
         'Products.CMFCore',
+        'plone.protect >= 3.0.0a1',
         'Products.GenericSetup',
         'Acquisition',
         'DateTime',

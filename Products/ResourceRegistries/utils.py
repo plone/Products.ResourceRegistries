@@ -1,7 +1,7 @@
 import re
 import os.path
 
-URL_MATCH = re.compile(r'''(url\s*\(\s*['"]?)(?!data:)([^'")]+)(['"]?\s*\))''', re.I | re.S)
+URL_MATCH = re.compile(r'''(url\s*\(\s*['"]?)([^'")]+)(['"]?\s*\))''', re.I | re.S)
 
 def makeAbsolute(path, prefix):
     """Make a url into an absolute URL by applying the given prefix

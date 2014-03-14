@@ -27,10 +27,6 @@ table {
 table p {
     background: url("http://example.org/absolute.jpg") repeat-x;
 }
-
-li {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
-}
 """
     
     def test_simple_prefix(self):
@@ -55,10 +51,6 @@ table {
 
 table p {
     background: url("http://example.org/absolute.jpg") repeat-x;
-}
-
-li {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
 }
 """, applyPrefix(self.cssSource, '/prefix'))
 
@@ -85,10 +77,6 @@ table {
 table p {
     background: url("http://example.org/absolute.jpg") repeat-x;
 }
-
-li {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
-}
 """, applyPrefix(self.cssSource, '/prefix/'))
 
     def test_deep_prefix(self):
@@ -113,10 +101,6 @@ table {
 
 table p {
     background: url("http://example.org/absolute.jpg") repeat-x;
-}
-
-li {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
 }
 """, applyPrefix(self.cssSource, '/some/prefix'))
 

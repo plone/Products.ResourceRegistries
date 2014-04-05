@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '2.3.0.dev0'
+version = '3.0'
 
 setup(name='Products.ResourceRegistries',
       version=version,

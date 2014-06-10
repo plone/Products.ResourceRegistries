@@ -75,16 +75,26 @@ class ResourceRegistryNodeAdapter(XMLAdapterBase):
         fragment = self._doc.createDocumentFragment()
         registry = getToolByName(self.context, self.registry_id)
         resources = registry.getResources()
+        old_child_id = None
+
         for resource in resources:
             data = resource._data.copy()
             if 'cooked_expression' in data:
                 del data['cooked_expression']
             child = self._doc.createElement(self.resource_type)
-            for key, value in data.items():
-                if type(value) == type(True) or type(value) == type(0):
+            attributes = data.items()
+
+            if old_child_id is not None:
+                attributes.append(('insert-after', old_child_id))
+
+            for key, value in attributes:
+                if isinstance(value, bool) or isinstance(value, int):
                     value = str(value)
                 child.setAttribute(key, value)
             fragment.appendChild(child)
+
+            old_child_id = data['id']
+
         return fragment
 
     def _initResources(self, node):

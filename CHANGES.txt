@@ -4,7 +4,10 @@ Changelog
 3.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- bugfix: do not convert URIs such as 
+  url(data:image/svg+xml;base64,PD94bWwgdmVyc2lv) to absolute urls
+  see https://github.com/plone/Products.ResourceRegistries/pull/16
+  [cillianderoiste]
 
 
 3.0 (2014-04-05)

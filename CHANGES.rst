@@ -9,6 +9,9 @@ Changelog
   see https://github.com/plone/Products.ResourceRegistries/pull/16
   [cillianderoiste]
 
+- Include ``insert-after`` as an attribute when exporting ResourceRegistries.
+  [saily]
+
 
 3.0 (2014-04-05)
 ----------------
@@ -24,7 +27,7 @@ Changelog
   redirects on expired session re-login
   [mihneasim]
 
-- Don't try to traverse to remote objects starting with '//', triggered 
+- Don't try to traverse to remote objects starting with '//', triggered
   from plone.css
   [eleddy]
 
@@ -32,8 +35,8 @@ Changelog
 2.2.9 (2013-06-13)
 ------------------
 
-- Allow users to add resources starting with '//', the proper way to link 
-  to external resources when serving over http and https. This makes it 
+- Allow users to add resources starting with '//', the proper way to link
+  to external resources when serving over http and https. This makes it
   much easier to manage content on CDNs.
   [eleddy]
 

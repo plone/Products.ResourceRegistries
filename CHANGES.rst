@@ -9,6 +9,9 @@ Changelog
   http://stackoverflow.com/questions/9664282
   [thet]
 
+- bugfix: Handle theme names containing a `.` properly in ``manage_bundlesForm``
+  [fRiSi]
+
 - bugfix: do not convert URIs such as
   url(data:image/svg+xml;base64,PD94bWwgdmVyc2lv) to absolute urls
   see https://github.com/plone/Products.ResourceRegistries/pull/16

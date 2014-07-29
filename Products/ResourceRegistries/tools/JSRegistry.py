@@ -252,7 +252,7 @@ class JSRegistryTool(BaseRegistryTool):
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""
-        return 'application/x-javascript;charset=utf-8'
+        return 'application/javascript; charset=utf-8'
 
     security.declarePrivate('getResourceContent')
     def getResourceContent(self, item, context, original=False, theme=None):

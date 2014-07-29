@@ -453,7 +453,7 @@ class TestPublishing(FunctionalRegistryTestCase):
     def testPublishJSThroughTool(self):
         response = self.publish(self.toolpath + '/test_rr_1.js')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript;charset=utf-8')
+        self.assertEqual(response.getHeader('Content-Type'), 'application/javascript; charset=utf-8')
 
     def testPublishNonMagicJSThroughTool(self):
         self.setRoles(['Manager'])
@@ -462,7 +462,7 @@ class TestPublishing(FunctionalRegistryTestCase):
         self.tool.registerScript('testmethod')
         response = self.publish(self.toolpath + '/testmethod')
         self.assertEqual(response.getStatus(), 200)
-        self.assertEqual(response.getHeader('Content-Type'), 'application/x-javascript;charset=utf-8')
+        self.assertEqual(response.getHeader('Content-Type'), 'application/javascript; charset=utf-8')
 
     def testPublishPageWithInlineJS(self):
         # This one fails from string/utf-8 concatenation
@@ -576,14 +576,14 @@ class TestZODBTraversal(RegistryTestCase):
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testroot.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('red')")
         self.portal.invokeFactory('Folder', 'subfolder')
         self.portal.subfolder.invokeFactory('File',
                                    id='testsubfolder.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('blue')")
 
         self.tool.registerScript('testroot.js')
@@ -627,13 +627,13 @@ class TestZODBTraversal(RegistryTestCase):
         self.portal.invokeFactory('Folder', 'folder2')
         self.portal.folder1.invokeFactory('File',
                                    id='context.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('pink')")
         self.portal.folder2.invokeFactory('File',
                                    id='context.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('purple')")
         self.tool.registerScript('context.js', inline=True)
         self.setRoles(['Member'])
@@ -661,8 +661,8 @@ class TestResourcePermissions(FunctionalRegistryTestCase):
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testroot.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('red')")
 
         script = self.portal.restrictedTraverse('testroot.js')
@@ -758,13 +758,13 @@ class TestMergingDisabled(RegistryTestCase):
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testroot.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('green')")
         self.portal.invokeFactory('File',
                                    id='simple2.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('blue')")
         self.setRoles(['Member'])
         self.tool.setDebugMode(False)
@@ -846,13 +846,13 @@ class TestMergingDisabled(RegistryTestCase):
         self.setRoles(['Manager'])
         self.portal.invokeFactory('File',
                                    id='testpurple.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('purple')")
         self.portal.invokeFactory('File',
                                    id='testpink.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript',
+                                   format='application/javascript',
+                                   content_type='application/javascript',
                                    file="window.alert('pink')")
         self.setRoles(['Member'])
         self.tool.registerScript('testpurple.js')
@@ -895,8 +895,8 @@ class TestUnicodeAwareness(RegistryTestCase):
         self.portal.addDTMLMethod('testmethod.js', file=body)
         self.portal.invokeFactory('File',
                                    id='testfile.js',
-                                   format='application/x-javascript',
-                                   content_type='application/x-javascript;charset=utf-8',
+                                   format='application/javascript',
+                                   content_type='application/javascript; charset=utf-8',
                                    file=body)
         self.setRoles(['Member'])
         self.tool.setDebugMode(False)

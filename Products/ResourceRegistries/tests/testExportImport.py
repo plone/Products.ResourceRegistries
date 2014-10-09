@@ -18,7 +18,7 @@ class TestExportImport(RegistryTestCase):
                "Javascript registry should have been imported")
         # We depend on some other steps:
         self.assertEqual(result['steps'],
-            [u'skins', u'toolset', u'componentregistry', 'jsregistry'])
+            [u'skins', u'componentregistry', u'plone.app.registry', u'toolset', 'jsregistry'])
 
     def test_snapshot(self):
         # GenericSetup snapshot should work

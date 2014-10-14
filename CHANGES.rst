@@ -1,11 +1,18 @@
 Changelog
 =========
 
-2.2.10 (unreleased)
+2.2.11 (Unreleased)
 -------------------
 
 - Include ``insert-after`` as an attribute when exporting ResourceRegistries.
   [saily]
+
+- Skip data URIs when making URLs absolute
+  [cillianderoiste]
+
+
+2.2.10 (2014-11-05)
+-------------------
 
 
 - Properly handle redirections from login view; resources used to be erased

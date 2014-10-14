@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.11 (Unreleased)
+2.2.11 (2014-10-13)
 -------------------
 
 - Include ``insert-after`` as an attribute when exporting ResourceRegistries.

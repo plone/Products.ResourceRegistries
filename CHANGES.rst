@@ -4,7 +4,10 @@ Changelog
 3.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Comment out views from old resource registry so it does not render
+  them on Plone 5.  Meanwhile we don't remove the product.  It is
+  planned to be removed on Plone 5.1.
+  [bloodbare]
 
 
 3.0.1 (2014-10-23)

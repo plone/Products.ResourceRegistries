@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.2 (unreleased)
+3.0.2 (2015-05-04)
 ------------------
 
 - Comment out views from old resource registry so it does not render

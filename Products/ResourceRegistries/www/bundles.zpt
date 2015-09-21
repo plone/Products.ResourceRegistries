@@ -71,20 +71,21 @@ legend {
 
         <fieldset>
               <legend>Bundles for themes</legend>
-              
+
               <p>Choose which bundles are associated with which themes</p>
 
               <div tal:repeat="theme context/aq_parent/portal_skins/getSkinSelections">
                   <label tal:content="theme" />
-                  
+
                   <textarea
                     rows="5"
                     style="margin-bottom: 10px"
-                    tal:define="m python:mappings.get(theme, [])"
+                    tal:define="m python:mappings.get(theme, []);
+                                themename python: theme.replace('.', '___')"
                     tal:attributes="name string:mappings.${theme}:record:lines"
                     tal:content="python:'\n'.join(m)"
                     />
-                  
+
               </div>
 
               <p style="clear:both">&nbsp;</p>

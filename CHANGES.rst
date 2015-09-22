@@ -4,7 +4,8 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- bugfix: Handle theme names containing a `.` properly in ``manage_bundlesForm``
+  [fRiSi]
 
 
 3.0.2 (2015-05-04)
@@ -23,9 +24,6 @@ Changelog
   the ``Content-Type`` http header of JavaScript resources. Also see:
   http://stackoverflow.com/questions/9664282
   [thet]
-
-- bugfix: Handle theme names containing a `.` properly in ``manage_bundlesForm``
-  [fRiSi]
 
 - bugfix: do not convert URIs such as
   url(data:image/svg+xml;base64,PD94bWwgdmVyc2lv) to absolute urls

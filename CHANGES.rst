@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.3 (unreleased)
+3.0.3 (2015-09-22)
 ------------------
 
 - bugfix: Handle theme names containing a `.` properly in ``manage_bundlesForm``

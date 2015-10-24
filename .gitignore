@@ -1,3 +1,4 @@
 .*
+!.gitattributes
 *.py?
 Products.ResourceRegistries.egg-info/

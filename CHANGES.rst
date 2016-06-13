@@ -4,7 +4,13 @@ Changelog
 2.2.12 (unreleased)
 -------------------
 
-- Nothing changed yet.
+New:
+
+- *add item here*
+
+Fixes:
+
+- ``_setId`` was incorrectly rising ``ValueError`` making it impossible to rename an external resource.
 
 
 2.2.11 (2014-10-13)

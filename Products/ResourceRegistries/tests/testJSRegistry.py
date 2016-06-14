@@ -113,6 +113,14 @@ class TestJSScriptRenaming(RegistryTestCase):
         self.tool.registerScript('eggs')
         self.assertRaises(ValueError, self.tool.renameResource, 'spam', 'eggs')
 
+    def testRenamingExternal(self):
+        old = '//example.org/foo.js'
+        new = '//example.org/bar.js'
+        self.tool.registerScript(old)
+        self.tool.renameResource(old, new)
+        self.assertNotIn(old, self.tool.getResourceIds())
+        self.assertIn(new, self.tool.getResourceIds())
+
     def testDoubleRenaming(self):
         self.tool.registerScript('ham')
         self.tool.registerScript('spam')

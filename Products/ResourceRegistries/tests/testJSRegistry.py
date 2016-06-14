@@ -118,8 +118,8 @@ class TestJSScriptRenaming(RegistryTestCase):
         new = '//example.org/bar.js'
         self.tool.registerScript(old)
         self.tool.renameResource(old, new)
-        self.assertNotIn(old, self.tool.getResourceIds())
-        self.assertIn(new, self.tool.getResourceIds())
+        self.assertFalse(old in self.tool.getResourceIds())
+        self.assertTrue(new in self.tool.getResourceIds())
 
     def testDoubleRenaming(self):
         self.tool.registerScript('ham')

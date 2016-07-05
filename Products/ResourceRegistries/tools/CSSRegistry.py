@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
@@ -109,6 +109,7 @@ class Stylesheet(Resource):
 InitializeClass(Stylesheet)
 
 
+@implementer(ICSSRegistry)
 class CSSRegistryTool(BaseRegistryTool):
     """A Plone registry for managing the linking to css files."""
 
@@ -117,8 +118,6 @@ class CSSRegistryTool(BaseRegistryTool):
     title = 'CSS Registry'
 
     security = ClassSecurityInfo()
-
-    implements(ICSSRegistry)
 
     #
     # ZMI stuff

@@ -1,5 +1,5 @@
 import re
-from zope.interface import implements
+from zope.interface import implementer
 
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
@@ -55,6 +55,7 @@ class JavaScript(Resource):
 InitializeClass(JavaScript)
 
 
+@implementer(IJSRegistry)
 class JSRegistryTool(BaseRegistryTool):
     """A Plone registry for managing the linking to Javascript files."""
 
@@ -63,8 +64,6 @@ class JSRegistryTool(BaseRegistryTool):
     title = 'JavaScript Registry'
 
     security = ClassSecurityInfo()
-
-    implements(IJSRegistry)
 
     #
     # ZMI stuff

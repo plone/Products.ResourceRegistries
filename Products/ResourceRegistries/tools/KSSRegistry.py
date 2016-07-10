@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
@@ -43,6 +43,7 @@ class KineticStylesheet(Resource):
 InitializeClass(KineticStylesheet)
 
 
+@implementer(IKSSRegistry)
 class KSSRegistryTool(BaseRegistryTool):
     """A Plone registry for managing the linking to kss files."""
 
@@ -51,8 +52,6 @@ class KSSRegistryTool(BaseRegistryTool):
     title = 'KSS Registry'
 
     security = ClassSecurityInfo()
-
-    implements(IKSSRegistry)
 
     #
     # ZMI stuff

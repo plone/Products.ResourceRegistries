@@ -7,7 +7,7 @@ from urllib import quote_plus
 from hashlib import md5
 from time import time
 
-from zope.interface import implements, alsoProvides
+from zope.interface import implementer, alsoProvides
 from zope.component import getAdapters
 from zope.component import queryUtility
 from zope.site.hooks import getSite
@@ -71,8 +71,8 @@ def is_anonymous():
     user = getSecurityManager().getUser()
     return bool(user.getUserName() == 'Anonymous User')
 
+@implementer(IResourceProvider)
 class PersistentResourceProvider(object):
-    implements(IResourceProvider)
 
     def __init__(self, context):
         self.context = context
@@ -250,11 +250,11 @@ InitializeClass(Skin)
 
 _marker = {} # must be a dict
 
+@implementer(IResourceRegistry)
 class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     """Base class for a Plone registry managing resource files."""
 
     security = ClassSecurityInfo()
-    implements(IResourceRegistry)
 
     manage_bundlesForm = PageTemplateFile('www/bundles', config.GLOBALS)
 

@@ -10,8 +10,12 @@ New:
 
 Fixes:
 
+- ``_setId`` was incorrectly rising ``ValueError`` making it impossible to rename an external resource.
+  [hvelarde]
+
 - Use zope.interface decorator.
   [gforcada]
+
 
 3.0.3 (2015-09-22)
 ------------------

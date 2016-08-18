@@ -4,10 +4,6 @@ Changelog
 3.0.4 (unreleased)
 ------------------
 
-New:
-
-- *add item here*
-
 Fixes:
 
 - ``_setId`` was incorrectly rising ``ValueError`` making it impossible to rename an external resource.

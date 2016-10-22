@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Remove tests, since this contains only stubs
+  [tomgross]
 
 
 3.0.4 (2016-08-18)

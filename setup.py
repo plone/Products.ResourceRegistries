@@ -34,7 +34,6 @@ setup(
     extras_require=dict(
         test=[
             'zope.contentprovider',
-            'Products.PloneTestCase',
         ],
     ),
     install_requires=[

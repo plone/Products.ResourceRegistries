@@ -1030,8 +1030,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
     security.declareProtected(permissions.ManagePortal, 'getDevelMode')
     def getDevelMode(self):
         """Are we running in development mode?"""
-        import Globals
-        return bool(Globals.DevelopmentMode)
+        from App.config import getConfiguration
+        return bool(getConfiguration().debug_mode)
 
     security.declareProtected(permissions.ManagePortal, 'getDebugMode')
     def getDebugMode(self):

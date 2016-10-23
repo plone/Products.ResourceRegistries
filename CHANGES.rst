@@ -14,6 +14,9 @@ New features:
 
 Bug fixes:
 
+- Fix import from Globals that is removed in Zope4.
+  [pbauer]
+
 - Remove tests, since this contains only stubs
   [tomgross]
 

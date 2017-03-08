@@ -95,7 +95,7 @@ class Resource(Persistent):
 
     def __init__(self, id, **kwargs):
         self._data = PersistentMapping()
-        extres = id.startswith('http://') or id.startswith('https://') or id.startswith('//') 
+        extres = id.startswith('http://') or id.startswith('https://') or id.startswith('//')
         if not extres and (id.startswith('/') or id.endswith('/') or ('//' in id)):
             raise ValueError("Invalid Resource ID: %s" % id)
         self._data['id'] = id
@@ -664,7 +664,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         default_charset = 'utf-8'
 
         for id in ids:
-            # skip external resources that look like //netdna.bootstrapcdn.com/etc... 
+            # skip external resources that look like //netdna.bootstrapcdn.com/etc...
             if id[0:2] == '//':
                 continue
             try:

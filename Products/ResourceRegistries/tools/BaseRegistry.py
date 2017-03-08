@@ -795,7 +795,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         # Now restore the headers and for safety, check that we
         # have a 20x response. If not, we have a problem and
         # some browser would hang indefinitely at this point.
-        assert int(self.REQUEST.RESPONSE.getStatus()) / 100 == 2
+        if int(self.REQUEST.RESPONSE.getStatus()) / 100 != 2:
+            return
         self.REQUEST.environ['HTTP_IF_MODIFIED_SINCE'] = if_modified
         self.REQUEST.RESPONSE.headers = original_response_headers
 

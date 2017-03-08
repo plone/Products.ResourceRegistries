@@ -4,7 +4,14 @@ Changelog
 2.2.13 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Removed assertion for response status 200 for inline resources.
+  If after inlining a ``++resource++`` item the response status was not in the
+  200 range, the assertion would fail, leading to the html being returned
+  with a wrong mimetype showing raw html and an error while rendering
+  ``plone.resourceregistries``.
+  Changed it into a condition instead: only restore original headers when
+  the status is in 200.
+  [maurits]
 
 
 2.2.12 (2016-06-21)

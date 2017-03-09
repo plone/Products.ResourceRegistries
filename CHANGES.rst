@@ -4,6 +4,8 @@ Changelog
 2.2.13 (unreleased)
 -------------------
 
+Bug fixes:
+
 - Removed assertion for response status 200 for inline resources.
   If after inlining a ``++resource++`` item the response status was not in the
   200 range, the assertion would fail, leading to the html being returned

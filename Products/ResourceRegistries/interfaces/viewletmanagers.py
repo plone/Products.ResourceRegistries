@@ -1,5 +1,6 @@
 from zope.viewlet.interfaces import IViewletManager
 
+
 class IHtmlHeadScripts(IViewletManager):
     """ A viewlet manager for javascripts. """
 

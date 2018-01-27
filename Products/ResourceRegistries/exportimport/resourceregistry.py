@@ -1,9 +1,7 @@
-from zope.component import queryMultiAdapter
-
 from Products.CMFCore.utils import getToolByName
-
 from Products.GenericSetup.interfaces import IBody
 from Products.GenericSetup.utils import XMLAdapterBase
+from zope.component import queryMultiAdapter
 
 
 def importResRegistry(context, reg_id, reg_title, filename):

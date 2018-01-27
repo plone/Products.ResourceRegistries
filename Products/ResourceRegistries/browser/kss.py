@@ -1,8 +1,8 @@
 from Acquisition import aq_inner
-
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from Products.PythonScripts.standard import url_quote
+
 
 class KSSView(BrowserView):
     """ Information for kss rendering. """

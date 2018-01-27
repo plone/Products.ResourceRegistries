@@ -1,18 +1,16 @@
-import re
-from zope.interface import implementer
-
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
-
+from packer import JavascriptKeywordMapper
+from packer import JavascriptPacker
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IJSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
+from zope.interface import implementer
 
-from packer import JavascriptPacker, JavascriptKeywordMapper
+import re
 
 
 class JavaScript(Resource):

@@ -1,5 +1,6 @@
-from zope.interface import Interface
 from zope.interface import Attribute
+from zope.interface import Interface
+
 
 class ICookedFile(Interface):
     """Marker interface for file objects created on the fly for

@@ -1,7 +1,9 @@
 from Products.CMFCore.utils import ToolInit
-
-from Products.ResourceRegistries.tools import CSSRegistry, KSSRegistry, JSRegistry
 from Products.ResourceRegistries import config
+from Products.ResourceRegistries.tools import CSSRegistry
+from Products.ResourceRegistries.tools import JSRegistry
+from Products.ResourceRegistries.tools import KSSRegistry
+
 
 def initialize(context):
 

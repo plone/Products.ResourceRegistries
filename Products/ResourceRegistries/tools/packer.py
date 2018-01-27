@@ -1,12 +1,18 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from optparse import OptionParser
+from optparse import OptionValueError
 
-import sys, re, unittest, textwrap
-from optparse import OptionParser, OptionValueError
+import re
+import six
+import sys
+import textwrap
+import unittest
 
 
 class KeywordMapper:
     def __init__(self, regexp, encoder):
-        if isinstance(regexp, (str, unicode)):
+        if isinstance(regexp, six.string_types):
             self.regexp = re.compile(regexp)
         else:
             self.regexp = regexp
@@ -35,14 +41,14 @@ class KeywordMapper:
             if not keyword_count[match]:
                 protected[match] = None
 
-        ## sorted_matches = [(c,len(v),v) for v,c in keyword_count.iteritems()]
+        ## sorted_matches = [(c,len(v),v) for v,c in six.iteritems(keyword_count)]
         # the above line implements the original behaviour, the code below
         # removes keywords which have not enough weight to be encoded, in total
         # this saves some bytes, because the total length of the generated
         # codes is a bit smaller. This needs corresponding code in the
         # fast_decode javascript function of the decoder, see comment there
         sorted_matches = []
-        for value, count in keyword_count.iteritems():
+        for value, count in six.iteritems(keyword_count):
             weight = count * len(value)
             if len(value) >= weight:
                 keyword_count[value] = 0
@@ -76,7 +82,7 @@ class KeywordMapper:
         self.mapping = self.analyseKeywords(input)
 
     def getKeywords(self):
-        sorted = zip(self.mapping.itervalues(), self.mapping.iterkeys())
+        sorted = zip(six.itervalues(self.mapping), six.iterkeys(self.mapping))
         sorted.sort()
         keywords = []
         for (index, encoded), value in sorted:
@@ -97,7 +103,7 @@ class JavascriptKeywordMapper(KeywordMapper):
     def __init__(self, regexp=None, encoder=None):
         if regexp is None:
             self.regexp = re.compile(r'\w+')
-        elif isinstance(regexp, (str, unicode)):
+        elif isinstance(regexp, six.string_types):
             self.regexp = re.compile(regexp)
         else:
             self.regexp = regexp
@@ -278,7 +284,7 @@ class JavascriptPacker(Packer):
         Packer.__init__(self)
         # protect strings
         # these sometimes catch to much, but in safe mode this doesn't hurt
-        
+
         # the parts:
         # match a single quote
         # match anything but the single quote, a backslash and a newline "[^'\\\n]"
@@ -312,7 +318,7 @@ class JavascriptPacker(Packer):
                 result = match.group(1)[start:start+length] + match.group(4)
                 return result
             self.sub(r"""((\$+)([a-zA-Z\$_]+))(\d*)\b""", _dollar_replacement)
-            
+
             self.keywordSub(r"""(\b_[A-Za-z\d]\w+)""", lambda i: "_%i" % i)
 
         # strip whitespace at the beginning and end of each line
@@ -418,7 +424,7 @@ js_compression_tests = (
                 document.write(localvar);
                 return 'bar'
             }
-        """, 
+        """,
         """\
             function dummy(){var localvar=10
             document.write(localvar);return 'bar'}
@@ -437,7 +443,7 @@ js_compression_tests = (
                 document.write(localvar);
                 return 'bar'
             }
-        """, 
+        """,
         """\
             function dummy(){var localvar=10
             document.write(localvar);return 'bar'}""",
@@ -479,7 +485,7 @@ js_compression_tests = (
                 '"': 'this.emitAndReturn(new kukit.kssp.dquote(this.src))',
                 "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
                 });
-            kukit.kssp.string2.prototype.process = kukit.kssp.string.prototype.process; 
+            kukit.kssp.string2.prototype.process = kukit.kssp.string.prototype.process;
 
 
             kukit.kssp.backslashed = kukit.tk.mkParser('backslashed', {});
@@ -489,7 +495,7 @@ js_compression_tests = (
                 var length = src.text.length;
                 if (length < src.pos + 1) {
                     this.emitError('Missing character after backslash');
-                } else { 
+                } else {
                     this.result.push(new kukit.tk.Fraction(src, src.pos+1));
                     this.src.pos += 1;
                     this.finished = true;
@@ -520,7 +526,7 @@ js_compression_tests = (
                 '"': 'this.emitAndReturn(new kukit.kssp.dquote(this.src))',
                 "\\": 'new kukit.kssp.backslashed(this.src, kukit.kssp.backslash)'
                 });
-            kukit.kssp.string2.prototype.process = kukit.kssp.string.prototype.process; 
+            kukit.kssp.string2.prototype.process = kukit.kssp.string.prototype.process;
 
 
             kukit.kssp.backslashed = kukit.tk.mkParser('backslashed', {});
@@ -530,7 +536,7 @@ js_compression_tests = (
                 var length = src.text.length;
                 if (length < src.pos + 1) {
                     this.emitError('Missing character after backslash');
-                } else { 
+                } else {
                     this.result.push(new kukit.tk.Fraction(src, src.pos+1));
                     this.src.pos += 1;
                     this.finished = true;
@@ -603,7 +609,7 @@ js_compression_tests = (
         'missingSemicolon',
         """\
             var x = function() {
- 
+
             } /* missing ; here */
             next_instr;
         """,
@@ -618,7 +624,7 @@ js_compression_tests = (
         'missingSemicolon',
         """\
             var x = function() {
- 
+
             } /* missing ; here */
             next_instr;
         """,
@@ -840,24 +846,24 @@ css_safe_compression_tests = (
     (
         'newlineCompression',
         """
-        
-        
+
+
         /* this is a comment */
-        
+
         #testElement {
             property: value; /* another comment */
         }
-        
+
         /* this is a multi
            line comment */
         #testElement {
-        
+
             /* yet another comment */
             property: value;
-            
+
         }
-        
-        
+
+
         """,
         """\
             /* */
@@ -1013,24 +1019,24 @@ css_full_compression_tests = (
     (
         'newlineCompression',
         """
-        
-        
+
+
         /* this is a comment */
-        
+
         #testElement {
             property: value; /* another comment */
         }
-        
+
         /* this is a multi
            line comment */
         #testElement {
-        
+
             /* yet another comment */
             property: value;
-            
+
         }
-        
-        
+
+
         """,
         """\
             #testElement{property:value;}
@@ -1213,10 +1219,11 @@ def run():
     elif options.css:
         packer = CSSPacker(options.level)
     elif len(args):
-        print >> sys.stderr, "Autodetection of packer not implemented yet."
+        print('Autodetection of packer not implemented yet.', file=sys.stderr)
         sys.exit(1)
     else:
-        print >> sys.stderr, "You have to specify the packer for input from stdin."
+        print('You have to specify the packer for input from stdin.',
+        file=sys.stderr)
         sys.exit(1)
 
     if not len(args):
@@ -1227,7 +1234,7 @@ def run():
         mapper = JavascriptKeywordMapper()
 
     for f in args:
-        if isinstance(f, basestring):
+        if isinstance(f, six.string_types):
             f = open(f)
         s = f.read()
         f.close()
@@ -1236,7 +1243,7 @@ def run():
             mapper.analyse(result)
             result = mapper.sub(result)
             result = mapper.getDecoder(result)
-        print result
+        print(result)
 
 if __name__ == '__main__':
     run()

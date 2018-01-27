@@ -1,11 +1,13 @@
 from Products.ResourceRegistries.interfaces import IKSSRegistry
+from .resourceregistry import exportResRegistry
+from .resourceregistry import importResRegistry
+from .resourceregistry import ResourceRegistryNodeAdapter
 
-from resourceregistry import ResourceRegistryNodeAdapter, \
-     importResRegistry, exportResRegistry
 
 _FILENAME = 'kssregistry.xml'
 _REG_ID = 'portal_kss'
 _REG_TITLE = 'KSS registry'
+
 
 def importKSSRegistry(context):
     """
@@ -14,6 +16,7 @@ def importKSSRegistry(context):
     portal_kss = context.getSite().get('portal_kss')
     if portal_kss is not None:
         return importResRegistry(context, _REG_ID, _REG_TITLE, _FILENAME)
+
 
 def exportKSSRegistry(context):
     """

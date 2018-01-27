@@ -1,5 +1,6 @@
-import re
 import os.path
+import re
+
 
 URL_MATCH = re.compile(r'''(url\s*\(\s*['"]?)(?!data:)([^'")]+)(['"]?\s*\))''', re.I | re.S)
 

@@ -1,18 +1,14 @@
-from zope.interface import implementer
-
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
-
+from packer import CSSPacker
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import IKSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
-
-from packer import CSSPacker
+from zope.interface import implementer
 
 
 class KineticStylesheet(Resource):

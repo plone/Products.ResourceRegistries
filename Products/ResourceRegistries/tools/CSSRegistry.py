@@ -1,22 +1,17 @@
-from zope.interface import implementer
-
 from AccessControl import ClassSecurityInfo
-from App.class_init import InitializeClass
-
 from Acquisition import aq_parent
-
+from App.class_init import InitializeClass
+from packer import CSSPacker
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
-
 from Products.ResourceRegistries.utils import applyPrefix
+from zope.interface import implementer
 
-from packer import CSSPacker
 import logging
 
 

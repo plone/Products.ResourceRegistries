@@ -1,48 +1,49 @@
-import logging
-
-# we *have* to use StringIO here, because we can't add attributes to cStringIO
 # instances (needed in BaseRegistryTool.__getitem__).
-from StringIO import StringIO
-from urllib import quote_plus
-from hashlib import md5
-from time import time
-
-from zope.interface import implementer, alsoProvides
-from zope.component import getAdapters
-from zope.component import queryUtility
-from zope.site.hooks import getSite
-
-from plone.registry.interfaces import IRegistry
-
-from AccessControl import ClassSecurityInfo, Unauthorized
+# we *have* to use StringIO here, because we can't add attributes to cStringIO
+from AccessControl import ClassSecurityInfo
+from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager
-import Acquisition
-from Acquisition import aq_base, aq_parent, aq_inner, ExplicitAcquisitionWrapper
+from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from Acquisition import ExplicitAcquisitionWrapper
 from App.class_init import InitializeClass
 from App.Common import rfc1123_date
 from DateTime import DateTime
+from hashlib import md5
+from OFS.Cache import Cacheable
+from OFS.Image import File
+from OFS.PropertyManager import PropertyManager
+from OFS.SimpleItem import SimpleItem
 from Persistence import Persistent
 from Persistence import PersistentMapping
-from OFS.Image import File
-from OFS.SimpleItem import SimpleItem
-from OFS.PropertyManager import PropertyManager
-from OFS.Cache import Cacheable
-from ZPublisher.Iterators import IStreamIterator
-
-from Products.CMFCore.Expression import Expression
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.Expression import createExprContext
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.Expression import Expression
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import UniqueObject
 from Products.Five.browser.resource import Resource as z3_Resource
-
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-
-from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries import config
-
-from Products.ResourceRegistries.interfaces import IResourceRegistry
+from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import ICookedFile
 from Products.ResourceRegistries.interfaces import IResourceProvider
+from Products.ResourceRegistries.interfaces import IResourceRegistry
 from Products.ResourceRegistries.interfaces.settings import IResourceRegistriesSettings
+from six import StringIO
+from six.moves.urllib.parse import quote_plus
+from time import time
+from zope.component import getAdapters
+from zope.component import queryUtility
+from zope.interface import alsoProvides
+from zope.interface import implementer
+from zope.site.hooks import getSite
+from ZPublisher.Iterators import IStreamIterator
+
+import Acquisition
+import logging
+import six
+
 
 DEVEL_MODE = dict()
 
@@ -358,7 +359,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
         response.setHeader('Expires',rfc1123_date((DateTime() + duration).timeTime()))
         response.setHeader('Cache-Control', 'max-age=%d' % int(seconds))
 
-        if isinstance(output, unicode):
+        if isinstance(output, six.text_type):
             output = output.encode('utf-8')
             if 'charset=' not in contenttype:
                 contenttype += ';charset=utf-8'
@@ -551,7 +552,7 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
 
                         # Add the original id under concatenated resources or
                         # create a new one starting with the previous item
-                        if concatenatedResources.has_key(prev_id):
+                        if prev_id in concatenatedResources:
                             concatenatedResources[prev_id].append(res_id)
                         else:
                             magic_id = self.generateId(resource, previtem)
@@ -715,26 +716,26 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                                 method = getattr(obj, 'GET').__name__
                     method = method in ('HEAD','POST') and 'GET' or method
                     content = getattr(obj, method)()
-                    if not isinstance(content, unicode):
+                    if not isinstance(content, six.text_type):
                         contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
                         contenttype = getCharsetFromContentType(contenttype, default_charset)
-                        content = unicode(content, contenttype)
+                        content = six.text_type(content, contenttype)
                     self._restoreCachingHeaders(original_headers, if_modified)
                 elif hasattr(aq_base(obj),'meta_type') and  obj.meta_type in ['DTML Method', 'Filesystem DTML Method']:
                     content = obj(client=self.aq_parent, REQUEST=self.REQUEST,
                                   RESPONSE=self.REQUEST.RESPONSE)
                     contenttype = self.REQUEST.RESPONSE.headers.get('content-type', '')
                     contenttype = getCharsetFromContentType(contenttype, default_charset)
-                    content = unicode(content, contenttype)
+                    content = six.text_type(content, contenttype)
                 elif hasattr(aq_base(obj),'meta_type') and obj.meta_type == 'Filesystem File':
                     obj._updateFromFS()
                     content = obj._readFile(0)
                     contenttype = getCharsetFromContentType(obj.content_type, default_charset)
-                    content = unicode(content, contenttype)
+                    content = six.text_type(content, contenttype)
                 elif hasattr(aq_base(obj),'meta_type') and obj.meta_type in ('ATFile', 'ATBlob'):
                     f = obj.getFile()
                     contenttype = getCharsetFromContentType(f.getContentType(), default_charset)
-                    content = unicode(str(f), contenttype)
+                    content = six.text_type(str(f), contenttype)
                 # We should add more explicit type-matching checks
                 elif hasattr(aq_base(obj), 'index_html') and callable(obj.index_html):
                     original_headers, if_modified = self._removeCachingHeaders()
@@ -748,8 +749,8 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     finally:
                         self.REQUEST.RESPONSE.write = response_write
                     content = tmp.getvalue() or content
-                    if not isinstance(content, unicode):
-                        content = unicode(content, default_charset)
+                    if not isinstance(content, six.text_type):
+                        content = six.text_type(content, default_charset)
                     self._restoreCachingHeaders(original_headers, if_modified)
                 elif callable(obj):
                     try:
@@ -761,11 +762,11 @@ class BaseRegistryTool(UniqueObject, SimpleItem, PropertyManager, Cacheable):
                     if IStreamIterator.providedBy(content):
                         content = content.read()
 
-                    if not isinstance(content, unicode):
-                        content = unicode(content, default_charset)
+                    if not isinstance(content, six.text_type):
+                        content = six.text_type(content, default_charset)
                 else:
                     content = str(obj)
-                    content = unicode(content, default_charset)
+                    content = six.text_type(content, default_charset)
 
             # Add start/end notes to the resource for better
             # understanding and debugging

@@ -1,8 +1,7 @@
+from .packer import CSSPacker
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_parent
 from App.class_init import InitializeClass
-from packer import CSSPacker
-from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
@@ -194,7 +193,7 @@ class CSSRegistryTool(BaseRegistryTool):
     security.declarePrivate('finalizeContent')
     def finalizeContent(self, resource, content):
         """Finalize the resource content."""
-        
+
         compression = resource.getCompression()
         if compression != 'none' and not self.getDebugMode():
             orig_url = "%s/%s?original=1" % (self.absolute_url(), resource.getId())
@@ -204,19 +203,19 @@ class CSSRegistryTool(BaseRegistryTool):
         m = resource.getMedia()
         if m:
             content = '@media %s {\n%s\n}\n' % (m, content)
-        
+
         if resource.getApplyPrefix() and not self.getDebugMode():
             prefix = aq_parent(self).absolute_url_path()
             if prefix.endswith('/'):
                 prefix = prefix[:-1]
-            
+
             resourceName = resource.getId()
-            
+
             if '/' in resourceName:
                 prefix += '/' + '/'.join(resourceName.split('/')[:-1])
-            
+
             content = applyPrefix(content, prefix)
-        
+
         return content
 
     #
@@ -294,10 +293,10 @@ class CSSRegistryTool(BaseRegistryTool):
                            authenticated=False, skipCooking=False,
                            applyPrefix=False, bundle='default'):
         """Register a stylesheet."""
-        
+
         if not id:
             raise ValueError("id is required")
-        
+
         stylesheet = self.resource_class(
                                 id,
                                 expression=expression,
@@ -320,7 +319,7 @@ class CSSRegistryTool(BaseRegistryTool):
         stylesheet = self.getResourcesDict().get(id, None)
         if stylesheet is None:
             raise ValueError('Invalid resource id %s' % (id))
-        
+
         if data.get('expression', None) is not None:
             stylesheet.setExpression(data['expression'])
         if data.get('authenticated', None) is not None:
@@ -357,7 +356,7 @@ class CSSRegistryTool(BaseRegistryTool):
     def getCompressionOptions(self):
         """Compression methods for use in ZMI forms."""
         return config.CSS_COMPRESSION_METHODS
-    
+
     security.declareProtected(permissions.ManagePortal, 'getExternalRenderingOptions')
     def getExternalRenderingOptions(self):
         """Rendering methods for use in ZMI forms."""

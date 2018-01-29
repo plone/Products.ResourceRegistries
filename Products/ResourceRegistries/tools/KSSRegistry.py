@@ -1,7 +1,6 @@
+from .packer import CSSPacker
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
-from packer import CSSPacker
-from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
@@ -190,7 +189,7 @@ class KSSRegistryTool(BaseRegistryTool):
         kineticstylesheet = self.getResourcesDict().get(id, None)
         if kineticstylesheet is None:
             raise ValueError('Invalid resource id %s' % (id))
-        
+
         if data.get('expression', None) is not None:
             kineticstylesheet.setExpression(data['expression'])
         if data.get('authenticated', None) is not None:
@@ -212,12 +211,12 @@ class KSSRegistryTool(BaseRegistryTool):
     def getCompressionOptions(self):
         """Compression methods for use in ZMI forms."""
         return config.KSS_COMPRESSION_METHODS
-    
+
     security.declareProtected(permissions.ManagePortal, 'getExternalCompressionOptions')
     def getExternalCompressionOptions(self):
         """Compression methods for use in ZMI forms."""
         return config.KSS_EXTERNAL_COMPRESSION_METHODS
-    
+
     security.declareProtected(permissions.View, 'getContentType')
     def getContentType(self):
         """Return the registry content type."""

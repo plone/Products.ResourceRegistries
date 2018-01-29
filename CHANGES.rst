@@ -14,6 +14,9 @@ New features:
 
 Bug fixes:
 
+- Fix relative import for py3
+  [pbauer]
+
 - Add Python 2 / 3 compatibility.  [maurits]
 
 

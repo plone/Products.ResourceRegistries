@@ -1,4 +1,4 @@
-from .packer import CSSPacker
+# -*- coding: utf-8 -*-
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_parent
 from App.class_init import InitializeClass
@@ -8,6 +8,7 @@ from Products.ResourceRegistries import permissions
 from Products.ResourceRegistries.interfaces import ICSSRegistry
 from Products.ResourceRegistries.tools.BaseRegistry import BaseRegistryTool
 from Products.ResourceRegistries.tools.BaseRegistry import Resource
+from Products.ResourceRegistries.tools.packer import CSSPacker
 from Products.ResourceRegistries.utils import applyPrefix
 from zope.interface import implementer
 

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.6 (unreleased)
+3.0.7 (unreleased)
 ------------------
 
 Breaking changes:
@@ -16,6 +16,12 @@ Bug fixes:
 
 - Fix relative import for py3
   [pbauer]
+
+
+3.0.6 (2018-02-05)
+------------------
+
+Bug fixes:
 
 - Add Python 2 / 3 compatibility.  [maurits]
 

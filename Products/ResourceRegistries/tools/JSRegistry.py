@@ -1,7 +1,7 @@
+from .packer import JavascriptKeywordMapper
+from .packer import JavascriptPacker
 from AccessControl import ClassSecurityInfo
 from App.class_init import InitializeClass
-from packer import JavascriptKeywordMapper
-from packer import JavascriptPacker
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.ResourceRegistries import config
 from Products.ResourceRegistries import permissions
@@ -240,7 +240,7 @@ class JSRegistryTool(BaseRegistryTool):
     def getCompressionOptions(self):
         """Compression methods for use in ZMI forms."""
         return config.JS_COMPRESSION_METHODS
-    
+
     security.declareProtected(permissions.ManagePortal, 'getExternalCompressionOptions')
     def getExternalCompressionOptions(self):
         """Compression methods for use in ZMI forms."""

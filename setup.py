@@ -25,7 +25,7 @@ setup(
     keywords='CSS Javascript Zope Packer',
     author='Plone Foundation',
     author_email='plone-developers@lists.sourceforge.net',
-    url='https://pypi.python.org/pypi/Products.ResourceRegistries',
+    url='https://pypi.org/project/Products.ResourceRegistries',
     license='GPL version 2',
     packages=find_packages(exclude=['ez_setup']),
     namespace_packages=['Products'],

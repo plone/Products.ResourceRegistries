@@ -9,6 +9,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.8 (2020-08-17)
+------------------
+
+Bug fixes:
+
+
+- Fixed imports on Plone 5.
+  [1letter] (#27)
+
 
 3.0.7 (2018-04-08)
 ------------------
